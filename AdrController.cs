@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using ColossalFramework;
 using ColossalFramework.UI;
+using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
 using Klyte.TransportLinesManager.Extensors;
@@ -17,7 +20,57 @@ namespace Klyte.Addresses
         internal static UITextureAtlas taAdr;
         private UIView uiView;
         private UIButton openAdrPanelButton;
-        private UIPanel buildingInfoParent;
+
+        private static Dictionary<String, String[]> m_loadedLocalesRoadName;
+        private static Dictionary<String, RoadPrefixFileIndexer> m_loadedLocalesRoadPrefix;
+
+        public static Dictionary<String, String[]> loadedLocalesRoadName
+        {
+            get {
+                if (m_loadedLocalesRoadName == null)
+                {
+                    m_loadedLocalesRoadName = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.roadPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.roadPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        fileContents.Replace(Environment.NewLine, "\n");
+                        m_loadedLocalesRoadName[filename] = fileContents.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED NAMES ({0}) QTT: {1}", filename, m_loadedLocalesRoadName[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesRoadName;
+            }
+        }
+
+        public static Dictionary<String, RoadPrefixFileIndexer> loadedLocalesRoadPrefix
+        {
+            get {
+                if (m_loadedLocalesRoadPrefix == null)
+                {
+                    m_loadedLocalesRoadPrefix = new Dictionary<string, RoadPrefixFileIndexer>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.roadPrefixPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.roadPrefixPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        fileContents.Replace(Environment.NewLine, "\n");
+                        m_loadedLocalesRoadPrefix[filename] = RoadPrefixFileIndexer.Parse(fileContents.Split('\n').Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).ToArray());
+                        AdrUtils.doLog("LOADED PREFIX NAMES ({0}) QTT: {1}", filename, m_loadedLocalesRoadPrefix[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesRoadPrefix;
+            }
+        }
+
+        public static void reloadLocalesRoad()
+        {
+            m_loadedLocalesRoadName = null;
+        }
+
+        public static void reloadLocalesRoadPrefix()
+        {
+            m_loadedLocalesRoadPrefix = null;
+        }
 
         public void destroy()
         {

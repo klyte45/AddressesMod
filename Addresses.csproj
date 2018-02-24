@@ -33,8 +33,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Addresses.cs" />
+    <Compile Include="LocaleStruct\RoadPrefixFileIndexer.cs" />
     <Compile Include="MainWindow\AdrConfigPanel.cs" />
-    <Compile Include="Overrides\RoadBaseAIOverrides.cs" />
+    <Compile Include="Overrides\NetManagerOverrides.cs" />
     <Compile Include="AdrController.cs" />
     <Compile Include="AdrConfigWarehouse.cs" />
     <Compile Include="UI\i18n\AdrLocaleLoader.cs" />
@@ -64,6 +65,7 @@
     <Reference Include="Mono.Security">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Mono.Security.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -115,6 +117,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TLMVersion.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DefaultFiles\--baseFilePrefix--.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

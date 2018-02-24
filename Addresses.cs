@@ -31,9 +31,10 @@ namespace Klyte.Addresses
     {
         public const string FOLDER_NAME = "Klyte_Addresses";
         public const string ROAD_SUBFOLDER_NAME = "Roads";
+        public const string ROADPREFIX_SUBFOLDER_NAME = "RoadsPrefix";
+        public const string ROADPREFIX_DEFAULT_FILE_NAME = "--baseFilePrefix--.txt";
         public const string CONFIG_FILENAME = "Addresses0";
         public const string ROAD_LOCALE_FIXED_IDENTIFIER = "ROAD_NAME";
-        public static string[] roadLocale { get; private set; }
         public static string minorVersion => majorVersion + "." + typeof(AddressesMod).Assembly.GetName().Version.Build;
         public static string majorVersion => typeof(AddressesMod).Assembly.GetName().Version.Major + "." + typeof(AddressesMod).Assembly.GetName().Version.Minor;
         public static string fullVersion => minorVersion + " r" + typeof(AddressesMod).Assembly.GetName().Version.Revision;
@@ -58,7 +59,6 @@ namespace Klyte.Addresses
 
         public static AddressesMod instance;
 
-        private UIDropDown selectedRoadNamingFile;
         private SavedBool m_debugMode;
         private SavedString m_selectedRoadFile;
         public bool needShowPopup;
@@ -97,7 +97,9 @@ namespace Klyte.Addresses
 
         public string Description => "TLMR's Extension which allow road name generation customization. Requires TLMR's subscribed (active is optional).";
 
-        public string roadPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
+        public static string roadPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
+        public static string roadPrefixPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROADPREFIX_SUBFOLDER_NAME;
+        public static string roadPrefixExampleFile => roadPrefixPath + Path.DirectorySeparatorChar + ROADPREFIX_DEFAULT_FILE_NAME;
 
         public void OnCreated(ILoading loading)
         {
@@ -146,8 +148,13 @@ namespace Klyte.Addresses
         {
             FileInfo fi = AdrUtils.EnsureFolderCreation(FOLDER_NAME);
             FileInfo fiRoad = AdrUtils.EnsureFolderCreation(roadPath);
+            FileInfo fiRoadPrefix = AdrUtils.EnsureFolderCreation(roadPrefixPath);
+            if (!AdrUtils.IsFileCreated(roadPrefixExampleFile))
+            {
+                File.WriteAllText(roadPrefixExampleFile, ResourceLoader.loadResourceString("DefaultFiles.--baseFilePrefix--.txt"));
+            }
+
             UIHelperExtension helper = new UIHelperExtension((UIHelper)helperDefault);
-            roadLocale = new string[0];
 
             void ev()
             {
@@ -163,15 +170,12 @@ namespace Klyte.Addresses
                         showVersionInfoPopup();
                     }
                 };
-                UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("ADR_NAMING_FILE_SELECTION"));
-                selectedRoadNamingFile = (UIDropDown)group7.AddDropdown(Locale.Get("ADR_ROAD_NAME_FILE"), new string[0], -1, onChangeSelectedRoadName);
-                group7.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), reloadOptionsRoad);
-                reloadOptionsRoad();
-                selectedRoadNamingFile.selectedValue = m_selectedRoadFile.value;
 
                 UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("ADR_GENERAL_INFO"));
                 group8.AddLabel(Locale.Get("ADR_ROAD_NAME_FILES_PATH_TITLE") + ":");
                 group8.AddLabel(fiRoad.FullName + Path.DirectorySeparatorChar).textColor = Color.yellow;
+                group8.AddLabel(Locale.Get("ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE") + ":");
+                group8.AddLabel(fiRoadPrefix.FullName + Path.DirectorySeparatorChar).textColor = Color.yellow;
 
                 UIHelperExtension group9 = helper.AddGroupExtended(Locale.Get("ADR_BETAS_EXTRA_INFO"));
                 group9.AddDropdownLocalized("ADR_MOD_LANG", AdrLocaleUtils.getLanguageIndex(), currentLanguageId.value, delegate (int idx)
@@ -201,27 +205,7 @@ namespace Klyte.Addresses
             }
         }
 
-        private void onChangeSelectedRoadName(int idx)
-        {
-            if (idx >= 0 && idx < selectedRoadNamingFile.items.Length)
-            {
-                string filename = selectedRoadNamingFile.items[idx];
-                m_selectedRoadFile.value = filename;
-                string fileContents = File.ReadAllText(roadPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                fileContents.Replace(Environment.NewLine, "\n");
-                roadLocale = fileContents.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED NAMES QTT: {0}", roadLocale.Length);
-                for (ushort i = 1; i < NetManager.instance.m_segments.m_buffer.Length; i++)
-                {
-                    NetManager.instance.UpdateSegment(i);
-                }
-            }
-        }
 
-        private void reloadOptionsRoad()
-        {
-            selectedRoadNamingFile.items = Directory.GetFiles(roadPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()).ToArray();
-        }
 
         public bool showVersionInfoPopup(bool force = false)
         {
@@ -313,7 +297,6 @@ namespace Klyte.Addresses
                     "AddressesIcon","AddressesIconSmall","ToolbarIconGroup6Hovered","ToolbarIconGroup6Focused","HelicopterIndicator","RemoveUnwantedIcon","24hLineIcon", "PerHourIcon"
                 });
             }
-            loadAdrLocale(false);
 
             AdrController.instance.Awake();
 

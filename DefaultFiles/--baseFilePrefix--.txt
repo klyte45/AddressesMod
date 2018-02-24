@@ -1,0 +1,51 @@
+﻿# ==================================================================================
+# Syntax for prefix categorizing
+# ==================================================================================
+# w = One way only
+# W = Two way only
+# <none> = any
+# ----------------------------------------------------------------------------------
+# s = Symmetric road
+# S = Asymmtric road
+# <none> = any
+# ----------------------------------------------------------------------------------
+# h = Highway road
+# H = Not highway road
+# <none> = any
+# ^Ignored for Dams!^
+# ----------------------------------------------------------------------------------
+# G = Ground road
+# B = Bridges/Elevated road
+# T = Tunnel road
+# D = Dam road
+# <none> = any
+# ^You can mix the road types on the descriptor key^
+# ----------------------------------------------------------------------------------
+# (X,Y) = Min (X, inclusive) and Max (Y, exclusive) lanes (0-255)
+# [X,Y] = Min (X, inclusive) and Max (Y, exclusive) roadWidth (0-999)
+# ^Omit the X or Y to use the default values. Ranges are integer^
+# ----------------------------------------------------------------------------------
+# The expression must be succeded by a "=" (equals sign) character. In the right side of "=" will be the prefix text. There are arguments to use for replacing:
+# {0} = Use this to be a placeholder for the generated road name (Example: "Street {0}" or "{0} Road")
+#
+# (Other arguments can be added later)
+# ==================================================================================
+# Examples:
+#
+# w[,128]=This is a road prefix for a one-way road with width until 128m (exclusive)
+# S(3,5)[16,48]=This is a road prefix for an Asymmetric Road with 3 or 4 lanes (5 in range is exclusive) and with width between 16m (inclusive) and 48m (exclusive)
+# =This is a prefix for any road
+# ==================================================================================
+# Edit this file from here. "#" as first character in the line mark that line as a comment and them will not be read by compiler.
+# Repeat lines for getting a higher weight for that prefix at name drawal
+
+BH={0} Bridge
+Bh(2,)={0} Bridge
+TH=Tunnel {0}
+Th(2,)=Tunnel {0}
+D={0} Dam
+GH[,20]={0} Street
+GH[20,]={0} Avenue
+GhW(2,)={0} Highway
+Ghw(2,3)={0} Way
+Ghw(3,)={0} Road

@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using Klyte.Addresses.Utils;
+using System.IO;
 
 namespace Klyte.Addresses.UI
 {
@@ -34,6 +35,12 @@ namespace Klyte.Addresses.UI
         private UIDropDown m_selectDistrict;
         private Dictionary<string, int> m_cachedDistricts;
         private string m_lastSelectedItem;
+        private UIDropDown m_districtNameFile;
+        private UIDropDown m_prefixesFile;
+
+        private UIHelperExtension m_uiHelperDistrict;
+        private UIHelperExtension m_uiHelperHighway;
+        private UIHelperExtension m_uiHelperGlobal;
 
         public static AdrConfigPanel Get()
         {
@@ -55,7 +62,7 @@ namespace Klyte.Addresses.UI
             controlContainer.isVisible = false;
             controlContainer.name = "AdrPanel";
 
-            AdrUtils.createUIElement(out mainPanel, controlContainer.transform, "AdrListPanel", new Vector4(395, 58, 400, 400));
+            AdrUtils.createUIElement(out mainPanel, controlContainer.transform, "AdrListPanel", new Vector4(395, 58, 400, 600));
             mainPanel.backgroundSprite = "MenuPanel2";
             CreateTitleBar();
 
@@ -64,17 +71,120 @@ namespace Klyte.Addresses.UI
             AdrUtils.createUIElement(out UITabContainer tabContainer, mainPanel.transform, "AdrTabContainer", new Vector4(0, 80, mainPanel.width, mainPanel.height - 80));
             m_StripMain.tabPages = tabContainer;
 
-            UIHelperExtension uiHelperDistrict = CreateTab("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
-            CreateTab("SubBarRoadsHighway", "ADR_CONFIG_HIGHWAY_TAB", "AdrHighway");
-            CreateTab("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
-
-            m_cachedDistricts = AdrUtils.getValidDistricts();
-            m_selectDistrict = uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
-            uiHelperDistrict.AddSpace(30);
+            m_uiHelperDistrict = CreateTab("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
+            m_uiHelperHighway = CreateTab("SubBarRoadsHighway", "ADR_CONFIG_HIGHWAY_TAB", "AdrHighway");
+            //m_uiHelperGlobal = CreateTab("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
+            PopulateTab1();
+            //PopulateTab3();
 
             DistrictManagerOverrides.eventOnDistrictRenamed += reloadDistricts;
+            reloadDistricts();
+        }
 
-            m_StripMain.selectedIndex = 0;
+        private void PopulateTab1()
+        {
+            ((UIScrollablePanel)m_uiHelperDistrict.self).autoLayoutDirection = LayoutDirection.Horizontal;
+            ((UIScrollablePanel)m_uiHelperDistrict.self).wrapLayout = true;
+
+            m_cachedDistricts = AdrUtils.getValidDistricts();
+            m_selectDistrict = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
+            m_uiHelperDistrict.AddSpace(30);
+
+            m_districtNameFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_NAME_FILE", new String[0], -1, onChangeSelectedRoadName);
+            AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), reloadOptionsRoad), 380);
+
+            m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_STREETS_PREFIXES_NAME_FILE", new String[0], -1, onChangeSelectedRoadPrefix);
+            AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_STREETS_PREFIXES_FILES_RELOAD"), reloadOptionsRoadPrefix), 380);
+        }
+
+        private void PopulateTab3()
+        {
+            ((UIScrollablePanel)m_uiHelperGlobal.self).autoLayoutDirection = LayoutDirection.Horizontal;
+            ((UIScrollablePanel)m_uiHelperGlobal.self).wrapLayout = true;
+        }
+
+        private void reloadOptionsRoad()
+        {
+            if (getSelectedConfigIndex() < 0) return;
+            AdrController.reloadLocalesRoad();
+            AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
+            List<string> items = AdrController.loadedLocalesRoadName.Keys.ToList();
+            items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME" : "ADR_DEFAULT_CITY_FILE_NAME"));
+            m_districtNameFile.items = items.ToArray();
+            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME | currentSelectedDistrict);
+            if (items.Contains(filename))
+            {
+                m_districtNameFile.selectedValue = filename;
+            }
+            else
+            {
+                m_districtNameFile.selectedIndex = 0;
+            }
+        }
+
+        private void reloadOptionsRoadPrefix()
+        {
+            if (getSelectedConfigIndex() < 0) return;
+            AdrController.reloadLocalesRoadPrefix();
+            List<string> items = AdrController.loadedLocalesRoadPrefix.Keys.ToList();
+            AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
+            items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME_PREFIX" : "ADR_DEFAULT_CITY_FILE_NAME_PREFIX"));
+            m_prefixesFile.items = items.ToArray();
+            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME | currentSelectedDistrict);
+            if (items.Contains(filename))
+            {
+                m_prefixesFile.selectedValue = filename;
+            }
+            else
+            {
+                m_prefixesFile.selectedIndex = 0;
+            }
+        }
+
+
+        private void onChangeSelectedRoadPrefix(int idx)
+        {
+            setDistrictProperty(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME, idx > 0 ? m_prefixesFile.selectedValue : null);
+        }
+
+        private void onChangeSelectedRoadName(int idx)
+        {
+            setDistrictProperty(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME, idx > 0 ? m_districtNameFile.selectedValue : null);
+        }
+
+        private void setDistrictProperty(AdrConfigWarehouse.ConfigIndex configIndex, string value)
+        {
+            AdrConfigWarehouse.ConfigIndex selectedDistrict;
+            if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
+            {
+                selectedDistrict = (AdrConfigWarehouse.ConfigIndex)(m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
+            }
+            else if (m_selectDistrict.selectedIndex == 0)
+            {
+                selectedDistrict = 0;
+            }
+            else
+            {
+                return;
+            }
+            AdrConfigWarehouse.setCurrentConfigString(configIndex | selectedDistrict, value);
+            AdrUtils.UpdateSegmentNamesView();
+        }
+
+        private int getSelectedConfigIndex()
+        {
+            if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
+            {
+                return (m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
+            }
+            else if (m_selectDistrict.selectedIndex == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         private UIHelperExtension CreateTab(string sprite, string localeKey, string objectName)
@@ -111,7 +221,8 @@ namespace Klyte.Addresses.UI
                 }
             }
             //load district info
-
+            reloadOptionsRoadPrefix();
+            reloadOptionsRoad();
         }
 
 
@@ -120,6 +231,7 @@ namespace Klyte.Addresses.UI
             m_cachedDistricts = AdrUtils.getValidDistricts();
             m_selectDistrict.items = m_cachedDistricts.Keys.OrderBy(x => x).ToArray();
             m_selectDistrict.selectedValue = m_lastSelectedItem;
+            AdrUtils.UpdateSegmentNamesView();
         }
 
         public int getCurrentSelectedDistrictId()
@@ -183,11 +295,13 @@ namespace Klyte.Addresses.UI
 
         public void SetActiveTab(int idx)
         {
-            this.m_StripMain.selectedIndex = idx;
+            m_StripMain.selectedIndex = idx;
         }
 
-        private void Update()
+        private void Start()
         {
+            SetActiveTab(-1);
+            SetActiveTab(0);
         }
     }
 
