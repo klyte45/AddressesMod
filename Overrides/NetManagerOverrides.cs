@@ -42,7 +42,7 @@ namespace Klyte.Addresses.Overrides
                     var currentPrefixFile = AdrController.loadedLocalesRoadPrefix[filenamePrefix];
                     format = currentPrefixFile.getPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer);
                 }
-                AdrUtils.doLog("selectedPrefix = {0}", format);
+                //AdrUtils.doLog("selectedPrefix = {0}", format);
                 if (format == null)
                 {
                     string key = DefaultPrefix(info, ai);
@@ -81,7 +81,7 @@ namespace Klyte.Addresses.Overrides
             {
                 arg = roadBaseAiGenerateName.Invoke(ai, new object[] { randomizer })?.ToString();
             }
-            __result = StringUtils.SafeFormat(format, arg);
+            __result = StringUtils.SafeFormat(format, arg);// + $" ({segmentID})";
             return false;
         }
 
@@ -149,14 +149,14 @@ namespace Klyte.Addresses.Overrides
         #endregion
 
         #region Hooking
-
+        public static readonly MethodInfo GenerateSegmentNameMethod = typeof(NetManager).GetMethod("GenerateSegmentName", allFlags);
         public override void Awake()
         {
             AdrUtils.doLog("Loading NetManager Overrides");
             #region RoadBaseAI Hooks
             MethodInfo preRename = typeof(NetManagerOverrides).GetMethod("GenerateSegmentName", allFlags);
 
-            AddRedirect(typeof(NetManager).GetMethod("GenerateSegmentName", allFlags), preRename);
+            AddRedirect(GenerateSegmentNameMethod, preRename);
             #endregion
         }
         #endregion

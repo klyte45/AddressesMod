@@ -1,4 +1,5 @@
 ﻿using ColossalFramework;
+using ColossalFramework.Math;
 using Klyte.TransportLinesManager.Utils;
 using System;
 using System.Collections.Generic;
@@ -101,7 +102,6 @@ namespace Klyte.Addresses.Utils
 
         private static List<ushort> calculatePathNet(ushort segmentID, bool startSegment)
         {
-            Dictionary<ushort, int> nodeHistory = new Dictionary<ushort, int>();
             List<ushort> result = new List<ushort>();
             ushort edgeNode;
             if (startSegment)
@@ -112,31 +112,36 @@ namespace Klyte.Addresses.Utils
             {
                 edgeNode = NetManager.instance.m_segments.m_buffer[segmentID].m_endNode;
             }
-            calculatePathNet(segmentID, segmentID, edgeNode, startSegment, ref nodeHistory, ref result);
+            calculatePathNet(segmentID, segmentID, edgeNode, startSegment, ref result);
             return result;
         }
 
 
-        private static void calculatePathNet(ushort firstSegmentID, ushort segmentID, ushort nodeCurr, bool insertOnEnd, ref Dictionary<ushort, int> nodeHistory, ref List<ushort> segmentOrder)
+        private static void calculatePathNet(ushort firstSegmentID, ushort segmentID, ushort nodeCurr, bool insertOnEnd, ref List<ushort> segmentOrder)
         {
             ushort otherEdgeNode = 0;
-            while (nodeHistory[nodeCurr] < 8)
+            List<ushort> possibilities = new List<ushort>();
+            for (int i = 0; i < 8; i++)
             {
-                ushort segment = NetManager.instance.m_nodes.m_buffer[nodeCurr].GetSegment(nodeHistory[nodeCurr]++);
-                if (segment != 0 && firstSegmentID != segment && segment != segmentID && NetManager.instance.IsSameName(segmentID, segment))
+                ushort segment = NetManager.instance.m_nodes.m_buffer[nodeCurr].GetSegment(i);
+                if (segment != 0 && firstSegmentID != segment && segment != segmentID && !segmentOrder.Contains(segment) && NetManager.instance.IsSameName(segmentID, segment))
                 {
-                    otherEdgeNode = NetManager.instance.m_segments.m_buffer[segment].GetOtherNode(nodeCurr);
-                    if (insertOnEnd || segmentOrder.Count == 0)
-                    {
-                        segmentOrder.Add(segment);
-                    }
-                    else
-                    {
-                        segmentOrder.Insert(0, segment);
-                    }
-                    calculatePathNet(firstSegmentID, segment, otherEdgeNode, insertOnEnd, ref nodeHistory, ref segmentOrder);
-                    break;
+                    possibilities.Add(segment);
                 }
+            }
+            if (possibilities.Count > 0)
+            {
+                ushort segment = possibilities.Min();
+                otherEdgeNode = NetManager.instance.m_segments.m_buffer[segment].GetOtherNode(nodeCurr);
+                if (insertOnEnd || segmentOrder.Count == 0)
+                {
+                    segmentOrder.Add(segment);
+                }
+                else
+                {
+                    segmentOrder.Insert(0, segment);
+                }
+                calculatePathNet(firstSegmentID, segment, otherEdgeNode, insertOnEnd, ref segmentOrder);
             }
         }
 
@@ -146,16 +151,71 @@ namespace Klyte.Addresses.Utils
             var flags = NetManager.instance.m_segments.m_buffer[segmentID].m_flags;
             if (segmentID != 0 && flags != NetSegment.Flags.None)
             {
-                List<ushort> path = calculatePathNet(segmentID, true);
+                List<ushort> path = calculatePathNet(segmentID, false);
                 path.Add(segmentID);
-                path.AddRange(calculatePathNet(segmentID, false));
-                if (path.Last() < path.First())
+                path.AddRange(calculatePathNet(segmentID, true));
+
+
+                ushort minSegId = path.Min();
+                if (minSegId != segmentID)
                 {
-                    path.Reverse();
+                    return getNodeOrderRoad(minSegId);
                 }
-                return path;
+                else
+                {
+                    if (path.Last() < path.First())
+                    {
+                        path.Reverse();
+                    }
+                    return path;
+                }
             }
             return null;
+        }
+
+        public static void GetClosestPositionAndDirectionAndPoint(NetSegment s, Vector3 point, out Vector3 pos, out Vector3 dir, out float length)
+        {
+            Bezier3 curve = default(Bezier3);
+            curve.a = Singleton<NetManager>.instance.m_nodes.m_buffer[(int)s.m_startNode].m_position;
+            curve.d = Singleton<NetManager>.instance.m_nodes.m_buffer[(int)s.m_endNode].m_position;
+            bool smoothStart = (Singleton<NetManager>.instance.m_nodes.m_buffer[(int)s.m_startNode].m_flags & NetNode.Flags.Middle) != NetNode.Flags.None;
+            bool smoothEnd = (Singleton<NetManager>.instance.m_nodes.m_buffer[(int)s.m_endNode].m_flags & NetNode.Flags.Middle) != NetNode.Flags.None;
+            NetSegment.CalculateMiddlePoints(curve.a, s.m_startDirection, curve.d, s.m_endDirection, smoothStart, smoothEnd, out curve.b, out curve.c);
+            float closestDistance = 1E+11f;
+            float pointPerc = 0f;
+            Vector3 targetA = curve.a;
+            for (int i = 1; i <= 16; i++)
+            {
+                Vector3 vector = curve.Position((float)i / 16f);
+                float dist = Segment3.DistanceSqr(targetA, vector, point, out float distSign);
+                if (dist < closestDistance)
+                {
+                    closestDistance = dist;
+                    pointPerc = ((float)i - 1f + distSign) / 16f;
+                }
+                targetA = vector;
+            }
+            float precision = 0.03125f;
+            for (int j = 0; j < 4; j++)
+            {
+                Vector3 a2 = curve.Position(Mathf.Max(0f, pointPerc - precision));
+                Vector3 vector2 = curve.Position(pointPerc);
+                Vector3 b = curve.Position(Mathf.Min(1f, pointPerc + precision));
+                float num6 = Segment3.DistanceSqr(a2, vector2, point, out float num7);
+                float num8 = Segment3.DistanceSqr(vector2, b, point, out float num9);
+                if (num6 < num8)
+                {
+                    pointPerc = Mathf.Max(0f, pointPerc - precision * (1f - num7));
+                }
+                else
+                {
+                    pointPerc = Mathf.Min(1f, pointPerc + precision * num9);
+                }
+                precision *= 0.5f;
+            }
+            pos = curve.Position(pointPerc);
+            dir = VectorUtils.NormalizeXZ(curve.Tangent(pointPerc));
+            length = pointPerc;
         }
         #endregion
     }

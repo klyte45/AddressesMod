@@ -107,7 +107,6 @@ namespace Klyte.Addresses
 
         public AddressesMod()
         {
-
             Debug.LogWarningFormat("Adrv" + majorVersion + " LOADING SVM ");
             SettingsFile svmSettings = new SettingsFile
             {
@@ -143,6 +142,7 @@ namespace Klyte.Addresses
             LocaleManager.eventLocaleChanged += new LocaleManager.LocaleChangedHandler(autoLoadSVMLocale);
             if (instance != null) { Destroy(instance); }
             instance = this;
+            loadAdrLocale(false);
         }
         public void OnSettingsUI(UIHelperBase helperDefault)
         {
@@ -263,7 +263,7 @@ namespace Klyte.Addresses
         }
         public void loadAdrLocale(bool force)
         {
-            if (SingletonLite<LocaleManager>.exists && IsTLMLoaded())
+            if (SingletonLite<LocaleManager>.exists && IsTLMLoaded() && (!isLocaleLoaded || force))
             {
                 AdrLocaleUtils.loadLocale(currentLanguageId.value == 0 ? SingletonLite<LocaleManager>.instance.language : AdrLocaleUtils.getSelectedLocaleByIndex(currentLanguageId.value), force);
                 if (!isLocaleLoaded)
@@ -298,8 +298,9 @@ namespace Klyte.Addresses
                 });
             }
 
-            AdrController.instance.Awake();
+            AdrController.instance.enabled = true;
 
+            loadAdrLocale(false);
             m_loaded = true;
         }
 
