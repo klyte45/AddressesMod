@@ -1,9 +1,8 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
-using Klyte.TransportLinesManager.Extensors;
-using Klyte.TransportLinesManager.Extensors.TransportTypeExt;
-using Klyte.TransportLinesManager.Interfaces;
-using Klyte.TransportLinesManager.Utils;
+using Klyte.Commons.Extensors;
+using Klyte.Commons.Interfaces;
+using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

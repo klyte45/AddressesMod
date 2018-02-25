@@ -11,8 +11,8 @@ using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
-using Klyte.TransportLinesManager.Extensors;
-using Klyte.TransportLinesManager.Utils;
+using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
 using UnityEngine;
 
 namespace Klyte.Addresses

@@ -85,9 +85,9 @@
       <Project>{25446827-2004-4490-8859-5b3e160e978a}</Project>
       <Name>UIHelperExtended</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TransportLinesManager\TransportLinesManager.csproj">
-      <Project>{3f345c94-6b63-4d8f-8a12-e1ebdae831f3}</Project>
-      <Name>TransportLinesManager</Name>
+    <ProjectReference Include="..\KlyteCommons\KlyteCommons.csproj">
+      <Project>{FBC8EC78-6489-4B4C-8D94-F455D37D3274}</Project>
+      <Name>KlyteCommons</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

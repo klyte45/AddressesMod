@@ -4,12 +4,7 @@ using ColossalFramework.UI;
 using ICities;
 using Klyte.Extensions;
 using Klyte.Harmony;
-using Klyte.TransportLinesManager.Extensors;
-using Klyte.TransportLinesManager.Extensors.BuildingAIExt;
-using Klyte.TransportLinesManager.Extensors.TransportTypeExt;
-using Klyte.TransportLinesManager.LineList.ExtraUI;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Overrides;
+using Klyte.Commons.Extensors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +13,7 @@ using System.Text;
 using UnityEngine;
 using Klyte.Addresses.Utils;
 using System.IO;
+using Klyte.Commons.Overrides;
 
 namespace Klyte.Addresses.UI
 {
@@ -72,10 +68,10 @@ namespace Klyte.Addresses.UI
             m_StripMain.tabPages = tabContainer;
 
             m_uiHelperDistrict = CreateTab("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
-            m_uiHelperHighway = CreateTab("SubBarRoadsHighway", "ADR_CONFIG_HIGHWAY_TAB", "AdrHighway");
-            //m_uiHelperGlobal = CreateTab("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
+            //m_uiHelperHighway = CreateTab("SubBarRoadsHighway", "ADR_CONFIG_HIGHWAY_TAB", "AdrHighway");
+            m_uiHelperGlobal = CreateTab("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
             PopulateTab1();
-            //PopulateTab3();
+            PopulateTab3();
 
             DistrictManagerOverrides.eventOnDistrictRenamed += reloadDistricts;
             reloadDistricts();

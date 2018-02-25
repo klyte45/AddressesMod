@@ -8,16 +8,8 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using ColossalFramework.DataBinding;
-using Klyte.TransportLinesManager.LineList;
-using Klyte.TransportLinesManager.MapDrawer;
 using ColossalFramework.Globalization;
-using Klyte.TransportLinesManager.i18n;
-using Klyte.TransportLinesManager.Utils;
-using Klyte.TransportLinesManager.Extensors;
-using Klyte.TransportLinesManager.Overrides;
-using Klyte.TransportLinesManager.Extensors.BuildingAIExt;
 using ColossalFramework.PlatformServices;
-using Klyte.TransportLinesManager;
 using Klyte.Addresses.Utils;
 using Klyte.Addresses.i18n;
 using System.IO;
@@ -66,21 +58,21 @@ namespace Klyte.Addresses
 
         public static bool LocaleLoaded => isLocaleLoaded;
 
-        private static bool m_isTLMLoaded = false;
-        public static bool IsTLMLoaded()
+        private static bool m_isKlyteCommonsLoaded = false;
+        public static bool IsKlyteCommonsEnabled()
         {
-            if (!m_isTLMLoaded)
+            if (!m_isKlyteCommonsLoaded)
             {
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies();
                 var assembly = (from a in assemblies
-                                where a.GetType("Klyte.TransportLinesManager.TLMMod") != null
+                                where a.GetType("Klyte.Commons.KlyteCommonsMod") != null
                                 select a).SingleOrDefault();
                 if (assembly != null)
                 {
-                    m_isTLMLoaded = true;
+                    m_isKlyteCommonsLoaded = true;
                 }
             }
-            return m_isTLMLoaded;
+            return m_isKlyteCommonsLoaded;
         }
 
         public static SavedBool debugMode => instance.m_debugMode;
@@ -146,6 +138,10 @@ namespace Klyte.Addresses
         }
         public void OnSettingsUI(UIHelperBase helperDefault)
         {
+            if (!IsKlyteCommonsEnabled())
+            {
+                return;
+            }
             FileInfo fi = AdrUtils.EnsureFolderCreation(FOLDER_NAME);
             FileInfo fiRoad = AdrUtils.EnsureFolderCreation(roadPath);
             FileInfo fiRoadPrefix = AdrUtils.EnsureFolderCreation(roadPrefixPath);
@@ -193,7 +189,7 @@ namespace Klyte.Addresses
 
                 AdrUtils.doLog("End Loading Options");
             }
-            if (IsTLMLoaded())
+            if (IsKlyteCommonsEnabled())
             {
                 loadAdrLocale(false);
                 ev();
@@ -263,7 +259,7 @@ namespace Klyte.Addresses
         }
         public void loadAdrLocale(bool force)
         {
-            if (SingletonLite<LocaleManager>.exists && IsTLMLoaded() && (!isLocaleLoaded || force))
+            if (SingletonLite<LocaleManager>.exists && IsKlyteCommonsEnabled() && (!isLocaleLoaded || force))
             {
                 AdrLocaleUtils.loadLocale(currentLanguageId.value == 0 ? SingletonLite<LocaleManager>.instance.language : AdrLocaleUtils.getSelectedLocaleByIndex(currentLanguageId.value), force);
                 if (!isLocaleLoaded)
@@ -287,9 +283,9 @@ namespace Klyte.Addresses
                 AdrUtils.doLog("NOT GAME ({0})", mode);
                 return;
             }
-            if (!IsTLMLoaded())
+            if (!IsKlyteCommonsEnabled())
             {
-                throw new Exception("Addresses requires Transport Lines Manager Reborn installed!");
+                throw new Exception("Addresses requires Klyte Commons installed!");
             }
             if (AdrController.taAdr == null)
             {
