@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Klyte.Addresses.Utils.AdrUtils;
 
 namespace Klyte.Addresses.LocaleStruct
 {
@@ -30,7 +31,7 @@ namespace Klyte.Addresses.LocaleStruct
             return result;
         }
 
-        public string getPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand)
+        public string getPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand, ushort segmentId)
         {
             Highway highway = Highway.ANY;
             RoadType type = RoadType.NONE;
@@ -62,11 +63,42 @@ namespace Klyte.Addresses.LocaleStruct
 
             OneWay wayVal = isOneWay ? OneWay.TRUE : OneWay.FALSE;
             Symmetry symVal = isSymmetric ? Symmetry.TRUE : Symmetry.FALSE;
+            LinkingType linking = LinkingType.NO_LINKING;
+            bool hasStart = true;
+            bool hasEnd = true;
+            if (wayVal == OneWay.TRUE)
+            {
+                AdrUtils.GetSegmentRoadEdges(segmentId, out ComparableRoad startRef, out ComparableRoad endRef);
+                if (startRef.segmentReference == 0 || endRef.segmentReference == 0)
+                {
+                    hasStart = startRef.segmentReference != 0;
+                    hasEnd = endRef.segmentReference != 0;
+                }
+                else if (NetManager.instance.m_segments.m_buffer[startRef.segmentReference].Info.GetAI() is RoadBaseAI baseAiSource && baseAiSource.m_highwayRules)
+                {
+                    switch (startRef.compareTo(endRef))
+                    {
+                        case 1:
+                            linking = LinkingType.FROM_BIG;
+                            break;
+                        case 0:
+                            linking = LinkingType.SAME_SIZE;
+                            break;
+                        case -1:
+                            linking = LinkingType.FROM_SMALL;
+                            break;
+                    }
+                }
+            }
+
             var filterResult = prefixes.Where(x =>
                 (x.roadType & type) != 0
                 && (x.oneWay & wayVal) != 0
                 && (x.symmetry & symVal) != 0
                 && (x.highway & highway) != 0
+                && (wayVal == OneWay.FALSE || ((x.linking & linking) != 0))
+                && (hasStart || !x.requireSource)
+                && (hasEnd || !x.requireTarget)
                 && x.minWidth <= width + 0.99f
                 && width + 0.99f < x.maxWidth
                 && x.minLanes <= lanes
@@ -80,6 +112,8 @@ namespace Klyte.Addresses.LocaleStruct
 
             return filterResult[rand.Int32((uint)(filterResult.Count))].name;
         }
+
+
 
         private class RoadPrefixFileItem
         {
@@ -105,27 +139,55 @@ namespace Klyte.Addresses.LocaleStruct
                     item.highway = Highway.FALSE;
                 }
 
-
-                if (kv[0].Contains("w"))
+                var matchesLinkingType = Regex.Matches(kv[0], @"[fie]");
+                if (matchesLinkingType?.Count > 0)
                 {
                     item.oneWay = OneWay.TRUE;
-                }
-                else if (kv[0].Contains("W"))
-                {
-                    item.oneWay = OneWay.FALSE;
-                }
 
-                if ((item.oneWay & OneWay.FALSE) != 0)
-                {
-                    if (kv[0].Contains("s"))
+                    item.linking = LinkingType.NONE;
+                    foreach (Match m in matchesLinkingType)
                     {
-                        item.symmetry = Symmetry.TRUE;
-                    }
-                    else if (kv[0].Contains("S"))
-                    {
-                        item.symmetry = Symmetry.FALSE;
+                        switch (m.Value)
+                        {
+                            case "f":
+                                item.linking |= LinkingType.FROM_BIG;
+                                break;
+                            case "i":
+                                item.linking |= LinkingType.FROM_SMALL;
+                                break;
+                            case "e":
+                                item.linking |= LinkingType.SAME_SIZE;
+                                break;
+                        }
                     }
                 }
+                else
+                {
+                    item.linking = LinkingType.NO_LINKING;
+                    if (kv[0].Contains("w") || kv[1].Contains("{1}") || kv[1].Contains("{2}") || kv[1].Contains("{3}") || kv[1].Contains("{4}"))
+                    {
+                        item.oneWay = OneWay.TRUE;
+
+                    }
+                    else if (kv[0].Contains("W"))
+                    {
+                        item.oneWay = OneWay.FALSE;
+                    }
+
+                    if ((item.oneWay & OneWay.FALSE) != 0)
+                    {
+                        if (kv[0].Contains("s"))
+                        {
+                            item.symmetry = Symmetry.TRUE;
+                        }
+                        else if (kv[0].Contains("S"))
+                        {
+                            item.symmetry = Symmetry.FALSE;
+                        }
+                    }
+                }
+                item.requireSource = kv[1].Contains("{1}") || kv[1].Contains("{3}") || kv[1].Contains("{4}");
+                item.requireTarget = kv[1].Contains("{2}");
 
                 var matchesRoad = Regex.Matches(kv[0], @"[GBTD]");
                 if (matchesRoad?.Count > 0)
@@ -164,6 +226,16 @@ namespace Klyte.Addresses.LocaleStruct
                         item.maxWidth = maxWidth;
                     }
                 }
+                var matchesWidthSingle = Regex.Matches(kv[0], @"\[([0-9]{0,3})\]");
+                if (matchesWidthSingle?.Count > 0)
+                {
+                    Match m = matchesWidth[0];
+                    if (ushort.TryParse(m.Groups[1].Value, out ushort minWidth))
+                    {
+                        item.minWidth = minWidth;
+                        item.maxWidth = ++minWidth;
+                    }
+                }
                 var matchesLanes = Regex.Matches(kv[0], @"\(([0-9]{0,3}),([0-9]{0,3})\)");
                 if (matchesLanes?.Count > 0)
                 {
@@ -175,6 +247,16 @@ namespace Klyte.Addresses.LocaleStruct
                     if (byte.TryParse(m.Groups[2].Value, out byte maxLanes))
                     {
                         item.maxLanes = maxLanes;
+                    }
+                }
+                var matchesLanesSingle = Regex.Matches(kv[0], @"\(([0-9]{0,3})\)");
+                if (matchesLanesSingle?.Count > 0)
+                {
+                    Match m = matchesLanesSingle[0];
+                    if (byte.TryParse(m.Groups[1].Value, out byte minLanes))
+                    {
+                        item.minLanes = minLanes;
+                        item.maxLanes = ++minLanes;
                     }
                 }
 
@@ -189,6 +271,9 @@ namespace Klyte.Addresses.LocaleStruct
             public byte maxLanes = 255;
             public RoadType roadType = RoadType.ANY;
             public Highway highway = Highway.ANY;
+            public LinkingType linking = LinkingType.ANY;
+            public bool requireSource = false;
+            public bool requireTarget = false;
             public string name;
         }
 
@@ -218,6 +303,15 @@ namespace Klyte.Addresses.LocaleStruct
             TUNNEL = 4,
             DAM = 8,
             ANY = GROUND | BRIDGE | TUNNEL | DAM
+        }
+        enum LinkingType : byte
+        {
+            NONE = 0,
+            FROM_SMALL = 1,
+            FROM_BIG = 2,
+            SAME_SIZE = 4,
+            NO_LINKING = 0x80,
+            ANY = FROM_SMALL | FROM_BIG | SAME_SIZE,
         }
     }
 

@@ -33,6 +33,9 @@ namespace Klyte.Addresses.UI
         private string m_lastSelectedItem;
         private UIDropDown m_districtNameFile;
         private UIDropDown m_prefixesFile;
+        private UITextField m_prefixPostalCodeDistrict;
+        private UITextField m_prefixPostalCodeCity;
+        private UITextField m_postalCodeFormat;
 
         private UIHelperExtension m_uiHelperDistrict;
         private UIHelperExtension m_uiHelperHighway;
@@ -62,9 +65,9 @@ namespace Klyte.Addresses.UI
             mainPanel.backgroundSprite = "MenuPanel2";
             CreateTitleBar();
 
-            AdrUtils.createUIElement(out m_StripMain, mainPanel.transform, "AdrTabstrip", new Vector4(5, 45, mainPanel.width - 10, 40));
+            AdrUtils.createUIElement(out m_StripMain, mainPanel.transform, "AdrTabstrip", new Vector4(5, 45, mainPanel.width - 5, 40));
 
-            AdrUtils.createUIElement(out UITabContainer tabContainer, mainPanel.transform, "AdrTabContainer", new Vector4(0, 80, mainPanel.width, mainPanel.height - 80));
+            AdrUtils.createUIElement(out UITabContainer tabContainer, mainPanel.transform, "AdrTabContainer", new Vector4(5, 80, mainPanel.width - 5, mainPanel.height - 80));
             m_StripMain.tabPages = tabContainer;
 
             m_uiHelperDistrict = CreateTab("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
@@ -81,6 +84,7 @@ namespace Klyte.Addresses.UI
         {
             ((UIScrollablePanel)m_uiHelperDistrict.self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel)m_uiHelperDistrict.self).wrapLayout = true;
+            ((UIScrollablePanel)m_uiHelperDistrict.self).width = 370;
 
             m_cachedDistricts = AdrUtils.getValidDistricts();
             m_selectDistrict = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
@@ -94,12 +98,56 @@ namespace Klyte.Addresses.UI
             m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_STREETS_PREFIXES_NAME_FILE", new String[0], -1, onChangeSelectedRoadPrefix);
             m_prefixesFile.width = 370;
             AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_STREETS_PREFIXES_FILES_RELOAD"), reloadOptionsRoadPrefix), 380);
+
+            m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("ADR_DISTRICT_POSTAL_CODE"), null, "", onChangePostalCodePrefixDistrict);
+            m_prefixPostalCodeDistrict.numericalOnly = true;
+            m_prefixPostalCodeDistrict.maxLength = 3;
         }
 
         private void PopulateTab3()
         {
             ((UIScrollablePanel)m_uiHelperGlobal.self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel)m_uiHelperGlobal.self).wrapLayout = true;
+            ((UIScrollablePanel)m_uiHelperGlobal.self).width = 370;
+
+            m_prefixPostalCodeCity = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_CITY_POSTAL_CODE"), null, AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_CITY_PREFIX).ToString(), onChangePostalCodePrefixCity);
+            m_prefixPostalCodeCity.numericalOnly = true;
+            m_prefixPostalCodeCity.maxLength = 3;
+
+            m_postalCodeFormat = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_POSTAL_CODE_FORMAT"), null, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT), onChangePostalCodeFormat);
+            m_prefixPostalCodeCity.maxLength = 3;
+
+            string[] formatExplain = new string[12];
+            for (int i = 0; i < formatExplain.Length; i++)
+            {
+                formatExplain[i] = Locale.Get("ADR_POSTAL_CODE_FORMAT_LEGEND", i);
+            }
+
+            AdrUtils.createUIElement(out UILabel formatExplanation, m_uiHelperGlobal.self.transform, "FormatText");
+            formatExplanation.wordWrap = true;
+            formatExplanation.textScale = 0.65f;
+            formatExplanation.textColor = Color.yellow;
+            formatExplanation.autoSize = false;
+            formatExplanation.autoHeight = true;
+            formatExplanation.width = 370;
+
+            string[] obs = new string[2];
+            for (int i = 0; i < obs.Length; i++)
+            {
+                obs[i] = Locale.Get("ADR_POSTAL_CODE_FORMAT_OBSERVATION", i);
+            }
+
+            AdrUtils.createUIElement(out UILabel obsExplanation, m_uiHelperGlobal.self.transform, "ObsText");
+            obsExplanation.wordWrap = true;
+            obsExplanation.textScale = 0.65f;
+            obsExplanation.textColor = Color.gray;
+            obsExplanation.autoSize = false;
+            obsExplanation.autoHeight = true;
+            obsExplanation.width = 370;
+
+
+            formatExplanation.text = "∙ " + string.Join(Environment.NewLine + "∙ ", formatExplain);
+            obsExplanation.text = string.Join(Environment.NewLine, obs);
         }
 
         private void reloadOptionsRoad()
@@ -143,31 +191,66 @@ namespace Klyte.Addresses.UI
 
         private void onChangeSelectedRoadPrefix(int idx)
         {
-            setDistrictProperty(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME, idx > 0 ? m_prefixesFile.selectedValue : null);
+            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME, idx > 0 ? m_prefixesFile.selectedValue : null);
+            AdrUtils.UpdateSegmentNamesView();
         }
 
         private void onChangeSelectedRoadName(int idx)
         {
-            setDistrictProperty(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME, idx > 0 ? m_districtNameFile.selectedValue : null);
+            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME, idx > 0 ? m_districtNameFile.selectedValue : null);
+            AdrUtils.UpdateSegmentNamesView();
         }
 
-        private void setDistrictProperty(AdrConfigWarehouse.ConfigIndex configIndex, string value)
+        private void onChangePostalCodePrefixDistrict(string val)
         {
-            AdrConfigWarehouse.ConfigIndex selectedDistrict;
+            setDistrictPropertyInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX, val);
+        }
+
+        private void onChangePostalCodePrefixCity(string val)
+        {
+            if (!int.TryParse(val, out int valInt)) return;
+            AdrConfigWarehouse.setCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_CITY_PREFIX, valInt);
+        }
+
+        private void onChangePostalCodeFormat(string val)
+        {
+            val = val?.Trim();
+            if (val?.Length == 0)
+            {
+                AdrConfigWarehouse.setCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT, null);
+            }
+            else
+            {
+                AdrConfigWarehouse.setCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT, val);
+            }
+            m_postalCodeFormat.text = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT);
+        }
+
+        private void setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex configIndex, string value)
+        {
+            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)) return;
+            AdrConfigWarehouse.setCurrentConfigString(configIndex | selectedDistrict, value);
+        }
+
+        private void setDistrictPropertyInt(AdrConfigWarehouse.ConfigIndex configIndex, string value)
+        {
+            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict) || !int.TryParse(value, out int valInt)) return;
+            AdrConfigWarehouse.setCurrentConfigInt(configIndex | selectedDistrict, valInt);
+        }
+
+        private bool getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)
+        {
+            selectedDistrict = 0;
             if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
             {
                 selectedDistrict = (AdrConfigWarehouse.ConfigIndex)(m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
             }
-            else if (m_selectDistrict.selectedIndex == 0)
+            else if (m_selectDistrict.selectedIndex != 0)
             {
-                selectedDistrict = 0;
+                return false;
             }
-            else
-            {
-                return;
-            }
-            AdrConfigWarehouse.setCurrentConfigString(configIndex | selectedDistrict, value);
-            AdrUtils.UpdateSegmentNamesView();
+
+            return true;
         }
 
         private int getSelectedConfigIndex()
@@ -194,7 +277,7 @@ namespace Klyte.Addresses.UI
 
             AdrUtils.createUIElement(out UIPanel contentContainer, null);
             contentContainer.name = "Container";
-            contentContainer.area = new Vector4(5, 0, mainPanel.width - 10, mainPanel.height - 70);
+            contentContainer.area = new Vector4(15, 0, mainPanel.width - 30, mainPanel.height - 70);
             m_StripMain.AddTab(objectName, tab.gameObject, contentContainer.gameObject);
 
             return AdrUtils.CreateScrollPanel(contentContainer, out UIScrollablePanel scrollablePanel, out UIScrollbar scrollbar, contentContainer.width - 20, contentContainer.height - 5, new Vector3());
@@ -222,6 +305,10 @@ namespace Klyte.Addresses.UI
             //load district info
             reloadOptionsRoadPrefix();
             reloadOptionsRoad();
+            if (getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict))
+            {
+                m_prefixPostalCodeDistrict.text = AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX | selectedDistrict).ToString();
+            }
         }
 
 

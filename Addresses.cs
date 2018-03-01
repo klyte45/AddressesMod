@@ -78,10 +78,10 @@ namespace Klyte.Addresses
         public static SavedBool debugMode => instance.m_debugMode;
         public static SavedString selectedRoadFile => instance.m_selectedRoadFile;
 
-        private SavedString currentSaveVersion => new SavedString("SVMSaveVersion", Settings.gameSettingsFile, "null", true);
+        private SavedString currentSaveVersion => new SavedString("AdrSaveVersion", Settings.gameSettingsFile, "null", true);
 
 
-        private SavedInt currentLanguageId => new SavedInt("SVMLanguage", Settings.gameSettingsFile, 0, true);
+        private SavedInt currentLanguageId => new SavedInt("AdrLanguage", Settings.gameSettingsFile, 0, true);
 
         public static bool isCityLoaded => Singleton<SimulationManager>.instance.m_metaData != null;
 
@@ -99,15 +99,15 @@ namespace Klyte.Addresses
 
         public AddressesMod()
         {
-            Debug.LogWarningFormat("Adrv" + majorVersion + " LOADING SVM ");
-            SettingsFile svmSettings = new SettingsFile
+            Debug.LogWarningFormat("Adrv" + majorVersion + " LOADING ADDRESSES ");
+            SettingsFile adrSettings = new SettingsFile
             {
                 fileName = CONFIG_FILENAME
             };
             Debug.LogWarningFormat("Adrv" + majorVersion + " SETTING FILES");
             try
             {
-                GameSettings.AddSettingsFile(svmSettings);
+                GameSettings.AddSettingsFile(adrSettings);
             }
             catch (Exception e)
             {
@@ -120,7 +120,7 @@ namespace Klyte.Addresses
                 }
                 else
                 {
-                    svmSettings = tryLoad;
+                    adrSettings = tryLoad;
                 }
             }
             m_debugMode = new SavedBool("AdrDebugMode", Settings.gameSettingsFile, typeof(AddressesMod).Assembly.GetName().Version.Major == 0, true);
@@ -131,7 +131,7 @@ namespace Klyte.Addresses
                 needShowPopup = true;
             }
             m_selectedRoadFile = new SavedString("AdrRoadFileName", Settings.gameSettingsFile, "", true);
-            LocaleManager.eventLocaleChanged += new LocaleManager.LocaleChangedHandler(autoLoadSVMLocale);
+            LocaleManager.eventLocaleChanged += new LocaleManager.LocaleChangedHandler(autoLoadAdrLocale);
             if (instance != null) { Destroy(instance); }
             instance = this;
             loadAdrLocale(false);
@@ -250,7 +250,7 @@ namespace Klyte.Addresses
             return false;
         }
 
-        public void autoLoadSVMLocale()
+        public void autoLoadAdrLocale()
         {
             if (currentLanguageId.value == 0)
             {

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using static Klyte.Addresses.Utils.AdrUtils;
 
 namespace Klyte.Addresses.Overrides
 {
@@ -25,6 +26,26 @@ namespace Klyte.Addresses.Overrides
 
         private static bool GenerateSegmentName(ushort segmentID, ref string __result)
         {
+            var list = new List<ushort>();
+            return GenerateSegmentNameInternal(segmentID, ref __result, ref list);
+        }
+
+        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue)
+        {
+            if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)
+            {
+                if (usedQueue.Count == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    InstanceID id = default(InstanceID);
+                    id.NetSegment = segmentID;
+                    __result = Singleton<InstanceManager>.instance.GetName(id);
+                    return false;
+                }
+            }
             var segment = NetManager.instance.m_segments.m_buffer[segmentID];
             var info = segment.Info;
             PrefabAI ai = info.GetAI();
@@ -39,7 +60,7 @@ namespace Klyte.Addresses.Overrides
                 if (filenamePrefix != null && AdrController.loadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
                 {
                     var currentPrefixFile = AdrController.loadedLocalesRoadPrefix[filenamePrefix];
-                    format = currentPrefixFile.getPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer);
+                    format = currentPrefixFile.getPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
                 }
                 //AdrUtils.doLog("selectedPrefix = {0}", format);
                 if (format == null)
@@ -55,6 +76,52 @@ namespace Klyte.Addresses.Overrides
                 return true;
             }
 
+            string genName = "";
+            string sourceRoad = "";
+            string targetRoad = "";
+            string sourceKm = "";
+            string sourceKmWithDecimal = "";
+            if (format.Contains("{0}"))
+            {
+                GetGeneratedRoadName(segment, ai, district, out genName);
+                if (genName == null) return true;
+            }
+            if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}"))
+            {
+                GetSegmentRoadEdges(segmentID, out ComparableRoad startRef, out ComparableRoad endRef);
+
+                ushort sourceSeg = startRef.segmentReference;
+                ushort targetSeg = endRef.segmentReference;
+
+                if (format.Contains("{1}"))
+                {
+                    if (!usedQueue.Contains(sourceSeg))
+                    {
+                        usedQueue.Add(sourceSeg);
+                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue);
+                    }
+                }
+                if (format.Contains("{2}"))
+                {
+                    if (!usedQueue.Contains(targetSeg))
+                    {
+                        usedQueue.Add(targetSeg);
+                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue);
+                    }
+                }
+                if (format.Contains("{3}") || format.Contains("{4}"))
+                {
+                    float km = GetNumberAt(startRef.segmentReference, NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference) / 1000f;
+                    sourceKm = km.ToString("0");
+                    sourceKmWithDecimal = km.ToString("0.0");
+                }
+            }
+            __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal);// + $" ({segmentID})";
+            return false;
+        }
+
+        private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, AdrConfigWarehouse.ConfigIndex district, out string genName)
+        {
             var filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME | district);
             if (string.IsNullOrEmpty(filename) || !AdrController.loadedLocalesRoadName.ContainsKey(filename))
             {
@@ -65,23 +132,21 @@ namespace Klyte.Addresses.Overrides
                 }
             }
 
-            randomizer = new Randomizer(segment.m_nameSeed);
-            string arg;
+            Randomizer randomizer = new Randomizer(segment.m_nameSeed);
             if (filename != null)
             {
                 int range = AdrController.loadedLocalesRoadName[filename]?.Length ?? 0;
                 if (range == 0)
                 {
-                    return true;
+                    genName = null;
+                    return;
                 }
-                arg = AdrController.loadedLocalesRoadName[filename][randomizer.Int32((uint)range)];
+                genName = AdrController.loadedLocalesRoadName[filename][randomizer.Int32((uint)range)];
             }
             else
             {
-                arg = roadBaseAiGenerateName.Invoke(ai, new object[] { randomizer })?.ToString();
+                genName = roadBaseAiGenerateName.Invoke(ai, new object[] { randomizer })?.ToString();
             }
-            __result = StringUtils.SafeFormat(format, arg);// + $" ({segmentID})";
-            return false;
         }
 
         private static string DefaultPrefix(NetInfo info, PrefabAI ai)

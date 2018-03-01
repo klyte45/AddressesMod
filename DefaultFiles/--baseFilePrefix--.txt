@@ -14,6 +14,14 @@
 # <none> = any
 # ^Ignored for Dams!^
 # ----------------------------------------------------------------------------------
+# f = One way starting FROM a larger road
+# i = One way ending IN a larger road
+# e = One way linking EQUALS SIZE road
+# <none> = any
+# ^One Way Highway Only! (implies in "hw" on category code)^
+# ^Only used when the source is a highway^
+# ^Comparison order: has continuation (the straight road have precedence, like in T cloverleafs) <=> is Highway (Highway is greater) <=> number of lanes <=> width^
+# ----------------------------------------------------------------------------------
 # G = Ground road
 # B = Bridges/Elevated road
 # T = Tunnel road
@@ -23,10 +31,16 @@
 # ----------------------------------------------------------------------------------
 # (X,Y) = Min (X, inclusive) and Max (Y, exclusive) lanes (0-255)
 # [X,Y] = Min (X, inclusive) and Max (Y, exclusive) roadWidth (0-999)
+# (X) = Only X lanes (0-255)
+# [X] = Only X roadWidth (0-999)
 # ^Omit the X or Y to use the default values. Ranges are integer^
 # ----------------------------------------------------------------------------------
 # The expression must be succeded by a "=" (equals sign) character. In the right side of "=" will be the prefix text. There are arguments to use for replacing:
 # {0} = Use this to be a placeholder for the generated road name (Example: "Street {0}" or "{0} Road")
+# {1} = Use this to be a placeholder for the target road name (i.e. where the road ends). Adds implicitly "w" (one way roads only) on category code.
+# {2} = Use this to be a placeholder for the source road name (i.e. where the road starts). Adds implicitly "w" (one way roads only) on category code.
+# {3} = Use this to be a placeholder for the mileage (in kilometers) from the source road as integer. Adds implicitly "w" (one way roads only) on category code.
+# {4} = Use this to be a placeholder for the mileage (in kilometers) from the source road with one decimal place. Adds implicitly "w" (one way roads only) on category code.
 #
 # (Other arguments can be added later)
 # ==================================================================================
@@ -47,5 +61,8 @@ D={0} Dam
 GH[,20]={0} Street
 GH[20,]={0} Avenue
 GhW(2,)={0} Highway
-Ghw(2,3)={0} Way
+Ghw(2)={0} Way
 Ghw(3,)={0} Road
+Ghwi(1)=Access to {1}
+Ghwt(1)=Exit {3}
+Ghwe(1)=Access to {1}
