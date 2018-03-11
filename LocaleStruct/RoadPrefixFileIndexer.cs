@@ -37,13 +37,20 @@ namespace Klyte.Addresses.LocaleStruct
             RoadType type = RoadType.NONE;
             if (ai is RoadBaseAI baseAi)
             {
-                if (baseAi.WorksAsBuilding())
+                if (baseAi is DamAI)
                 {
                     type = RoadType.DAM;
                 }
-                else if (baseAi.BuildOnWater())
+                else if (baseAi is RoadBridgeAI)
                 {
-                    type = RoadType.BRIDGE;
+                    if (baseAi.BuildOnWater())
+                    {
+                        type = RoadType.BRIDGE;
+                    }
+                    else
+                    {
+                        type = RoadType.ELEVATED;
+                    }
                 }
                 else if (baseAi.IsUnderground())
                 {
@@ -68,13 +75,16 @@ namespace Klyte.Addresses.LocaleStruct
             bool hasEnd = true;
             if (wayVal == OneWay.TRUE)
             {
-                AdrUtils.GetSegmentRoadEdges(segmentId, out ComparableRoad startRef, out ComparableRoad endRef);
+                AdrUtils.GetSegmentRoadEdges(segmentId, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                AdrUtils.doLog($"OneWay s={startRef}; e= {endRef}");
                 if (startRef.segmentReference == 0 || endRef.segmentReference == 0)
                 {
                     hasStart = startRef.segmentReference != 0;
                     hasEnd = endRef.segmentReference != 0;
                 }
-                else if (NetManager.instance.m_segments.m_buffer[startRef.segmentReference].Info.GetAI() is RoadBaseAI baseAiSource && baseAiSource.m_highwayRules)
+                else if ((NetManager.instance.m_segments.m_buffer[startRef.segmentReference].Info.GetAI() is RoadBaseAI baseAiSource && baseAiSource.m_highwayRules) ||
+                  (NetManager.instance.m_segments.m_buffer[endRef.segmentReference].Info.GetAI() is RoadBaseAI baseAiTarget && baseAiTarget.m_highwayRules))
+
                 {
                     switch (startRef.compareTo(endRef))
                     {
@@ -104,7 +114,7 @@ namespace Klyte.Addresses.LocaleStruct
                 && x.minLanes <= lanes
                 && lanes < x.maxLanes
             ).ToList();
-            //AdrUtils.doLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} = {filterResult?.Count}");
+            AdrUtils.doLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} = {filterResult?.Count}");
             if (filterResult?.Count == 0)
             {
                 return null;
@@ -127,7 +137,7 @@ namespace Klyte.Addresses.LocaleStruct
                 }
                 RoadPrefixFileItem item = new RoadPrefixFileItem
                 {
-                    name = kv[1]
+                    name = kv[1]?.Trim()
                 };
 
                 if (kv[0].Contains("h"))
@@ -189,7 +199,7 @@ namespace Klyte.Addresses.LocaleStruct
                 item.requireSource = kv[1].Contains("{1}") || kv[1].Contains("{3}") || kv[1].Contains("{4}");
                 item.requireTarget = kv[1].Contains("{2}");
 
-                var matchesRoad = Regex.Matches(kv[0], @"[GBTD]");
+                var matchesRoad = Regex.Matches(kv[0], @"[GBTDE]");
                 if (matchesRoad?.Count > 0)
                 {
                     item.roadType = RoadType.NONE;
@@ -208,6 +218,9 @@ namespace Klyte.Addresses.LocaleStruct
                                 break;
                             case "D":
                                 item.roadType |= RoadType.DAM;
+                                break;
+                            case "E":
+                                item.roadType |= RoadType.ELEVATED;
                                 break;
                         }
                     }
@@ -302,7 +315,8 @@ namespace Klyte.Addresses.LocaleStruct
             BRIDGE = 2,
             TUNNEL = 4,
             DAM = 8,
-            ANY = GROUND | BRIDGE | TUNNEL | DAM
+            ELEVATED = 16,
+            ANY = ELEVATED | GROUND | BRIDGE | TUNNEL | DAM
         }
         enum LinkingType : byte
         {

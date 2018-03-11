@@ -1,1 +1,6 @@
-﻿0.0.0
+﻿v1.0.1
+    - Fixed: Custom road names not showing on address label at building info panel
+    - Fixed: Wrong behaviour generating ramp names
+    - Added support to land elevated segments (viaducts) in the prefix parser as "E"
+v1
+    Initial release

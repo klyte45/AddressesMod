@@ -15,7 +15,7 @@ using Klyte.Addresses.i18n;
 using System.IO;
 using System.Text;
 
-[assembly: AssemblyVersion("0.0.1.*")]
+[assembly: AssemblyVersion("1.0.1.*")]
 
 namespace Klyte.Addresses
 {
@@ -24,7 +24,6 @@ namespace Klyte.Addresses
         public const string FOLDER_NAME = "Klyte_Addresses";
         public const string ROAD_SUBFOLDER_NAME = "Roads";
         public const string ROADPREFIX_SUBFOLDER_NAME = "RoadsPrefix";
-        public const string ROADPREFIX_DEFAULT_FILE_NAME = "--baseFilePrefix--.txt";
         public const string CONFIG_FILENAME = "Addresses0";
         public const string ROAD_LOCALE_FIXED_IDENTIFIER = "ROAD_NAME";
         public static string minorVersion => majorVersion + "." + typeof(AddressesMod).Assembly.GetName().Version.Build;
@@ -87,11 +86,10 @@ namespace Klyte.Addresses
 
         public string Name => "Addresses " + version;
 
-        public string Description => "TLMR's Extension which allow road name generation customization. Requires TLMR's subscribed (active is optional).";
+        public string Description => "TLMR's Extension which allow road name generation customization. Requires Klyte Commons subscribed and active.";
 
         public static string roadPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
         public static string roadPrefixPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROADPREFIX_SUBFOLDER_NAME;
-        public static string roadPrefixExampleFile => roadPrefixPath + Path.DirectorySeparatorChar + ROADPREFIX_DEFAULT_FILE_NAME;
 
         public void OnCreated(ILoading loading)
         {
@@ -145,11 +143,6 @@ namespace Klyte.Addresses
             FileInfo fi = AdrUtils.EnsureFolderCreation(FOLDER_NAME);
             FileInfo fiRoad = AdrUtils.EnsureFolderCreation(roadPath);
             FileInfo fiRoadPrefix = AdrUtils.EnsureFolderCreation(roadPrefixPath);
-            if (!AdrUtils.IsFileCreated(roadPrefixExampleFile))
-            {
-                File.WriteAllText(roadPrefixExampleFile, ResourceLoader.loadResourceString("DefaultFiles.--baseFilePrefix--.txt"));
-            }
-
             UIHelperExtension helper = new UIHelperExtension((UIHelper)helperDefault);
 
             void ev()
@@ -169,9 +162,19 @@ namespace Klyte.Addresses
 
                 UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("ADR_GENERAL_INFO"));
                 group8.AddLabel(Locale.Get("ADR_ROAD_NAME_FILES_PATH_TITLE") + ":");
-                group8.AddLabel(fiRoad.FullName + Path.DirectorySeparatorChar).textColor = Color.yellow;
+                var namesFilesButton = ((UIButton)group8.AddButton(Path.DirectorySeparatorChar.ToString(), () => { ColossalFramework.Utils.OpenInFileBrowser(fiRoad.FullName); }));
+                namesFilesButton.textColor = Color.yellow;
+                AdrUtils.LimitWidth(namesFilesButton, 710);
+                namesFilesButton.text = fiRoad.FullName + Path.DirectorySeparatorChar;
                 group8.AddLabel(Locale.Get("ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE") + ":");
-                group8.AddLabel(fiRoadPrefix.FullName + Path.DirectorySeparatorChar).textColor = Color.yellow;
+                var prefixFilesButton = ((UIButton)group8.AddButton(fiRoadPrefix.FullName + Path.DirectorySeparatorChar, () => { ColossalFramework.Utils.OpenInFileBrowser(fiRoadPrefix.FullName); }));
+                prefixFilesButton.textColor = Color.yellow;
+                AdrUtils.LimitWidth(prefixFilesButton, 710);
+
+                UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("ADR_ADDITIONAL_FILES_SOURCE"));
+                group7.AddLabel(Locale.Get("ADR_GET_FILES_GITHUB"));
+                group7.AddButton(Locale.Get("ADR_GO_TO_GITHUB"), () => { Application.OpenURL("https://github.com/klyte45/AddressesFiles"); });
+
 
                 UIHelperExtension group9 = helper.AddGroupExtended(Locale.Get("ADR_BETAS_EXTRA_INFO"));
                 group9.AddDropdownLocalized("ADR_MOD_LANG", AdrLocaleUtils.getLanguageIndex(), currentLanguageId.value, delegate (int idx)
@@ -277,7 +280,7 @@ namespace Klyte.Addresses
         public void OnLevelLoaded(LoadMode mode)
         {
             AdrUtils.doLog("LEVEL LOAD");
-            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame)
+            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame && mode != LoadMode.NewGameFromScenario)
             {
                 m_loaded = false;
                 AdrUtils.doLog("NOT GAME ({0})", mode);
@@ -298,6 +301,7 @@ namespace Klyte.Addresses
 
             loadAdrLocale(false);
             m_loaded = true;
+            showVersionInfoPopup();
         }
 
         public void OnLevelUnloading()

@@ -93,11 +93,15 @@ namespace Klyte.Addresses.UI
 
             m_districtNameFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_NAME_FILE", new String[0], -1, onChangeSelectedRoadName);
             m_districtNameFile.width = 370;
+            m_uiHelperDistrict.AddSpace(1);
             AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), reloadOptionsRoad), 380);
+            m_uiHelperDistrict.AddSpace(20);
 
             m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_STREETS_PREFIXES_NAME_FILE", new String[0], -1, onChangeSelectedRoadPrefix);
             m_prefixesFile.width = 370;
+            m_uiHelperDistrict.AddSpace(1);
             AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_STREETS_PREFIXES_FILES_RELOAD"), reloadOptionsRoadPrefix), 380);
+            m_uiHelperDistrict.AddSpace(40);
 
             m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("ADR_DISTRICT_POSTAL_CODE"), null, "", onChangePostalCodePrefixDistrict);
             m_prefixPostalCodeDistrict.numericalOnly = true;

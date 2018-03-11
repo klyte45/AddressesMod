@@ -14,8 +14,9 @@ namespace Klyte.Addresses.i18n
         private const string idxSeparator = ">";
         private const string localeKeySeparator = "|";
         private const string commentChar = "#";
+        private const string ignorePrefixChar = "%";
         private static string language = "";
-        private static string[] locales = new string[] { "en", "pt", "ko", "de", "cn", "pl", "nl" };
+        private static string[] locales = new string[] { "en", "pt" };
 
         public static string loadedLanguage
         {
@@ -44,6 +45,7 @@ namespace Klyte.Addresses.i18n
             return locales[idx - 1];
         }
 
+
         public static void loadLocale(string localeId, bool force)
         {
             if (force)
@@ -54,7 +56,6 @@ namespace Klyte.Addresses.i18n
         }
         private static void loadLocaleIntern(string localeId, bool setLocale)
         {
-            Locale target = AdrUtils.GetPrivateField<Locale>(LocaleManager.instance, "m_Locale");
             string load = ResourceLoader.loadResourceString("UI.i18n." + localeId + ".properties");
             if (load == null)
             {
@@ -67,8 +68,46 @@ namespace Klyte.Addresses.i18n
                 }
                 localeId = "en";
             }
+            var locale = AdrUtils.GetPrivateField<Locale>(LocaleManager.instance, "m_Locale");
+            Locale.Key k;
 
-            LoadIntoLocale(target, load, "ADR_");
+
+            foreach (var myString in load.Split(new string[] { lineSeparator }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (myString.StartsWith(commentChar)) continue;
+                if (!myString.Contains(kvSeparator)) continue;
+                bool noPrefix = myString.StartsWith(ignorePrefixChar);
+                var array = myString.Split(kvSeparator.ToCharArray(), 2);
+                string value = array[1];
+                int idx = 0;
+                string localeKey = null;
+                if (array[0].Contains(idxSeparator))
+                {
+                    var arrayIdx = array[0].Split(idxSeparator.ToCharArray());
+                    if (!int.TryParse(arrayIdx[1], out idx))
+                    {
+                        continue;
+                    }
+                    array[0] = arrayIdx[0];
+
+                }
+                if (array[0].Contains(localeKeySeparator))
+                {
+                    array = array[0].Split(localeKeySeparator.ToCharArray());
+                    localeKey = array[1];
+                }
+
+                k = new Locale.Key()
+                {
+                    m_Identifier = noPrefix ? array[0].Substring(1) : "ADR_" + array[0],
+                    m_Key = localeKey,
+                    m_Index = idx
+                };
+                if (!locale.Exists(k))
+                {
+                    locale.AddLocalizedString(k, value.Replace("\\n", "\n"));
+                }
+            }
 
             if (localeId != "en")
             {
@@ -79,63 +118,6 @@ namespace Klyte.Addresses.i18n
                 language = localeId;
             }
 
-        }
-
-        public static void LoadIntoLocale(Locale target, string load, string prefix = "", string fixedName = null)
-        {
-            Locale.Key k;
-            int idxFn = 0;
-            foreach (var line in load.Split(new string[] { lineSeparator }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (line.StartsWith(commentChar)) continue;
-                string identifier, localeKey, value;
-                int idx;
-                if (fixedName == null)
-                {
-                    if (!line.Contains(kvSeparator)) continue;
-                    var array = line.Split(kvSeparator.ToCharArray(), 2);
-                    value = array[1];
-                    idx = 0;
-                    localeKey = null;
-                    if (array[0].Contains(idxSeparator))
-                    {
-                        var arrayIdx = array[0].Split(idxSeparator.ToCharArray());
-                        if (!int.TryParse(arrayIdx[1], out idx))
-                        {
-                            continue;
-                        }
-                        array[0] = arrayIdx[0];
-
-                    }
-                    if (array[0].Contains(localeKeySeparator))
-                    {
-                        array = array[0].Split(localeKeySeparator.ToCharArray());
-                        localeKey = array[1];
-                    }
-                    identifier = prefix + array[0];
-                }
-                else
-                {
-                    identifier = fixedName;
-                    localeKey = null;
-                    idx = idxFn++;
-                    value = line;
-                }
-                k = new Locale.Key()
-                {
-                    m_Identifier = identifier,
-                    m_Key = localeKey,
-                    m_Index = idx
-                };
-                if (!target.Exists(k))
-                {
-                    target.AddLocalizedString(k, value.Replace("\\n", "\n"));
-                }
-                else
-                {
-                    AdrUtils.doLog("Entrada já existente: {0}", k);
-                }
-            }
         }
     }
 }

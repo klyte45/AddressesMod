@@ -34,8 +34,7 @@ namespace Klyte.Addresses
                     foreach (var filename in Directory.GetFiles(AddressesMod.roadPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
                     {
                         string fileContents = File.ReadAllText(AddressesMod.roadPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                        fileContents.Replace(Environment.NewLine, "\n");
-                        m_loadedLocalesRoadName[filename] = fileContents.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        m_loadedLocalesRoadName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
                         AdrUtils.doLog("LOADED NAMES ({0}) QTT: {1}", filename, m_loadedLocalesRoadName[filename].Length);
                     }
                 }

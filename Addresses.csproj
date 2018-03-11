@@ -118,16 +118,14 @@
   <ItemGroup>
     <EmbeddedResource Include="TLMVersion.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DefaultFiles\--baseFilePrefix--.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\Addresses\$(TargetFileName)"
-call $(ProjectDir)updateVersionTLM.bat "$(SolutionDir)_requiredDLLs\$(SolutionName)$(TargetExt)" $(ProjectDir)</PreBuildEvent>
+    <PreBuildEvent>del "Q:\Steam\steamapps\workshop\content\255710\1322787091\$(TargetFileName)"
+call $(ProjectDir)updateVersionTLM.bat "$(SolutionDir)\..\KlyteCommons\_requiredDLLs\KlyteCommons$(TargetExt)" $(ProjectDir)  
+</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(TargetPath)" "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\Addresses\"
+    <PostBuildEvent>xcopy /Y "$(TargetPath)" "Q:\Steam\steamapps\workshop\content\255710\1322787091\"
 xcopy /Y "$(TargetPath)" "$(ProjectDir)\_requiredDLLs\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

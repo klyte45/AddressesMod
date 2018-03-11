@@ -32,6 +32,7 @@ namespace Klyte.Addresses.Overrides
 
         private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue)
         {
+            AdrUtils.doLog($"[START {segmentID}]" + __result);
             if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)
             {
                 if (usedQueue.Count == 0)
@@ -62,7 +63,7 @@ namespace Klyte.Addresses.Overrides
                     var currentPrefixFile = AdrController.loadedLocalesRoadPrefix[filenamePrefix];
                     format = currentPrefixFile.getPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
                 }
-                //AdrUtils.doLog("selectedPrefix = {0}", format);
+                AdrUtils.doLog("selectedPrefix = {0}", format);
                 if (format == null)
                 {
                     string key = DefaultPrefix(info, ai);
@@ -86,12 +87,14 @@ namespace Klyte.Addresses.Overrides
                 GetGeneratedRoadName(segment, ai, district, out genName);
                 if (genName == null) return true;
             }
+            ushort sourceSeg = 0;
+            ushort targetSeg = 0;
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}"))
             {
-                GetSegmentRoadEdges(segmentID, out ComparableRoad startRef, out ComparableRoad endRef);
+                GetSegmentRoadEdges(segmentID, true, out ComparableRoad startRef, out ComparableRoad endRef);
 
-                ushort sourceSeg = startRef.segmentReference;
-                ushort targetSeg = endRef.segmentReference;
+                sourceSeg = startRef.segmentReference;
+                targetSeg = endRef.segmentReference;
 
                 if (format.Contains("{1}"))
                 {
@@ -116,8 +119,17 @@ namespace Klyte.Addresses.Overrides
                     sourceKmWithDecimal = km.ToString("0.0");
                 }
             }
-            __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal);// + $" ({segmentID})";
+            if (AddressesMod.debugMode)
+            {
+                __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, genName, sourceSeg, targetSeg, sourceKm, sourceKmWithDecimal);
+            }
+            else
+            {
+                __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal);
+            }
+            AdrUtils.doLog($"[END {segmentID}]" + __result);
             return false;
+
         }
 
         private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, AdrConfigWarehouse.ConfigIndex district, out string genName)
