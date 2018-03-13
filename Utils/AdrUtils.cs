@@ -323,6 +323,9 @@ namespace Klyte.Addresses.Utils
                     if (VectorUtils.XZ(NetManager.instance.m_nodes.m_buffer[nodeF].m_position).GetAngleToPoint(VectorUtils.XZ(NetManager.instance.m_nodes.m_buffer[nodeL].m_position)) > 180)
                     {
                         accessSegments.Reverse();
+                        var temp = nodeStartS;
+                        nodeStartS = nodeStartE;
+                        nodeStartE = temp;
                     }
                 }
             }

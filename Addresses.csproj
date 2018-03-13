@@ -33,12 +33,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Addresses.cs" />
+    <Compile Include="Extensors\AdrNeighborhoodExtension.cs" />
     <Compile Include="LocaleStruct\RoadPrefixFileIndexer.cs" />
     <Compile Include="MainWindow\AdrConfigPanel.cs" />
+    <Compile Include="MainWindow\Tabs\AdrGlobalConfigTab.cs" />
+    <Compile Include="MainWindow\Tabs\AdrNeighborConfigTab.cs" />
+    <Compile Include="MainWindow\Tabs\AdrDistrictConfigTab.cs" />
+    <Compile Include="Overrides\OutsideConnectionAIOverrides.cs" />
     <Compile Include="Overrides\NetManagerOverrides.cs" />
     <Compile Include="AdrController.cs" />
     <Compile Include="AdrConfigWarehouse.cs" />
+    <Compile Include="UI\AdrAzimuthTitleLineNeighbor.cs" />
+    <Compile Include="UI\AdrAzimuthEditorLineNeighbor .cs" />
     <Compile Include="UI\i18n\AdrLocaleLoader.cs" />
+    <Compile Include="UI\AdrMapBorders.cs" />
     <Compile Include="Utils\ResourceLoader.cs" />
     <Compile Include="Utils\AdrUtils.cs" />
   </ItemGroup>

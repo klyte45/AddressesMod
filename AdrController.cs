@@ -7,6 +7,7 @@ using System.Text;
 using ColossalFramework;
 using ColossalFramework.Math;
 using ColossalFramework.UI;
+using Klyte.Addresses.Extensors;
 using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
@@ -24,6 +25,7 @@ namespace Klyte.Addresses
 
         private static Dictionary<String, String[]> m_loadedLocalesRoadName;
         private static Dictionary<String, RoadPrefixFileIndexer> m_loadedLocalesRoadPrefix;
+        private static Dictionary<String, String[]> m_loadedLocalesNeighborName;
 
         public static Dictionary<String, String[]> loadedLocalesRoadName
         {
@@ -62,6 +64,24 @@ namespace Klyte.Addresses
             }
         }
 
+        public static Dictionary<String, String[]> loadedLocalesNeighborName
+        {
+            get {
+                if (m_loadedLocalesNeighborName == null)
+                {
+                    m_loadedLocalesNeighborName = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.neigborsPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.neigborsPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesNeighborName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED Neighbors ({0}) QTT: {1}", filename, m_loadedLocalesNeighborName[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesNeighborName;
+            }
+        }
+
         public static void reloadLocalesRoad()
         {
             m_loadedLocalesRoadName = null;
@@ -70,6 +90,11 @@ namespace Klyte.Addresses
         public static void reloadLocalesRoadPrefix()
         {
             m_loadedLocalesRoadPrefix = null;
+        }
+
+        public static void reloadLocalesNeighbors()
+        {
+            m_loadedLocalesNeighborName = null;
         }
 
         public void destroy()

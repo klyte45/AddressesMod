@@ -1,6 +1,8 @@
-﻿v1.0.1
+﻿v1.1
     - Fixed: Custom road names not showing on address label at building info panel
     - Fixed: Wrong behaviour generating ramp names
-    - Added support to land elevated segments (viaducts) in the prefix parser as "E"
-v1
-    Initial release
+    - Added neighbors editor based in azimuth angle
+    - Added new placeholders for:
+    ---- Source district/City: {5}
+    ---- Target district/City: {6}
+    ---- Cardinal direction: {7} (only for oneway)

@@ -82,6 +82,9 @@ namespace Klyte.Addresses.Overrides
             string targetRoad = "";
             string sourceKm = "";
             string sourceKmWithDecimal = "";
+            string sourceDistrict = "";
+            string targetDistrict = "";
+            string direction = "";
             if (format.Contains("{0}"))
             {
                 GetGeneratedRoadName(segment, ai, district, out genName);
@@ -89,7 +92,7 @@ namespace Klyte.Addresses.Overrides
             }
             ushort sourceSeg = 0;
             ushort targetSeg = 0;
-            if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}"))
+            if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
                 GetSegmentRoadEdges(segmentID, true, out ComparableRoad startRef, out ComparableRoad endRef);
 
@@ -118,18 +121,64 @@ namespace Klyte.Addresses.Overrides
                     sourceKm = km.ToString("0");
                     sourceKmWithDecimal = km.ToString("0.0");
                 }
+                if (format.Contains("{7}"))//direction
+                {
+                    var nodeS = NetManager.instance.m_nodes.m_buffer[startRef.nodeReference];
+                    var nodeE = NetManager.instance.m_nodes.m_buffer[endRef.nodeReference];
+
+                    direction = CardinalPoint.getCardinalPoint(VectorUtils.XZ(nodeS.m_position).GetAngleToPoint(VectorUtils.XZ(nodeE.m_position))).ToString();
+                }
+            }
+            if (format.Contains("{5}") || format.Contains("{6}"))
+            {
+                GetSegmentRoadEdges(segmentID, false, out ComparableRoad startRef, out ComparableRoad endRef);
+                if (format.Contains("{5}"))//source district
+                {
+                    sourceDistrict = GetDistrictAt(startRef);
+                }
+                if (format.Contains("{6}"))//target district
+                {
+                    targetDistrict = GetDistrictAt(endRef);
+                }
             }
             if (AddressesMod.debugMode)
             {
-                __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, genName, sourceSeg, targetSeg, sourceKm, sourceKmWithDecimal);
+                __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, genName, sourceSeg, targetSeg, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
             }
             else
             {
-                __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal);
+                __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
             }
             AdrUtils.doLog($"[END {segmentID}]" + __result);
             return false;
 
+        }
+
+        private static string GetDistrictAt(ComparableRoad refer)
+        {
+            string sourceDistrict;
+            var node = NetManager.instance.m_nodes.m_buffer[refer.nodeReference];
+            AdrUtils.doLog($"[Node {refer.nodeReference}] Flags => " + NetManager.instance.m_nodes.m_buffer[refer.nodeReference].m_flags);
+            if ((NetManager.instance.m_nodes.m_buffer[refer.nodeReference].m_flags & NetNode.Flags.Outside) != 0)
+            {
+                float angle = Vector2.zero.GetAngleToPoint(VectorUtils.XZ(node.m_position));
+                AdrUtils.doLog($"[Node {refer.nodeReference}] angle => {angle}, pos => {node.m_position} ");
+                sourceDistrict = OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out bool canTrust);
+            }
+            else
+            {
+                int districtId = AdrUtils.GetDistrict(node.m_position);
+                if (districtId == 0)
+                {
+                    sourceDistrict = SimulationManager.instance.m_metaData.m_CityName;
+                }
+                else
+                {
+                    sourceDistrict = DistrictManager.instance.GetDistrictName(districtId);
+                }
+            }
+
+            return sourceDistrict;
         }
 
         private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, AdrConfigWarehouse.ConfigIndex district, out string genName)

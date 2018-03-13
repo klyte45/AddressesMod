@@ -48,9 +48,14 @@ namespace Klyte.Addresses
             PREFIX_FILENAME = 0x000300 | TYPE_STRING | DISTRICT_CONFIG,
 
             ZIPCODE_GLOBAL_CONFIG = 0x000100 | GLOBAL_CONFIG,
-            
+            NEIGHBOR_GLOBAL_CONFIG = 0x000200 | GLOBAL_CONFIG,
+
             ZIPCODE_FORMAT = 0x01 | ZIPCODE_GLOBAL_CONFIG | TYPE_INT,
-            ZIPCODE_CITY_PREFIX = 0x02 | ZIPCODE_GLOBAL_CONFIG | TYPE_INT,            
+            ZIPCODE_CITY_PREFIX = 0x02 | ZIPCODE_GLOBAL_CONFIG | TYPE_INT,
+
+
+            NEIGHBOR_CONFIG_AZIMUTHS_STOPS = 0x01 | TYPE_STRING | NEIGHBOR_GLOBAL_CONFIG,
+            NEIGHBOR_CONFIG_NAME_FILE = 0x02 | TYPE_STRING | NEIGHBOR_GLOBAL_CONFIG,
         }
 
         public static ConfigIndex[] defaultTrueBoolProperties => new ConfigIndex[] {

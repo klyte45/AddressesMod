@@ -43,14 +43,7 @@ namespace Klyte.Addresses.LocaleStruct
                 }
                 else if (baseAi is RoadBridgeAI)
                 {
-                    if (baseAi.BuildOnWater())
-                    {
-                        type = RoadType.BRIDGE;
-                    }
-                    else
-                    {
-                        type = RoadType.ELEVATED;
-                    }
+                    type = RoadType.BRIDGE;
                 }
                 else if (baseAi.IsUnderground())
                 {
@@ -73,7 +66,7 @@ namespace Klyte.Addresses.LocaleStruct
             LinkingType linking = LinkingType.NO_LINKING;
             bool hasStart = true;
             bool hasEnd = true;
-            if (wayVal == OneWay.TRUE)
+            if (wayVal == OneWay.TRUE && lanes <= 2)
             {
                 AdrUtils.GetSegmentRoadEdges(segmentId, true, out ComparableRoad startRef, out ComparableRoad endRef);
                 AdrUtils.doLog($"OneWay s={startRef}; e= {endRef}");
@@ -114,6 +107,22 @@ namespace Klyte.Addresses.LocaleStruct
                 && x.minLanes <= lanes
                 && lanes < x.maxLanes
             ).ToList();
+            if (filterResult.Count == 0 && linking != LinkingType.NO_LINKING)
+            {
+                filterResult = prefixes.Where(x =>
+                   (x.roadType & type) != 0
+                   && (x.oneWay & wayVal) != 0
+                   && (x.symmetry & symVal) != 0
+                   && (x.highway & highway) != 0
+                   && (wayVal == OneWay.FALSE || ((x.linking & LinkingType.NO_LINKING) != 0))
+                   && (hasStart || !x.requireSource)
+                   && (hasEnd || !x.requireTarget)
+                   && x.minWidth <= width + 0.99f
+                   && width + 0.99f < x.maxWidth
+                   && x.minLanes <= lanes
+                   && lanes < x.maxLanes
+               ).ToList();
+            }
             AdrUtils.doLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} = {filterResult?.Count}");
             if (filterResult?.Count == 0)
             {
@@ -174,7 +183,7 @@ namespace Klyte.Addresses.LocaleStruct
                 else
                 {
                     item.linking = LinkingType.NO_LINKING;
-                    if (kv[0].Contains("w") || kv[1].Contains("{1}") || kv[1].Contains("{2}") || kv[1].Contains("{3}") || kv[1].Contains("{4}"))
+                    if (kv[0].Contains("w") || kv[1].Contains("{1}") || kv[1].Contains("{2}") || kv[1].Contains("{3}") || kv[1].Contains("{4}") || kv[1].Contains("{7}"))
                     {
                         item.oneWay = OneWay.TRUE;
 
@@ -199,7 +208,7 @@ namespace Klyte.Addresses.LocaleStruct
                 item.requireSource = kv[1].Contains("{1}") || kv[1].Contains("{3}") || kv[1].Contains("{4}");
                 item.requireTarget = kv[1].Contains("{2}");
 
-                var matchesRoad = Regex.Matches(kv[0], @"[GBTDE]");
+                var matchesRoad = Regex.Matches(kv[0], @"[GBTD]");
                 if (matchesRoad?.Count > 0)
                 {
                     item.roadType = RoadType.NONE;
@@ -218,9 +227,6 @@ namespace Klyte.Addresses.LocaleStruct
                                 break;
                             case "D":
                                 item.roadType |= RoadType.DAM;
-                                break;
-                            case "E":
-                                item.roadType |= RoadType.ELEVATED;
                                 break;
                         }
                     }
@@ -315,8 +321,7 @@ namespace Klyte.Addresses.LocaleStruct
             BRIDGE = 2,
             TUNNEL = 4,
             DAM = 8,
-            ELEVATED = 16,
-            ANY = ELEVATED | GROUND | BRIDGE | TUNNEL | DAM
+            ANY =  GROUND | BRIDGE | TUNNEL | DAM
         }
         enum LinkingType : byte
         {
