@@ -12,7 +12,9 @@ using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
+using Klyte.Commons;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
 using UnityEngine;
 
@@ -97,36 +99,10 @@ namespace Klyte.Addresses
             m_loadedLocalesNeighborName = null;
         }
 
-        public void destroy()
-        {
-            Destroy(openAdrPanelButton);
-        }
 
         public void Start()
         {
-            UITabstrip toolStrip = ToolsModifierControl.mainToolbar.GetComponentInChildren<UITabstrip>();
-            openAdrPanelButton = toolStrip.AddTab();
-            this.openAdrPanelButton.size = new Vector2(49f, 49f);
-            this.openAdrPanelButton.name = "AddressesButton";
-            this.openAdrPanelButton.tooltip = "Addresses (v" + AddressesMod.version + ")";
-            this.openAdrPanelButton.relativePosition = new Vector3(0f, 5f);
-            toolStrip.AddTab("AddressesButton", this.openAdrPanelButton.gameObject, null, null);
-            openAdrPanelButton.atlas = taAdr;
-            openAdrPanelButton.normalBgSprite = "AddressesIconSmall";
-            openAdrPanelButton.focusedFgSprite = "ToolbarIconGroup6Focused";
-            openAdrPanelButton.hoveredFgSprite = "ToolbarIconGroup6Hovered";
-            this.openAdrPanelButton.eventButtonStateChanged += delegate (UIComponent c, UIButton.ButtonState s)
-            {
-                if (s == UIButton.ButtonState.Focused)
-                {
-                    internal_OpenAdrPanel();
-                }
-                else
-                {
-                    internal_CloseAdrPanel();
-                }
-            };
-            AdrConfigPanel.Get();
+            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), taAdr, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")");
 
             var typeTarg = typeof(Redirector<>);
             List<Type> instances = GetSubtypesRecursive(typeTarg);
@@ -137,6 +113,16 @@ namespace Klyte.Addresses
             }
         }
 
+        public void OpenAdrPanel()
+        {
+            KlyteModsPanel.instance.OpenAt(ModTab.Addresses);
+        }
+        public void CloseAdrPanel()
+        {
+            KCController.instance.CloseKCPanel();
+        }
+
+        
         private static List<Type> GetSubtypesRecursive(Type typeTarg)
         {
             var classes = from t in Assembly.GetAssembly(typeof(AdrController)).GetTypes()
@@ -162,38 +148,7 @@ namespace Klyte.Addresses
         {
             initNearLinesOnWorldInfoPanel();
         }
-
-        private void ToggleAdrPanel()
-        {
-            openAdrPanelButton.SimulateClick();
-        }
-        public void OpenAdrPanel()
-        {
-            AddressesMod.instance.showVersionInfoPopup();
-            if (!AdrConfigPanel.Get().GetComponent<UIPanel>().isVisible)
-            {
-                openAdrPanelButton.SimulateClick();
-            }
-        }
-        public void CloseAdrPanel()
-        {
-            if (AdrConfigPanel.Get().GetComponent<UIPanel>().isVisible)
-            {
-                openAdrPanelButton.SimulateClick();
-            }
-        }
-
-        private void internal_CloseAdrPanel()
-        {
-            AdrConfigPanel.Get().GetComponent<UIPanel>().isVisible = false;
-            openAdrPanelButton.Unfocus();
-            openAdrPanelButton.state = UIButton.ButtonState.Normal;
-        }
-
-        private void internal_OpenAdrPanel()
-        {
-            AdrConfigPanel.Get().GetComponent<UIPanel>().isVisible = true;
-        }
+        
 
         private void initNearLinesOnWorldInfoPanel()
         {

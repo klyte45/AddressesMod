@@ -15,6 +15,7 @@ using Klyte.Addresses.Utils;
 using System.IO;
 using Klyte.Commons.Overrides;
 using Klyte.Commons.Utils;
+using Klyte.Commons.UI;
 
 namespace Klyte.Addresses.UI
 {
@@ -29,27 +30,16 @@ namespace Klyte.Addresses.UI
 
         private UITabstrip m_StripMain;
         
-        public static AdrConfigPanel Get()
-        {
-            if (instance)
-            {
-                return instance;
-            }
-            UIView view = FindObjectOfType<UIView>();
-            AdrUtils.createUIElement(out UIPanel panelObj, view.transform);
-
-            return instance = panelObj.gameObject.AddComponent<AdrConfigPanel>();
-        }
-
         #region Awake
         private void Awake()
         {
+            instance = this;
             controlContainer = GetComponent<UIPanel>();
             controlContainer.area = new Vector4(0, 0, 0, 0);
             controlContainer.isVisible = false;
             controlContainer.name = "AdrPanel";
 
-            AdrUtils.createUIElement(out mainPanel, controlContainer.transform, "AdrListPanel", new Vector4(395, 58, 400, 600));
+            AdrUtils.createUIElement(out mainPanel, controlContainer.transform, "AdrListPanel", new Vector4(0, 0, 400, 600));
             mainPanel.backgroundSprite = "MenuPanel2";
             CreateTitleBar();
 
@@ -93,7 +83,7 @@ namespace Klyte.Addresses.UI
             titlebar.autoSize = false;
             titlebar.text = "Addresses v" + AddressesMod.version;
             titlebar.textAlignment = UIHorizontalAlignment.Center;
-            AdrUtils.createDragHandle(titlebar, mainPanel);
+            AdrUtils.createDragHandle(titlebar, KlyteModsPanel.instance.mainPanel);
 
             AdrUtils.createUIElement(out UIButton closeButton, mainPanel.transform, "CloseButton", new Vector4(mainPanel.width - 37, 5, 32, 32));
             AdrUtils.initButton(closeButton, false, "buttonclose", true);
@@ -106,7 +96,7 @@ namespace Klyte.Addresses.UI
             AdrUtils.createUIElement(out UISprite logo, mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));
             logo.atlas = AdrController.taAdr;
             logo.spriteName = "AddressesIcon";
-            AdrUtils.createDragHandle(logo, mainPanel);
+            AdrUtils.createDragHandle(logo, KlyteModsPanel.instance.mainPanel);
         }
 
         private static UIComponent CreateContentTemplate(float width, float height)

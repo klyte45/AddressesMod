@@ -129,7 +129,7 @@ namespace Klyte.Addresses.Overrides
 
         #region Hooking
         public static readonly MethodInfo GenerateNameMethod = typeof(OutsideConnectionAI).GetMethod("GenerateName", allFlags);
-        public override void Awake()
+        public override void AwakeBody()
         {
             AdrUtils.doLog("Loading OutsideConnectionAI Overrides");
             #region RoadBaseAI Hooks
@@ -140,5 +140,9 @@ namespace Klyte.Addresses.Overrides
         }
         #endregion
 
+        public override void doLog(string text, params object[] param)
+        {
+            AdrUtils.doLog(text, param);
+        }
     }
 }

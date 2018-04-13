@@ -275,7 +275,7 @@ namespace Klyte.Addresses.Overrides
 
         #region Hooking
         public static readonly MethodInfo GenerateSegmentNameMethod = typeof(NetManager).GetMethod("GenerateSegmentName", allFlags);
-        public override void Awake()
+        public override void AwakeBody()
         {
             AdrUtils.doLog("Loading NetManager Overrides");
             #region RoadBaseAI Hooks
@@ -283,6 +283,11 @@ namespace Klyte.Addresses.Overrides
 
             AddRedirect(GenerateSegmentNameMethod, preRename);
             #endregion
+        }
+
+        public override void doLog(string text, params object[] param)
+        {
+            AdrUtils.doLog(text, param);
         }
         #endregion
 
