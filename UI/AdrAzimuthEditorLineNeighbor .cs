@@ -8,7 +8,7 @@ using System.Linq;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using Klyte.Addresses.Utils;
-using Klyte.Extensions;
+using Klyte.Commons.Extensors;
 using ICities;
 using Klyte.Addresses.Extensors;
 using Klyte.Addresses.Overrides;

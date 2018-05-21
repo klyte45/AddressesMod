@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Klyte.Addresses.Utils.AdrUtils;
+using static Klyte.Commons.Utils.KlyteUtils;
 
 namespace Klyte.Addresses.LocaleStruct
 {

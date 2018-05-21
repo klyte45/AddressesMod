@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using ColossalFramework;
-using ColossalFramework.Math;
+﻿using ColossalFramework;
 using ColossalFramework.UI;
-using Klyte.Addresses.Extensors;
 using Klyte.Addresses.LocaleStruct;
-using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
 using Klyte.Commons;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.UI;
-using Klyte.Commons.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using UnityEngine;
 
 namespace Klyte.Addresses
@@ -23,7 +19,6 @@ namespace Klyte.Addresses
     internal class AdrController : Singleton<AdrController>
     {
         internal static UITextureAtlas taAdr;
-        private UIButton openAdrPanelButton;
 
         private static Dictionary<String, String[]> m_loadedLocalesRoadName;
         private static Dictionary<String, RoadPrefixFileIndexer> m_loadedLocalesRoadPrefix;
@@ -102,7 +97,7 @@ namespace Klyte.Addresses
 
         public void Start()
         {
-            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), taAdr, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")");
+            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), taAdr, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")").eventVisibilityChanged += (x, y) => { if (y) AddressesMod.instance.showVersionInfoPopup(); };
 
             var typeTarg = typeof(Redirector<>);
             List<Type> instances = GetSubtypesRecursive(typeTarg);
@@ -122,7 +117,7 @@ namespace Klyte.Addresses
             KCController.instance.CloseKCPanel();
         }
 
-        
+
         private static List<Type> GetSubtypesRecursive(Type typeTarg)
         {
             var classes = from t in Assembly.GetAssembly(typeof(AdrController)).GetTypes()
@@ -148,16 +143,19 @@ namespace Klyte.Addresses
         {
             initNearLinesOnWorldInfoPanel();
         }
-        
+
 
         private void initNearLinesOnWorldInfoPanel()
         {
 
 
-            UIPanel parent2 = GameObject.Find("UIView").transform.GetComponentInChildren<ZonedBuildingWorldInfoPanel>().GetComponent<UIPanel>();
+            BuildingWorldInfoPanel[] panelList = GameObject.Find("UIView").GetComponentsInChildren<BuildingWorldInfoPanel>();
+            AdrUtils.doLog("WIP LIST: [{0}]", string.Join(", ", panelList.Select(x => x.name).ToArray()));
 
-            if (parent2 != null)
+            foreach (BuildingWorldInfoPanel wip in panelList)
             {
+                AdrUtils.doLog("LOADING WIP HOOK FOR: {0}", wip.name);
+                UIComponent parent2 = wip.GetComponent<UIComponent>();
                 parent2.eventVisibilityChanged += (component, value) =>
                 {
                     UpdateAddressField(parent2);
@@ -168,22 +166,8 @@ namespace Klyte.Addresses
                 };
             }
 
-            UIPanel parent = GameObject.Find("UIView").transform.GetComponentInChildren<CityServiceWorldInfoPanel>().GetComponent<UIPanel>();
-
-            if (parent != null)
-            {
-                parent.eventVisibilityChanged += (component, value) =>
-                {
-                    UpdateAddressField(parent);
-                };
-                parent.eventPositionChanged += (component, value) =>
-                {
-                    UpdateAddressField(parent);
-                };
-            }
-
         }
-        private void UpdateAddressField(UIPanel parent)
+        private void UpdateAddressField(UIComponent parent)
         {
             if (parent != null)
             {
@@ -214,7 +198,7 @@ namespace Klyte.Addresses
             }
         }
 
-        private UIButton initBuildingEditOnWorldInfoPanel(UIPanel parent)
+        private UIButton initBuildingEditOnWorldInfoPanel(UIComponent parent)
         {
             AdrUtils.createUIElement(out UIButton saida, parent.transform, "AddressesIcon", new Vector4(5, -40, 30, 30));
             saida.atlas = taAdr;

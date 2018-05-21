@@ -1,27 +1,24 @@
 using ColossalFramework;
+using ColossalFramework.DataBinding;
+using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using ICities;
-using Klyte.Extensions;
+using Klyte.Addresses.i18n;
+using Klyte.Addresses.Utils;
+using Klyte.Commons.Extensors;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using ColossalFramework.DataBinding;
-using ColossalFramework.Globalization;
-using ColossalFramework.PlatformServices;
-using Klyte.Addresses.Utils;
-using Klyte.Addresses.i18n;
-using System.IO;
-using System.Text;
 
-[assembly: AssemblyVersion("1.1.0.*")]
+[assembly: AssemblyVersion("1.2.0.*")]
 
 namespace Klyte.Addresses
 {
     public class AddressesMod : MonoBehaviour, IUserMod, ILoadingExtension
     {
-        public const string FOLDER_NAME = "Klyte_Addresses";
+        public static readonly string FOLDER_NAME = AdrUtils.BASE_FOLDER_PATH + "AddressesNames";
         public const string ROAD_SUBFOLDER_NAME = "Roads";
         public const string ROADPREFIX_SUBFOLDER_NAME = "RoadsPrefix";
         public const string NEIGHBOR_SUBFOLDER_NAME = "RegionCities";
@@ -85,7 +82,7 @@ namespace Klyte.Addresses
 
         public static bool isCityLoaded => Singleton<SimulationManager>.instance.m_metaData != null;
 
-        public string Name => "Addresses " + version;
+        public string Name => "Addresses & Names " + version;
 
         public string Description => "TLMR's Extension which allow road name generation customization. Requires Klyte Commons subscribed and active.";
 
@@ -312,7 +309,6 @@ namespace Klyte.Addresses
 
             loadAdrLocale(false);
             m_loaded = true;
-            showVersionInfoPopup();
         }
 
         public void OnLevelUnloading()
