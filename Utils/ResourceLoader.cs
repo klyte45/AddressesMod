@@ -1,16 +1,5 @@
-﻿using ColossalFramework;
-using ColossalFramework.Globalization;
-using ColossalFramework.Math;
-using ColossalFramework.Plugins;
-using ColossalFramework.UI;
-using ICities;
-using Klyte.Commons.Extensors;
-using Klyte.Commons.Extensors;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 

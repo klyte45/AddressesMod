@@ -1,20 +1,9 @@
-﻿using ColossalFramework;
-using ColossalFramework.Globalization;
+﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using ICities;
-using Klyte.Commons.Extensors;
-using Klyte.Harmony;
+using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using UnityEngine;
-using Klyte.Addresses.Utils;
-using System.IO;
-using Klyte.Commons.Overrides;
-using Klyte.Commons.Utils;
 
 namespace Klyte.Addresses.UI
 {
