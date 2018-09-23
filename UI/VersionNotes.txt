@@ -1,5 +1,5 @@
-﻿v1.2
-    - Parklife compatibility
-    - Moved to 45's button from Klyte Commons
-    - Added address info in all buildings panels
-    - Changed location of name files to the game's AppData folder
+﻿v1.3
+    - Added autoname function to public transport stations, based in the crossing streets
+    - Also cargo ports and stations can have it names generated
+    - Now can use addresses as name for RICO buildings (only Residences are default renamed as it)
+    - Now you can customize the address lines format. The first line can be used for naming the RICO buildings

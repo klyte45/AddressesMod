@@ -1,11 +1,7 @@
-﻿using ColossalFramework;
-using ColossalFramework.Math;
-using Klyte.Commons.Utils;
+﻿using Klyte.Commons.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Klyte.Addresses.Utils
@@ -54,17 +50,53 @@ namespace Klyte.Addresses.Utils
         public static void getAddressLines(Vector3 sidewalk, Vector3 midPosBuilding, out String[] addressLines)
         {
             addressLines = null;
-            if (!GetAddressStreetAndNumber(sidewalk, midPosBuilding, out int number, out string streetName)) return;
-            //doLog($"number = {number} A");
-            int districtId = GetDistrict(midPosBuilding);
-            string districtName = "";
-            if (districtId > 0)
+            string line1 = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE1);
+            string line2 = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE2);
+            string line3 = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE3);
+            string format = line1 + "≠" + line2 + "≠" + line3;
+
+            string a = "";//street
+            int b = 0;//number
+            string c = SimulationManager.instance.m_metaData.m_CityName;//city
+            string d = "";//district
+            string e = "";//zipcode
+
+            if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
-                districtName = DistrictManager.instance.GetDistrictName(districtId) + " - ";
+                if (!GetAddressStreetAndNumber(sidewalk, midPosBuilding, out b, out a)) return;
             }
 
-            addressLines = new String[] { streetName + "," + number, districtName + SimulationManager.instance.m_metaData.m_CityName, formatPostalCode(sidewalk, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT)) };
-        }         
+            if (format.ToCharArray().Intersect("D[]".ToCharArray()).Count() > 0)
+            {
+                int districtId = GetDistrict(midPosBuilding);
+                if (districtId > 0)
+                {
+                    d = DistrictManager.instance.GetDistrictName(districtId);
+                    format = Regex.Replace(format, @"\]|\[", "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                }
+                else
+                {
+                    format = Regex.Replace(format, @"\[[^]]*\]", "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                }
+
+            }
+
+            if (format.Contains("E"))
+            {
+                e = formatPostalCode(sidewalk, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ZIPCODE_FORMAT));
+            }
+            parseToFormatableString(ref format, 5);
+
+            addressLines = String.Format(format, a, b, c, d, e).Split("≠".ToCharArray());
+        }
+
+        private static void parseToFormatableString(ref string input, byte count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                input = input.Replace(((char)((int)'A' + i)).ToString(), $"{{{i}}}");
+            }
+        }
 
 
 

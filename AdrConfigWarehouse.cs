@@ -1,13 +1,5 @@
-﻿using ColossalFramework;
-using ColossalFramework.Globalization;
-using Klyte.Commons.Extensors;
-using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using Klyte.Commons.Interfaces;
 using System.Linq;
-using UnityEngine;
 
 namespace Klyte.Addresses
 {
@@ -47,19 +39,45 @@ namespace Klyte.Addresses
             ZIPCODE_PREFIX = 0x000200 | TYPE_INT | DISTRICT_CONFIG,
             PREFIX_FILENAME = 0x000300 | TYPE_STRING | DISTRICT_CONFIG,
 
-            ZIPCODE_GLOBAL_CONFIG = 0x000100 | GLOBAL_CONFIG,
+            ADDRESSING_GLOBAL_CONFIG = 0x000100 | GLOBAL_CONFIG,
             NEIGHBOR_GLOBAL_CONFIG = 0x000200 | GLOBAL_CONFIG,
+            BUILDING_GLOBAL_CONFIG = 0x000300 | GLOBAL_CONFIG,
 
-            ZIPCODE_FORMAT = 0x01 | ZIPCODE_GLOBAL_CONFIG | TYPE_INT,
-            ZIPCODE_CITY_PREFIX = 0x02 | ZIPCODE_GLOBAL_CONFIG | TYPE_INT,
+            ZIPCODE_FORMAT = 0x01 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
+            ZIPCODE_CITY_PREFIX = 0x02 | ADDRESSING_GLOBAL_CONFIG | TYPE_INT,
+            ADDRESS_FORMAT_LINE1 = 0x03 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
+            ADDRESS_FORMAT_LINE2 = 0x04 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
+            ADDRESS_FORMAT_LINE3 = 0x05 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
 
 
             NEIGHBOR_CONFIG_AZIMUTHS_STOPS = 0x01 | TYPE_STRING | NEIGHBOR_GLOBAL_CONFIG,
             NEIGHBOR_CONFIG_NAME_FILE = 0x02 | TYPE_STRING | NEIGHBOR_GLOBAL_CONFIG,
+
+            ENABLE_CUSTOM_NAMING_STATIONS_TRAIN = 0x01 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_MONORAIL = 0x02 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_METRO = 0x03 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_CABLE_CAR = 0x04 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_FERRY = 0x05 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_SHIP = 0x06 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_BLIMP = 0x07 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_STATIONS_AIRPLANE = 0x08 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_CARGO_SHIP = 0x09 | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_CUSTOM_NAMING_CARGO_TRAIN = 0x0A | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_ADDRESS_NAMING_RES = 0x0B | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_ADDRESS_NAMING_IND = 0x0c | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_ADDRESS_NAMING_COM = 0x0d | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
+            ENABLE_ADDRESS_NAMING_OFF = 0x0e | TYPE_BOOL | BUILDING_GLOBAL_CONFIG,
         }
 
         public static ConfigIndex[] defaultTrueBoolProperties => new ConfigIndex[] {
-
+             ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_TRAIN,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_MONORAIL ,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_METRO    ,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_CABLE_CAR,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_FERRY,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_CARGO_SHIP           ,
+             ConfigIndex.ENABLE_CUSTOM_NAMING_CARGO_TRAIN          ,
+             ConfigIndex.ENABLE_ADDRESS_NAMING_RES                 ,
         };
 
         public override string getDefaultStringValueForProperty(ConfigIndex i)
@@ -67,6 +85,18 @@ namespace Klyte.Addresses
             if (i == ConfigIndex.ZIPCODE_FORMAT)
             {
                 return "GCEDF-AJ";
+            }
+            if (i == ConfigIndex.ADDRESS_FORMAT_LINE1)
+            {
+                return "A, B";
+            }
+            if (i == ConfigIndex.ADDRESS_FORMAT_LINE2)
+            {
+                return "[D - ]C";
+            }
+            if (i == ConfigIndex.ADDRESS_FORMAT_LINE3)
+            {
+                return "E";
             }
             return base.getDefaultStringValueForProperty(i);
         }

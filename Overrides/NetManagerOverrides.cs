@@ -6,6 +6,7 @@ using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using static Klyte.Commons.Utils.KlyteUtils;
 
@@ -19,11 +20,17 @@ namespace Klyte.Addresses.Overrides
 
         private static bool GenerateSegmentName(ushort segmentID, ref string __result)
         {
-            var list = new List<ushort>();
-            return GenerateSegmentNameInternal(segmentID, ref __result, ref list);
+            var path = new List<ushort>();
+            return GenerateSegmentNameInternal(segmentID, ref __result, ref path, false);
         }
 
-        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue)
+        public static bool GetStreetNameForStation(ushort segmentID, ref string __result)
+        {
+            var path = new List<ushort>();
+            return GenerateSegmentNameInternal(segmentID, ref __result, ref path, true);
+        }
+
+        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool ignorePrefix)
         {
             AdrUtils.doLog($"[START {segmentID}]" + __result);
             if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)
@@ -70,6 +77,19 @@ namespace Klyte.Addresses.Overrides
                 return true;
             }
 
+            if (ignorePrefix)
+            {
+                Match m = Regex.Match(format, @"((\{0\})|(\{5\})[^{}]*(\{6\})|(\{6\})[^{}]*(\{5\}))");
+                List<string> matchesFound = new List<string>();
+                while (m.Success)
+                {
+                    matchesFound.Add(m.Value);
+                    m = m.NextMatch();
+                }
+                if (matchesFound.Count == 0) return true;
+                format = string.Join(" ", matchesFound.ToArray());
+            }
+
             string genName = "";
             string sourceRoad = "";
             string targetRoad = "";
@@ -97,7 +117,7 @@ namespace Klyte.Addresses.Overrides
                     if (!usedQueue.Contains(sourceSeg))
                     {
                         usedQueue.Add(sourceSeg);
-                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue);
+                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue, ignorePrefix);
                     }
                 }
                 if (format.Contains("{2}"))
@@ -105,7 +125,7 @@ namespace Klyte.Addresses.Overrides
                     if (!usedQueue.Contains(targetSeg))
                     {
                         usedQueue.Add(targetSeg);
-                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue);
+                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue, ignorePrefix);
                     }
                 }
                 if (format.Contains("{3}") || format.Contains("{4}"))
