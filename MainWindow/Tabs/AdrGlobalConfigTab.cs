@@ -75,7 +75,7 @@ namespace Klyte.Addresses.UI
             m_addressLine1Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE1"), null, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE1), onChangeAddressLine1);
             m_addressLine2Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE2"), null, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE2), onChangeAddressLine2);
             m_addressLine3Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE3"), null, AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE3), onChangeAddressLine3);
-            string[] formatExplainAddress = new string[5];
+            string[] formatExplainAddress = new string[6];
             for (int i = 0; i < formatExplainAddress.Length; i++)
             {
                 formatExplainAddress[i] = Locale.Get("ADR_ADDRESS_FORMAT_LEGEND", i);
@@ -89,7 +89,7 @@ namespace Klyte.Addresses.UI
             formatExplainAddressLabel.autoHeight = true;
             formatExplainAddressLabel.width = 370;
 
-            formatExplainAddressLabel.text = "∙ " + string.Join(Environment.NewLine + "∙ ", formatExplain);
+            formatExplainAddressLabel.text = "∙ " + string.Join(Environment.NewLine + "∙ ", formatExplainAddress);
 
 
             m_uiHelperGlobal.AddSpace(20);
