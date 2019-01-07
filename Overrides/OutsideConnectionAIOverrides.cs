@@ -1,13 +1,13 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
+using Klyte.Addresses.Extensors;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
 using System;
 using System.Reflection;
 using UnityEngine;
-using Klyte.Addresses.Extensors;
 
 namespace Klyte.Addresses.Overrides
 {
@@ -125,7 +125,7 @@ namespace Klyte.Addresses.Overrides
         public override void AwakeBody()
         {
             AdrUtils.doLog("Loading OutsideConnectionAI Overrides");
-            #region RoadBaseAI Hooks
+            #region OutsideConnectionAIOverrides Hooks
             MethodInfo preRename = typeof(OutsideConnectionAIOverrides).GetMethod("GenerateNameOverride", allFlags);
 
             AddRedirect(GenerateNameMethod, preRename);

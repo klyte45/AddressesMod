@@ -3,6 +3,8 @@ using ColossalFramework.UI;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Klyte.Addresses.UI
@@ -17,9 +19,10 @@ namespace Klyte.Addresses.UI
         private UITextField m_addressLine1Format;
         private UITextField m_addressLine2Format;
         private UITextField m_addressLine3Format;
-        private UICheckBox m_enableStationAutoName;
 
         private UIHelperExtension m_uiHelperGlobal;
+        private UIDropDown m_districtPrefixGenFile;
+        private UIDropDown m_districtNameGenFile;
 
         #region Awake
         private void Awake()
@@ -30,6 +33,21 @@ namespace Klyte.Addresses.UI
             ((UIScrollablePanel)m_uiHelperGlobal.self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel)m_uiHelperGlobal.self).wrapLayout = true;
             ((UIScrollablePanel)m_uiHelperGlobal.self).width = 370;
+
+            m_districtPrefixGenFile = m_uiHelperGlobal.AddDropdownLocalized("ADR_DISTRICT_GEN_PREFIX_FILE", new String[0], -1, onChangeSelectedDistrictPrefix);
+            m_districtPrefixGenFile.width = 370;
+            m_uiHelperGlobal.AddSpace(1);
+            AdrUtils.LimitWidth((UIButton)m_uiHelperGlobal.AddButton(Locale.Get("ADR_DISTRICT_GEN_PREFIX_FILES_RELOAD"), reloadDistrictPrefixesFiles), 380);
+            m_uiHelperGlobal.AddSpace(20);
+
+            m_districtNameGenFile = m_uiHelperGlobal.AddDropdownLocalized("ADR_DISTRICT_GEN_NAME_FILE", new String[0], -1, onChangeSelectedDistrictName);
+            m_districtNameGenFile.width = 370;
+            m_uiHelperGlobal.AddSpace(1);
+            AdrUtils.LimitWidth((UIButton)m_uiHelperGlobal.AddButton(Locale.Get("ADR_DISTRICT_GEN_NAME_FILES_RELOAD"), reloadDistrictNamesFiles), 380);
+            m_uiHelperGlobal.AddSpace(20);
+
+            reloadDistrictPrefixesFiles();
+            reloadDistrictNamesFiles();
 
             m_prefixPostalCodeCity = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_CITY_POSTAL_CODE"), null, AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_CITY_PREFIX).ToString(), onChangePostalCodePrefixCity);
             m_prefixPostalCodeCity.numericalOnly = true;
@@ -180,6 +198,56 @@ namespace Klyte.Addresses.UI
             }
             m_addressLine3Format.text = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ADDRESS_FORMAT_LINE3);
         }
+
+
+        private void reloadDistrictPrefixesFiles()
+        {
+            AdrController.reloadLocalesDistrictPrefix();
+            List<string> items = AdrController.loadedLocalesDistrictPrefix.Keys.ToList();
+            items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
+            m_districtPrefixGenFile.items = items.ToArray();
+            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_PREFIX_FILE);
+            if (items.Contains(filename))
+            {
+                m_districtPrefixGenFile.selectedValue = filename;
+            }
+            else
+            {
+                m_districtPrefixGenFile.selectedIndex = 0;
+            }
+            DistrictManager.instance.NamesModified();
+        }
+
+
+        private void reloadDistrictNamesFiles()
+        {
+            AdrController.reloadLocalesDistrictName();
+            List<string> items = AdrController.loadedLocalesDistrictName.Keys.ToList();
+            items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
+            m_districtNameGenFile.items = items.ToArray();
+            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_NAMING_FILE);
+            if (items.Contains(filename))
+            {
+                m_districtNameGenFile.selectedValue = filename;
+            }
+            else
+            {
+                m_districtNameGenFile.selectedIndex = 0;
+            }
+            DistrictManager.instance.NamesModified();
+        }
+
+        private void onChangeSelectedDistrictPrefix(int idx)
+        {
+            AdrConfigWarehouse.setCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_PREFIX_FILE, idx > 0 ? m_districtPrefixGenFile.selectedValue : null);
+            DistrictManager.instance.NamesModified();
+        }
+        private void onChangeSelectedDistrictName(int idx)
+        {
+            AdrConfigWarehouse.setCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_NAMING_FILE, idx > 0 ? m_districtNameGenFile.selectedValue : null);
+            DistrictManager.instance.NamesModified();
+        }
+
     }
 
 }

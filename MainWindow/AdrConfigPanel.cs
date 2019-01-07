@@ -1,8 +1,8 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using UnityEngine;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.UI;
+using UnityEngine;
 
 namespace Klyte.Addresses.UI
 {
@@ -16,7 +16,7 @@ namespace Klyte.Addresses.UI
         private UIPanel mainPanel;
 
         private UITabstrip m_StripMain;
-        
+
         #region Awake
         private void Awake()
         {
@@ -37,8 +37,9 @@ namespace Klyte.Addresses.UI
 
             CreateTab<AdrDistrictConfigTab>("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
             CreateTab<AdrNeighborConfigTab>("IconRightArrow", "ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor");
+            CreateTab<AdrCitizenConfigTab>("IconCitizen", "ADR_CONFIG_CITIZEN_TAB", "AdrCitizen");
             CreateTab<AdrGlobalConfigTab>("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
-        }        
+        }
 
         private void CreateTab<T>(string sprite, string localeKey, string objectName) where T : UICustomControl
         {

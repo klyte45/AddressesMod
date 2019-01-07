@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("1.3.0.1")]
+[assembly: AssemblyVersion("1.4.0.0")]
 
 namespace Klyte.Addresses
 {
@@ -22,6 +22,11 @@ namespace Klyte.Addresses
         public const string ROAD_SUBFOLDER_NAME = "Roads";
         public const string ROADPREFIX_SUBFOLDER_NAME = "RoadsPrefix";
         public const string NEIGHBOR_SUBFOLDER_NAME = "RegionCities";
+        public const string DISTRICT_PREFIXES_SUBFOLDER_NAME = "DistrictPrefix";
+        public const string DISTRICT_NAMES_SUBFOLDER_NAME = "DistrictName";
+        public const string CITIZEN_FIRST_NAME_MASC_SUBFOLDER_NAME = "CitizenFirstNameMale";
+        public const string CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME = "CitizenFirstNameFemale";
+        public const string CITIZEN_LAST_NAME_SUBFOLDER_NAME = "CitizenLastName";
         public const string CONFIG_FILENAME = "Addresses0";
         public const string ROAD_LOCALE_FIXED_IDENTIFIER = "ROAD_NAME";
         public static string minorVersion => majorVersion + "." + typeof(AddressesMod).Assembly.GetName().Version.Build;
@@ -93,6 +98,11 @@ namespace Klyte.Addresses
         public static string roadPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
         public static string roadPrefixPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROADPREFIX_SUBFOLDER_NAME;
         public static string neigborsPath => FOLDER_NAME + Path.DirectorySeparatorChar + NEIGHBOR_SUBFOLDER_NAME;
+        public static string districtPrefixPath => FOLDER_NAME + Path.DirectorySeparatorChar + DISTRICT_PREFIXES_SUBFOLDER_NAME;
+        public static string districtNamePath => FOLDER_NAME + Path.DirectorySeparatorChar + DISTRICT_NAMES_SUBFOLDER_NAME;
+        public static string citizenFirstNameMascPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_MASC_SUBFOLDER_NAME;
+        public static string citizenFirstNameFemPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME;
+        public static string citizenLastNamePath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_LAST_NAME_SUBFOLDER_NAME;
 
         public void OnCreated(ILoading loading)
         {
@@ -143,10 +153,6 @@ namespace Klyte.Addresses
             {
                 return;
             }
-            FileInfo fi = AdrUtils.EnsureFolderCreation(FOLDER_NAME);
-            FileInfo fiRoad = AdrUtils.EnsureFolderCreation(roadPath);
-            FileInfo fiRoadPrefix = AdrUtils.EnsureFolderCreation(roadPrefixPath);
-            FileInfo fiNeighbors = AdrUtils.EnsureFolderCreation(neigborsPath);
             UIHelperExtension helper = new UIHelperExtension((UIHelper)helperDefault);
 
             void ev()
@@ -165,23 +171,15 @@ namespace Klyte.Addresses
                 };
 
                 UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("ADR_GENERAL_INFO"));
-                group8.AddLabel(Locale.Get("ADR_ROAD_NAME_FILES_PATH_TITLE") + ":");
-                var namesFilesButton = ((UIButton)group8.AddButton("/", () => { ColossalFramework.Utils.OpenInFileBrowser(fiRoad.FullName); }));
-                namesFilesButton.textColor = Color.yellow;
-                AdrUtils.LimitWidth(namesFilesButton, 710);
-                namesFilesButton.text = fiRoad.FullName + Path.DirectorySeparatorChar;
+                addFolderButton(roadPath, group8, "ADR_ROAD_NAME_FILES_PATH_TITLE");
+                addFolderButton(roadPrefixPath, group8, "ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE");
+                addFolderButton(neigborsPath, group8, "ADR_NEIGHBOR_CITIES_NAME_FILES_PATH_TITLE");
+                addFolderButton(districtPrefixPath, group8, "ADR_DISTRICT_PREFIXES_FILES_PATH_TITLE");
+                addFolderButton(districtNamePath, group8, "ADR_DISTRICT_NAME_FILES_PATH_TITLE");
+                addFolderButton(citizenFirstNameMascPath, group8, "ADR_CITIZEN_FIRST_NAME_MASC_FILES_PATH_TITLE");
+                addFolderButton(citizenFirstNameFemPath, group8, "ADR_CITIZEN_FIRST_NAME_FEM_FILES_PATH_TITLE");
+                addFolderButton(citizenLastNamePath, group8, "ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
 
-                group8.AddLabel(Locale.Get("ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE") + ":");
-                var prefixFilesButton = ((UIButton)group8.AddButton("/", () => { ColossalFramework.Utils.OpenInFileBrowser(fiRoadPrefix.FullName); }));
-                prefixFilesButton.textColor = Color.yellow;
-                AdrUtils.LimitWidth(prefixFilesButton, 710);
-                prefixFilesButton.text = fiRoadPrefix.FullName + Path.DirectorySeparatorChar;
-
-                group8.AddLabel(Locale.Get("ADR_NEIGHBOR_CITIES_NAME_FILES_PATH_TITLE") + ":");
-                var neighButton = ((UIButton)group8.AddButton("/", () => { ColossalFramework.Utils.OpenInFileBrowser(fiNeighbors.FullName); }));
-                neighButton.textColor = Color.yellow;
-                AdrUtils.LimitWidth(neighButton, 710);
-                neighButton.text = fiNeighbors.FullName + Path.DirectorySeparatorChar;
 
                 UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("ADR_ADDITIONAL_FILES_SOURCE"));
                 group7.AddLabel(Locale.Get("ADR_GET_FILES_GITHUB"));
@@ -216,6 +214,15 @@ namespace Klyte.Addresses
             }
         }
 
+        private static void addFolderButton(string filePath, UIHelperExtension helper, string localeId)
+        {
+            var fileInfo = AdrUtils.EnsureFolderCreation(filePath);
+            helper.AddLabel(Locale.Get(localeId) + ":");
+            var namesFilesButton = ((UIButton)helper.AddButton("/", () => { ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName); }));
+            namesFilesButton.textColor = Color.yellow;
+            AdrUtils.LimitWidth(namesFilesButton, 710);
+            namesFilesButton.text = fileInfo.FullName + Path.DirectorySeparatorChar;
+        }
 
 
         public bool showVersionInfoPopup(bool force = false)

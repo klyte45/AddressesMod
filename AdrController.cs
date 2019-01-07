@@ -23,6 +23,11 @@ namespace Klyte.Addresses
         private static Dictionary<String, String[]> m_loadedLocalesRoadName;
         private static Dictionary<String, RoadPrefixFileIndexer> m_loadedLocalesRoadPrefix;
         private static Dictionary<String, String[]> m_loadedLocalesNeighborName;
+        private static Dictionary<String, String[]> m_loadedLocalesDistrictPrefix;
+        private static Dictionary<String, String[]> m_loadedLocalesDistrictName;
+        private static Dictionary<String, String[]> m_loadedLocalesCitizenFirstNameMasc;
+        private static Dictionary<String, String[]> m_loadedLocalesCitizenFirstNameFem;
+        private static Dictionary<String, String[]> m_loadedLocalesCitizenLastName;
 
         public static Dictionary<String, String[]> loadedLocalesRoadName
         {
@@ -79,6 +84,95 @@ namespace Klyte.Addresses
             }
         }
 
+        public static Dictionary<String, String[]> loadedLocalesDistrictPrefix
+        {
+            get {
+                if (m_loadedLocalesDistrictPrefix == null)
+                {
+                    m_loadedLocalesDistrictPrefix = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.districtPrefixPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.districtPrefixPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesDistrictPrefix[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED District Prefixes ({0}) QTT: {1}", filename, m_loadedLocalesDistrictPrefix[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesDistrictPrefix;
+            }
+        }
+
+        public static Dictionary<String, String[]> loadedLocalesDistrictName
+        {
+            get {
+                if (m_loadedLocalesDistrictName == null)
+                {
+                    m_loadedLocalesDistrictName = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.districtNamePath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.districtNamePath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesDistrictName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED District Namees ({0}) QTT: {1}", filename, m_loadedLocalesDistrictName[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesDistrictName;
+            }
+        }
+
+        public static Dictionary<String, String[]> loadedLocalesCitizenFirstNameMasc
+        {
+            get {
+                if (m_loadedLocalesCitizenFirstNameMasc == null)
+                {
+                    m_loadedLocalesCitizenFirstNameMasc = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.citizenFirstNameMascPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.citizenFirstNameMascPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesCitizenFirstNameMasc[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED Citizen First Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenFirstNameMasc[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesCitizenFirstNameMasc;
+            }
+        }
+        public static Dictionary<String, String[]> loadedLocalesCitizenFirstNameFem
+        {
+            get {
+                if (m_loadedLocalesCitizenFirstNameFem == null)
+                {
+                    m_loadedLocalesCitizenFirstNameFem = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.citizenFirstNameFemPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.citizenFirstNameFemPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesCitizenFirstNameFem[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED Citizen First Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenFirstNameFem[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesCitizenFirstNameFem;
+            }
+        }
+
+        public static Dictionary<String, String[]> loadedLocalesCitizenLastName
+        {
+            get {
+                if (m_loadedLocalesCitizenLastName == null)
+                {
+                    m_loadedLocalesCitizenLastName = new Dictionary<string, String[]>();
+                    foreach (var filename in Directory.GetFiles(AddressesMod.citizenLastNamePath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+                    {
+                        string fileContents = File.ReadAllText(AddressesMod.citizenLastNamePath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                        m_loadedLocalesCitizenLastName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        AdrUtils.doLog("LOADED Citizen Last Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenLastName[filename].Length);
+                    }
+                }
+
+                return m_loadedLocalesCitizenLastName;
+            }
+        }
+
         public static void reloadLocalesRoad()
         {
             m_loadedLocalesRoadName = null;
@@ -93,7 +187,27 @@ namespace Klyte.Addresses
         {
             m_loadedLocalesNeighborName = null;
         }
+        public static void reloadLocalesDistrictPrefix()
+        {
+            m_loadedLocalesDistrictPrefix = null;
+        }
+        public static void reloadLocalesDistrictName()
+        {
+            m_loadedLocalesDistrictName = null;
+        }
 
+        public static void reloadLocalesCitizenFirstNameMasc()
+        {
+            m_loadedLocalesCitizenFirstNameMasc = null;
+        }
+        public static void reloadLocalesCitizenFirstNameFem()
+        {
+            m_loadedLocalesCitizenFirstNameFem = null;
+        }
+        public static void reloadLocalesCitizenLastName()
+        {
+            m_loadedLocalesCitizenLastName = null;
+        }
 
         public void Start()
         {
@@ -218,4 +332,6 @@ namespace Klyte.Addresses
             return saida;
         }
     }
+
+    delegate Dictionary<string, string[]> ReturnerDictionary();
 }
