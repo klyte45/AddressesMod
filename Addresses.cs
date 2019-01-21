@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("1.4.0.0")]
+[assembly: AssemblyVersion("1.4.0.1")]
 
 namespace Klyte.Addresses
 {
