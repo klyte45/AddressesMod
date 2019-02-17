@@ -89,7 +89,11 @@ namespace Klyte.Addresses.Overrides
                         InstanceID id = default(InstanceID);
                         id.NetSegment = segId;
                         __result = Singleton<InstanceManager>.instance.GetName(id);
-                        if (__result != string.Empty) return false;
+                        if (__result != string.Empty)
+                        {
+                            Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
+                            return false;
+                        }
                     }
 
                     if (NetManagerOverrides.GetStreetNameForStation(segId, ref __result))
@@ -98,6 +102,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
+                        Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }
@@ -111,6 +116,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
+                        Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }

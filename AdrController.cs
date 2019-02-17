@@ -290,24 +290,31 @@ namespace Klyte.Addresses
                 {
                     addressIcon = initBuildingEditOnWorldInfoPanel(parent);
                 }
-                var prop = typeof(WorldInfoPanel).GetField("m_InstanceID", System.Reflection.BindingFlags.NonPublic
-                    | System.Reflection.BindingFlags.Instance);
-                ushort buildingId = ((InstanceID)(prop.GetValue(parent.gameObject.GetComponent<WorldInfoPanel>()))).Building;
-                addressIcon.isVisible = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].Info.m_placementMode == BuildingInfo.PlacementMode.Roadside;
-                if (addressIcon.isVisible)
+                try
                 {
-                    UILabel addressLabel = addressIcon.Find<UILabel>("Address");
-                    Vector3 sidewalk = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].CalculateSidewalkPosition();
-                    Vector3 midPosBuilding = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].m_position;
-
-                    AdrUtils.getAddressLines(sidewalk, midPosBuilding, out String[] addressLines);
-                    if (addressLines == null)
+                    var prop = typeof(WorldInfoPanel).GetField("m_InstanceID", System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance);
+                    ushort buildingId = ((InstanceID)(prop.GetValue(parent.gameObject.GetComponent<WorldInfoPanel>()))).Building;
+                    addressIcon.isVisible = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].Info.m_placementMode == BuildingInfo.PlacementMode.Roadside;
+                    if (addressIcon.isVisible)
                     {
-                        addressIcon.isVisible = false;
-                        return;
+                        UILabel addressLabel = addressIcon.Find<UILabel>("Address");
+                        Vector3 sidewalk = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].CalculateSidewalkPosition();
+                        Vector3 midPosBuilding = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].m_position;
+
+                        AdrUtils.getAddressLines(sidewalk, midPosBuilding, out String[] addressLines);
+                        if (addressLines == null)
+                        {
+                            addressIcon.isVisible = false;
+                            return;
+                        }
+                        addressLabel.prefix = addressLines[0];
+                        addressLabel.suffix = addressLines[1] + "\n" + addressLines[2];
                     }
-                    addressLabel.prefix = addressLines[0];
-                    addressLabel.suffix = addressLines[1] + "\n" + addressLines[2];
+                }
+                catch (Exception e)
+                {
+                    AdrUtils.doErrorLog($"Exception trying to update address:\n{e.GetType()}\n{e.StackTrace}");
                 }
             }
         }
