@@ -179,7 +179,7 @@ namespace Klyte.Addresses.UI
         }
         private void reloadOptionsFilesNeighbor()
         {
-            AdrController.reloadLocalesNeighbors();
+            AdrController.LoadLocalesNeighborName();
             List<string> items = AdrController.loadedLocalesNeighborName.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_CITIES_REGIONAL_NAMES"));
             m_neighborFileSelect.items = items.ToArray();

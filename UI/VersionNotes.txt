@@ -1,3 +1,5 @@
-﻿v1.4
+﻿v1.4.1
+    - Fixed stackoverflow when lazy loading names' files at city startup (which causes crash) 
+v1.4
     - Added options for district generated names & qualifiers
     - Added cims' names customization

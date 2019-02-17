@@ -69,7 +69,7 @@ namespace Klyte.Addresses.UI
         private void reloadOptionsRoad()
         {
             if (getSelectedConfigIndex() < 0) return;
-            AdrController.reloadLocalesRoad();
+            AdrController.LoadLocalesRoadNames();
             AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
             List<string> items = AdrController.loadedLocalesRoadName.Keys.ToList();
             items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME" : "ADR_DEFAULT_CITY_FILE_NAME"));
@@ -88,7 +88,7 @@ namespace Klyte.Addresses.UI
         private void reloadOptionsRoadPrefix()
         {
             if (getSelectedConfigIndex() < 0) return;
-            AdrController.reloadLocalesRoadPrefix();
+            AdrController.LoadLocalesRoadPrefix();
             List<string> items = AdrController.loadedLocalesRoadPrefix.Keys.ToList();
             AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
             items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME_PREFIX" : "ADR_DEFAULT_CITY_FILE_NAME_PREFIX"));

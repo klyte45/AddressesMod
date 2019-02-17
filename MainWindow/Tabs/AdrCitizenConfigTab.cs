@@ -51,7 +51,7 @@ namespace Klyte.Addresses.UI
 
         private void reloadMaleNameFiles()
         {
-            AdrController.reloadLocalesCitizenFirstNameMasc();
+            AdrController.LoadLocalesCitizenFirstNameMale();
             List<string> items = AdrController.loadedLocalesCitizenFirstNameMasc.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
             m_maleFiles.items = items.ToArray();
@@ -68,7 +68,7 @@ namespace Klyte.Addresses.UI
         }
         private void reloadFemaleNameFiles()
         {
-            AdrController.reloadLocalesCitizenFirstNameFem();
+            AdrController.LoadLocalesCitizenFirstNameFemale();
             List<string> items = AdrController.loadedLocalesCitizenFirstNameFem.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
             m_femaleFiles.items = items.ToArray();
@@ -85,7 +85,7 @@ namespace Klyte.Addresses.UI
         }
         private void reloadLastNameFiles()
         {
-            AdrController.reloadLocalesCitizenLastName();
+            AdrController.LoadLocalesCitizenLastName();
             List<string> items = AdrController.loadedLocalesCitizenLastName.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
             m_lastNameFiles.items = items.ToArray();

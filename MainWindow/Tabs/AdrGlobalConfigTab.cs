@@ -202,7 +202,7 @@ namespace Klyte.Addresses.UI
 
         private void reloadDistrictPrefixesFiles()
         {
-            AdrController.reloadLocalesDistrictPrefix();
+            AdrController.LoadLocalesDistrictPrefix();
             List<string> items = AdrController.loadedLocalesDistrictPrefix.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
             m_districtPrefixGenFile.items = items.ToArray();
@@ -221,7 +221,7 @@ namespace Klyte.Addresses.UI
 
         private void reloadDistrictNamesFiles()
         {
-            AdrController.reloadLocalesDistrictName();
+            AdrController.LoadLocalesDistrictName();
             List<string> items = AdrController.loadedLocalesDistrictName.Keys.ToList();
             items.Insert(0, Locale.Get("ADR_DEFAULT_FILE_NAME"));
             m_districtNameGenFile.items = items.ToArray();
