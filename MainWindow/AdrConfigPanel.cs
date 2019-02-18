@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
+using Klyte.Addresses.TextureAtlas;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.UI;
 using UnityEngine;
@@ -82,7 +83,7 @@ namespace Klyte.Addresses.UI
             };
 
             AdrUtils.createUIElement(out UISprite logo, mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));
-            logo.atlas = AdrController.taAdr;
+            logo.atlas = AdrCommonTextureAtlas.instance.atlas;
             logo.spriteName = "AddressesIcon";
             AdrUtils.createDragHandle(logo, KlyteModsPanel.instance.mainPanel);
         }

@@ -1,11 +1,13 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
 using Klyte.Addresses.LocaleStruct;
+using Klyte.Addresses.TextureAtlas;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
 using Klyte.Commons;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.UI;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +20,6 @@ namespace Klyte.Addresses
 {
     internal class AdrController : Singleton<AdrController>
     {
-        internal static UITextureAtlas taAdr;
 
         private static Dictionary<String, String[]> m_loadedLocalesRoadName;
         private static Dictionary<String, RoadPrefixFileIndexer> m_loadedLocalesRoadPrefix;
@@ -142,7 +143,7 @@ namespace Klyte.Addresses
 
         public void Start()
         {
-            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), taAdr, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")").eventVisibilityChanged += (x, y) => { if (y) AddressesMod.instance.showVersionInfoPopup(); };
+            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), AdrCommonTextureAtlas.instance.atlas, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")").eventVisibilityChanged += (x, y) => { if (y) AddressesMod.instance.showVersionInfoPopup(); };
 
             var typeTarg = typeof(Redirector<>);
             List<Type> instances = GetSubtypesRecursive(typeTarg);
@@ -262,7 +263,7 @@ namespace Klyte.Addresses
         private UIButton initBuildingEditOnWorldInfoPanel(UIComponent parent)
         {
             AdrUtils.createUIElement(out UIButton saida, parent.transform, "AddressesIcon", new Vector4(5, -40, 30, 30));
-            saida.atlas = taAdr;
+            saida.atlas = AdrCommonTextureAtlas.instance.atlas;
             saida.color = Color.white;
             saida.tooltipLocaleID = "ADR_BUILDING_ADDRESS";
             AdrUtils.initButtonSameSprite(saida, "AddressesIcon");
