@@ -18,7 +18,7 @@ namespace Klyte.Addresses.TextureAtlas
     {
         protected override string ResourceName => "UI.Images.sprites.png";
         protected override string CommonName => "AddressesSprites";
-        protected override string[] SpriteNames => new string[] {
+        public override string[] SpriteNames => new string[] {
                     "AddressesIcon","AddressesIconSmall","ToolbarIconGroup6Hovered","ToolbarIconGroup6Focused","HelicopterIndicator","RemoveUnwantedIcon","24hLineIcon", "PerHourIcon"
                 };
     }

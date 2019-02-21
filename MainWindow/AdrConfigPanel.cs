@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Klyte.Addresses.UI
 {
 
-    internal class AdrConfigPanel : UICustomControl
+    public class AdrConfigPanel : UICustomControl
     {
         private const int NUM_SERVICES = 0;
         private static AdrConfigPanel instance;
@@ -79,7 +79,7 @@ namespace Klyte.Addresses.UI
             closeButton.hoveredBgSprite = "buttonclosehover";
             closeButton.eventClick += (x, y) =>
             {
-                AdrController.instance.CloseAdrPanel();
+                AddressesMod.instance.controller.CloseAdrPanel();
             };
 
             AdrUtils.createUIElement(out UISprite logo, mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));

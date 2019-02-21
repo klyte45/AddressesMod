@@ -4,9 +4,12 @@ using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using ICities;
 using Klyte.Addresses.i18n;
+using Klyte.Addresses.TextureAtlas;
+using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Interfaces;
+using Klyte.Commons.UI;
 using System;
 using System.IO;
 using System.Linq;
@@ -18,13 +21,15 @@ using UnityEngine;
 namespace Klyte.Addresses
 {
 
-    public class AddressesMod : BasicIUserMod<AddressesMod, AdrLocaleUtils, AdrResourceLoader>
+    public class AddressesMod : BasicIUserMod<AddressesMod, AdrLocaleUtils, AdrResourceLoader, AdrController, AdrCommonTextureAtlas, AdrConfigPanel>
     {
 
         public AddressesMod()
         {
             Construct();
         }
+
+        protected override ModTab? Tab => ModTab.Addresses;
 
         public override string SimpleName => "Addresses & Names Mod";
         public override string Description => "TLMR's Extension which allow road name generation customization. Requires Klyte Commons subscribed and active.";
@@ -40,31 +45,6 @@ namespace Klyte.Addresses
         }
 
         public override void LoadSettings()
-        {
-        }
-
-        public override void OnCreated(ILoading loading)
-        {
-        }
-
-        public override void OnLevelLoaded(LoadMode mode)
-        {
-            AdrUtils.doLog("LEVEL LOAD");
-            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame && mode != LoadMode.NewGameFromScenario)
-            {
-                AdrUtils.doLog("NOT GAME ({0})", mode);
-                return;
-            }
-
-            AdrController.Ensure();
-
-        }
-
-        public override void OnLevelUnloading()
-        {
-        }
-
-        public override void OnReleased()
         {
         }
 

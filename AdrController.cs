@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace Klyte.Addresses
 {
-    internal class AdrController : Singleton<AdrController>
+    public class AdrController : MonoBehaviour
     {
 
         private static Dictionary<String, String[]> m_loadedLocalesRoadName;
@@ -30,26 +30,14 @@ namespace Klyte.Addresses
         private static Dictionary<String, String[]> m_loadedLocalesCitizenFirstNameFem;
         private static Dictionary<String, String[]> m_loadedLocalesCitizenLastName;
 
-        public static Dictionary<String, String[]> loadedLocalesRoadName => m_loadedLocalesRoadName;
-        public static Dictionary<String, RoadPrefixFileIndexer> loadedLocalesRoadPrefix => m_loadedLocalesRoadPrefix;
-        public static Dictionary<String, String[]> loadedLocalesNeighborName => m_loadedLocalesNeighborName;
-        public static Dictionary<String, String[]> loadedLocalesDistrictPrefix => m_loadedLocalesDistrictPrefix;
-        public static Dictionary<String, String[]> loadedLocalesDistrictName => m_loadedLocalesDistrictName;
-        public static Dictionary<String, String[]> loadedLocalesCitizenFirstNameMasc => m_loadedLocalesCitizenFirstNameMasc;
-        public static Dictionary<String, String[]> loadedLocalesCitizenFirstNameFem => m_loadedLocalesCitizenFirstNameFem;
-        public static Dictionary<String, String[]> loadedLocalesCitizenLastName => m_loadedLocalesCitizenLastName;
-
-        public static void LoadLocalesRoadNames()
-        {
-            m_loadedLocalesRoadName = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.roadPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.roadPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesRoadName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED NAMES ({0}) QTT: {1}", filename, m_loadedLocalesRoadName[filename].Length);
-            }
-
-        }
+        internal static Dictionary<String, String[]> loadedLocalesRoadName => m_loadedLocalesRoadName;
+        internal static Dictionary<String, RoadPrefixFileIndexer> loadedLocalesRoadPrefix => m_loadedLocalesRoadPrefix;
+        internal static Dictionary<String, String[]> loadedLocalesNeighborName => m_loadedLocalesNeighborName;
+        internal static Dictionary<String, String[]> loadedLocalesDistrictPrefix => m_loadedLocalesDistrictPrefix;
+        internal static Dictionary<String, String[]> loadedLocalesDistrictName => m_loadedLocalesDistrictName;
+        internal static Dictionary<String, String[]> loadedLocalesCitizenFirstNameMasc => m_loadedLocalesCitizenFirstNameMasc;
+        internal static Dictionary<String, String[]> loadedLocalesCitizenFirstNameFem => m_loadedLocalesCitizenFirstNameFem;
+        internal static Dictionary<String, String[]> loadedLocalesCitizenLastName => m_loadedLocalesCitizenLastName;
 
         public static void LoadLocalesRoadPrefix()
         {
@@ -63,94 +51,22 @@ namespace Klyte.Addresses
             }
         }
 
+        public static void LoadLocalesRoadNames() => LoadSimpleNamesFiles(out m_loadedLocalesRoadName, AddressesMod.roadPath);
+        public static void LoadLocalesNeighborName() => LoadSimpleNamesFiles(out m_loadedLocalesNeighborName, AddressesMod.neigborsPath);
+        public static void LoadLocalesDistrictPrefix() => LoadSimpleNamesFiles(out m_loadedLocalesDistrictPrefix, AddressesMod.districtPrefixPath);
+        public static void LoadLocalesDistrictName() => LoadSimpleNamesFiles(out m_loadedLocalesDistrictName, AddressesMod.districtNamePath);
+        public static void LoadLocalesCitizenFirstNameMale() => LoadSimpleNamesFiles(out m_loadedLocalesCitizenFirstNameMasc, AddressesMod.citizenFirstNameMascPath);
+        public static void LoadLocalesCitizenFirstNameFemale() => LoadSimpleNamesFiles(out m_loadedLocalesCitizenFirstNameFem, AddressesMod.citizenFirstNameFemPath);
+        public static void LoadLocalesCitizenLastName() => LoadSimpleNamesFiles(out m_loadedLocalesCitizenLastName, AddressesMod.citizenLastNamePath);
 
-        public static void LoadLocalesNeighborName()
+        private static void LoadSimpleNamesFiles(out Dictionary<string, String[]> result, string path)
         {
-            m_loadedLocalesNeighborName = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.neigborsPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+            result = new Dictionary<string, String[]>();
+            foreach (var filename in Directory.GetFiles(path, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
             {
-                string fileContents = File.ReadAllText(AddressesMod.neigborsPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesNeighborName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED Neighbors ({0}) QTT: {1}", filename, m_loadedLocalesNeighborName[filename].Length);
-            }
-
-        }
-
-        public static void LoadLocalesDistrictPrefix()
-        {
-            m_loadedLocalesDistrictPrefix = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.districtPrefixPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.districtPrefixPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesDistrictPrefix[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED District Prefixes ({0}) QTT: {1}", filename, m_loadedLocalesDistrictPrefix[filename].Length);
-            }
-
-        }
-
-
-        public static void LoadLocalesDistrictName()
-        {
-            m_loadedLocalesDistrictName = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.districtNamePath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.districtNamePath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesDistrictName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED District Namees ({0}) QTT: {1}", filename, m_loadedLocalesDistrictName[filename].Length);
-            }
-
-        }
-
-
-        public static void LoadLocalesCitizenFirstNameMale()
-        {
-            m_loadedLocalesCitizenFirstNameMasc = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.citizenFirstNameMascPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.citizenFirstNameMascPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesCitizenFirstNameMasc[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED Citizen First Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenFirstNameMasc[filename].Length);
-            }
-
-        }
-
-
-        public static void LoadLocalesCitizenFirstNameFemale()
-        {
-            m_loadedLocalesCitizenFirstNameFem = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.citizenFirstNameFemPath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.citizenFirstNameFemPath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesCitizenFirstNameFem[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED Citizen First Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenFirstNameFem[filename].Length);
-            }
-
-        }
-
-        public static void LoadLocalesCitizenLastName()
-        {
-            m_loadedLocalesCitizenLastName = new Dictionary<string, String[]>();
-            foreach (var filename in Directory.GetFiles(AddressesMod.citizenLastNamePath, "*.txt").Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
-            {
-                string fileContents = File.ReadAllText(AddressesMod.citizenLastNamePath + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
-                m_loadedLocalesCitizenLastName[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                AdrUtils.doLog("LOADED Citizen Last Names ({0}) QTT: {1}", filename, m_loadedLocalesCitizenLastName[filename].Length);
-            }
-
-        }
-
-
-
-        public void Start()
-        {
-            KlyteModsPanel.instance.AddTab(ModTab.Addresses, typeof(AdrConfigPanel), AdrCommonTextureAtlas.instance.atlas, "AddressesIcon", "Addresses (v" + AddressesMod.version + ")").eventVisibilityChanged += (x, y) => { if (y) AddressesMod.instance.showVersionInfoPopup(); };
-
-            var typeTarg = typeof(Redirector<>);
-            List<Type> instances = GetSubtypesRecursive(typeTarg);
-
-            foreach (Type t in instances)
-            {
-                gameObject.AddComponent(t);
+                string fileContents = File.ReadAllText(path + Path.DirectorySeparatorChar + filename, Encoding.UTF8);
+                result[filename] = fileContents.Split(Environment.NewLine.ToCharArray()).Select(x => x?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                AdrUtils.doLog($"LOADED Files at {path} ({filename}) QTT: {result[filename].Length}");
             }
         }
 
@@ -160,29 +76,7 @@ namespace Klyte.Addresses
         }
         public void CloseAdrPanel()
         {
-            KCController.instance.CloseKCPanel();
-        }
-
-
-        private static List<Type> GetSubtypesRecursive(Type typeTarg)
-        {
-            var classes = from t in Assembly.GetAssembly(typeof(AdrController)).GetTypes()
-                          let y = t.BaseType
-                          where t.IsClass && y != null && y.IsGenericType == typeTarg.IsGenericType && (y.GetGenericTypeDefinition() == typeTarg || y.BaseType == typeTarg)
-                          select t;
-            List<Type> result = new List<Type>();
-            foreach (Type t in classes)
-            {
-                if (t.IsAbstract)
-                {
-                    result.AddRange(GetSubtypesRecursive(t));
-                }
-                else
-                {
-                    result.Add(t);
-                }
-            }
-            return result;
+            KlyteCommonsMod.CloseKCPanel();
         }
 
         public void Awake()
@@ -202,8 +96,6 @@ namespace Klyte.Addresses
 
         private void initNearLinesOnWorldInfoPanel()
         {
-
-
             BuildingWorldInfoPanel[] panelList = GameObject.Find("UIView").GetComponentsInChildren<BuildingWorldInfoPanel>();
             AdrUtils.doLog("WIP LIST: [{0}]", string.Join(", ", panelList.Select(x => x.name).ToArray()));
 
