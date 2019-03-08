@@ -30,7 +30,7 @@ namespace Klyte.Addresses.Overrides
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, true);
         }
 
-        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool ignorePrefix)
+        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool removePrefix)
         {
             AdrUtils.doLog($"[START {segmentID}]" + __result);
             if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)
@@ -52,7 +52,7 @@ namespace Klyte.Addresses.Overrides
             PrefabAI ai = info.GetAI();
             string format = null;
             Randomizer randomizer = new Randomizer(segment.m_nameSeed);
-            AdrConfigWarehouse.ConfigIndex district = (AdrConfigWarehouse.ConfigIndex)(AdrUtils.GetDistrict(segment.m_middlePosition) & 0xFF);
+            AdrConfigWarehouse.ConfigIndex district = (AdrConfigWarehouse.ConfigIndex)(DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
 
             if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
             {
@@ -77,17 +77,10 @@ namespace Klyte.Addresses.Overrides
                 return true;
             }
 
-            if (ignorePrefix)
+            if (removePrefix)
             {
-                Match m = Regex.Match(format, @"((\{0\})|(\{5\})[^{}]*(\{6\})|(\{6\})[^{}]*(\{5\}))");
-                List<string> matchesFound = new List<string>();
-                while (m.Success)
-                {
-                    matchesFound.Add(m.Value);
-                    m = m.NextMatch();
-                }
-                if (matchesFound.Count == 0) return true;
-                format = string.Join(" ", matchesFound.ToArray());
+                format = Regex.Replace(format, "(?!\\{)(\\w+|\\.)(?!\\})", "");
+                if (format.IsNullOrWhiteSpace()) return true;
             }
 
             string genName = "";
@@ -107,7 +100,7 @@ namespace Klyte.Addresses.Overrides
             ushort targetSeg = 0;
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
-                GetSegmentRoadEdges(segmentID, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                GetSegmentRoadEdges(segmentID, true, true, false, out ComparableRoad startRef, out ComparableRoad endRef);
 
                 sourceSeg = startRef.segmentReference;
                 targetSeg = endRef.segmentReference;
@@ -117,7 +110,7 @@ namespace Klyte.Addresses.Overrides
                     if (!usedQueue.Contains(sourceSeg))
                     {
                         usedQueue.Add(sourceSeg);
-                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue, ignorePrefix);
+                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue, false);
                     }
                 }
                 if (format.Contains("{2}"))
@@ -125,7 +118,7 @@ namespace Klyte.Addresses.Overrides
                     if (!usedQueue.Contains(targetSeg))
                     {
                         usedQueue.Add(targetSeg);
-                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue, ignorePrefix);
+                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue, false);
                     }
                 }
                 if (format.Contains("{3}") || format.Contains("{4}"))
@@ -136,15 +129,14 @@ namespace Klyte.Addresses.Overrides
                 }
                 if (format.Contains("{7}"))//direction
                 {
-                    var nodeS = NetManager.instance.m_nodes.m_buffer[startRef.nodeReference];
-                    var nodeE = NetManager.instance.m_nodes.m_buffer[endRef.nodeReference];
+                    int cardinalDirection = KlyteUtils.GetCardinalDirection(startRef, endRef);
 
-                    direction = CardinalPoint.getCardinalPoint(VectorUtils.XZ(nodeS.m_position).GetAngleToPoint(VectorUtils.XZ(nodeE.m_position))).ToString();
+                    direction = Locale.Get("KCM_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
                 }
             }
             if (format.Contains("{5}") || format.Contains("{6}"))
             {
-                GetSegmentRoadEdges(segmentID, false, out ComparableRoad startRef, out ComparableRoad endRef);
+                GetSegmentRoadEdges(segmentID, false, false, false, out ComparableRoad startRef, out ComparableRoad endRef);
                 if (format.Contains("{5}"))//source district
                 {
                     sourceDistrict = GetDistrictAt(startRef);
@@ -166,7 +158,6 @@ namespace Klyte.Addresses.Overrides
             return false;
 
         }
-
         private static string GetDistrictAt(ComparableRoad refer)
         {
             string sourceDistrict;
@@ -180,7 +171,7 @@ namespace Klyte.Addresses.Overrides
             }
             else
             {
-                int districtId = AdrUtils.GetDistrict(node.m_position);
+                int districtId = Singleton<DistrictManager>.instance.GetDistrict(node.m_position);
                 if (districtId == 0)
                 {
                     sourceDistrict = SimulationManager.instance.m_metaData.m_CityName;
@@ -284,6 +275,7 @@ namespace Klyte.Addresses.Overrides
             }
             return text;
         }
+
         #endregion
 
         #region Hooking

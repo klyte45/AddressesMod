@@ -69,7 +69,7 @@ namespace Klyte.Addresses.LocaleStruct
             bool hasEnd = true;
             if (wayVal == OneWay.TRUE && lanes <= 2)
             {
-                AdrUtils.GetSegmentRoadEdges(segmentId, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                AdrUtils.GetSegmentRoadEdges(segmentId, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
                 AdrUtils.doLog($"OneWay s={startRef}; e= {endRef}");
                 if (startRef.segmentReference == 0 || endRef.segmentReference == 0)
                 {
@@ -322,7 +322,7 @@ namespace Klyte.Addresses.LocaleStruct
             BRIDGE = 2,
             TUNNEL = 4,
             DAM = 8,
-            ANY =  GROUND | BRIDGE | TUNNEL | DAM
+            ANY = GROUND | BRIDGE | TUNNEL | DAM
         }
         enum LinkingType : byte
         {

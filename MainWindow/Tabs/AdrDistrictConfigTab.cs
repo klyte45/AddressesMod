@@ -55,7 +55,7 @@ namespace Klyte.Addresses.UI
             m_prefixPostalCodeDistrict.numericalOnly = true;
             m_prefixPostalCodeDistrict.maxLength = 3;
             
-            DistrictManagerOverrides.eventOnDistrictRenamed += reloadDistricts;
+            DistrictManagerOverrides.eventOnDistrictChanged += reloadDistricts;
             reloadDistricts();
         }
 

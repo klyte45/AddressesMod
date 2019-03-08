@@ -68,7 +68,7 @@ namespace Klyte.Addresses.Utils
 
             if (format.ToCharArray().Intersect("D[]".ToCharArray()).Count() > 0)
             {
-                int districtId = GetDistrict(midPosBuilding);
+                int districtId = DistrictManager.instance.GetDistrict(midPosBuilding);
                 if (districtId > 0)
                 {
                     d = DistrictManager.instance.GetDistrictName(districtId);
@@ -118,7 +118,7 @@ namespace Klyte.Addresses.Utils
         public static string formatPostalCode(Vector3 position, string format = "GCEDF-AJ")
         {
             format = format ?? "GCEDF-AJ";
-            int district = GetDistrict(position) & 0xff;
+            int district = DistrictManager.instance.GetDistrict(position) & 0xff;
             if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
                 int districtPrefix = AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX | (AdrConfigWarehouse.ConfigIndex)district);
