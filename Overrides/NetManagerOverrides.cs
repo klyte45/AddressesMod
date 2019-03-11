@@ -100,7 +100,7 @@ namespace Klyte.Addresses.Overrides
             ushort targetSeg = 0;
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
-                GetSegmentRoadEdges(segmentID, true, true, false, out ComparableRoad startRef, out ComparableRoad endRef);
+                GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
 
                 sourceSeg = startRef.segmentReference;
                 targetSeg = endRef.segmentReference;
