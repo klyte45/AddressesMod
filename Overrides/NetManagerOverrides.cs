@@ -30,7 +30,7 @@ namespace Klyte.Addresses.Overrides
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, true);
         }
 
-        private static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool removePrefix)
+        public static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool removePrefix)
         {
             AdrUtils.doLog($"[START {segmentID}]" + __result);
             if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)

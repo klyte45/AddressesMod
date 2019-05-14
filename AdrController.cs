@@ -1,13 +1,16 @@
 ﻿using ColossalFramework;
+using ColossalFramework.Globalization;
+using ColossalFramework.Math;
 using ColossalFramework.UI;
 using Klyte.Addresses.LocaleStruct;
+using Klyte.Addresses.Overrides;
 using Klyte.Addresses.TextureAtlas;
 using Klyte.Addresses.UI;
 using Klyte.Addresses.Utils;
 using Klyte.Commons;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.UI;
-
+using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,8 +94,58 @@ namespace Klyte.Addresses
             LoadLocalesCitizenLastName();
 
             initNearLinesOnWorldInfoPanel();
+
+            AdrConfigWarehouse.eventOnPropertyChanged += (x, b, i, s) =>
+            {
+                if ((x & AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR) == AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR)
+                {
+                    Commons.Overrides.DistrictManagerOverrides.OnDistrictChanged();
+                }
+                if (x == AdrConfigWarehouse.ConfigIndex.CITY_ZERO_BUILDING)
+                {
+                    Shared.AdrEvents.TriggerZeroMarkerBuildingChange();
+                }
+            };
+
+            Commons.Overrides.BuildingManagerOverrides.eventBuidlingReleased += RemoveZeroMarker;
+
+            var dtbHookableType = Type.GetType("Klyte.DynamicTextBoards.Utils.DTBHookable, KlyteDynamicTextBoards");
+            if (dtbHookableType != null)
+            {
+                dtbHookableType.GetField("GetStreetSuffix", Redirector.allFlags).SetValue(null, new Func<ushort, string>((ushort idx) =>
+                {
+                    var result = "";
+                    var usedQueue = new List<ushort>();
+                    NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
+
+                    return result;
+                }));
+                dtbHookableType.GetField("GetDistrictColor", Redirector.allFlags).SetValue(null, new Func<ushort, Color>((ushort idx) =>
+                {
+                    return AdrConfigWarehouse.GetDistrictColor(idx);
+                }));
+                dtbHookableType.GetField("GetStartPoint", Redirector.allFlags).SetValue(null, new Func<Vector2>(() =>
+                {
+                    var buildingZM = AdrConfigWarehouse.GetZeroMarkBuilding();
+                    if (buildingZM == 0)
+                    {
+                        return Vector2.zero;
+                    }
+                    else
+                    {
+                        return BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
+                    }
+                }));
+            }
         }
 
+        private void RemoveZeroMarker(ushort building)
+        {
+            if (AdrConfigWarehouse.GetZeroMarkBuilding() == building)
+            {
+                AdrConfigWarehouse.setCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.CITY_ZERO_BUILDING, null);
+            }
+        }
 
         private void initNearLinesOnWorldInfoPanel()
         {
@@ -114,6 +167,9 @@ namespace Klyte.Addresses
             }
 
         }
+
+        private static Func<WorldInfoPanel, InstanceID> GetWipBuildingInstanceId = ReflectionUtils.GetGetFieldDelegate<WorldInfoPanel, InstanceID>(typeof(WorldInfoPanel).GetField("m_InstanceID", BindingFlags.NonPublic | BindingFlags.Instance));
+
         private void UpdateAddressField(UIComponent parent)
         {
             if (parent != null)
@@ -123,11 +179,14 @@ namespace Klyte.Addresses
                 {
                     addressIcon = initBuildingEditOnWorldInfoPanel(parent);
                 }
+                UIButton zmButton = parent.Find<UIButton>("ZmButton");
+                if (!zmButton)
+                {
+                    zmButton = initZmButtonOnWorldInfoPanel(parent);
+                }
                 try
                 {
-                    var prop = typeof(WorldInfoPanel).GetField("m_InstanceID", System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance);
-                    ushort buildingId = ((InstanceID)(prop.GetValue(parent.gameObject.GetComponent<WorldInfoPanel>()))).Building;
+                    ushort buildingId = GetWipBuildingInstanceId(parent.gameObject.GetComponent<WorldInfoPanel>()).Building;
                     addressIcon.isVisible = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingId].Info.m_placementMode == BuildingInfo.PlacementMode.Roadside;
                     if (addressIcon.isVisible)
                     {
@@ -144,12 +203,21 @@ namespace Klyte.Addresses
                         addressLabel.prefix = addressLines[0];
                         addressLabel.suffix = addressLines[1] + "\n" + addressLines[2];
                     }
+                    zmButton.color = buildingId == AdrConfigWarehouse.GetZeroMarkBuilding() ? Color.white : Color.black;
+                    zmButton.focusedColor = zmButton.color;
                 }
                 catch (Exception e)
                 {
                     AdrUtils.doErrorLog($"Exception trying to update address:\n{e.GetType()}\n{e.StackTrace}");
                 }
             }
+        }
+
+        private void SetZeroMarkBuilding(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            AdrConfigWarehouse.setCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.CITY_ZERO_BUILDING, GetWipBuildingInstanceId(component.GetComponentInParent<WorldInfoPanel>()).Building);
+            component.color = Color.white;
+            ((UIButton)component).focusedColor = component.color;
         }
 
         private UIButton initBuildingEditOnWorldInfoPanel(UIComponent parent)
@@ -160,14 +228,28 @@ namespace Klyte.Addresses
             saida.tooltipLocaleID = "ADR_BUILDING_ADDRESS";
             AdrUtils.initButtonSameSprite(saida, "AddressesIcon");
 
-            AdrUtils.createUIElement(out UILabel prefixes, saida.transform, "Address");
-            prefixes.autoSize = false;
-            prefixes.wordWrap = true;
-            prefixes.area = new Vector4(35, 1, parent.width - 40, 60);
-            prefixes.textAlignment = UIHorizontalAlignment.Left;
-            prefixes.useOutline = true;
-            prefixes.text = Environment.NewLine;
-            prefixes.textScale = 0.6f;
+            AdrUtils.createUIElement(out UILabel addressContainer, saida.transform, "Address");
+            addressContainer.autoSize = false;
+            addressContainer.wordWrap = true;
+            addressContainer.area = new Vector4(35, 1, parent.width - 40, 60);
+            addressContainer.textAlignment = UIHorizontalAlignment.Left;
+            addressContainer.useOutline = true;
+            addressContainer.text = Environment.NewLine;
+            addressContainer.textScale = 0.6f;
+            addressContainer.isInteractive = false;
+
+            return saida;
+        }
+        private UIButton initZmButtonOnWorldInfoPanel(UIComponent parent)
+        {
+            AdrUtils.createUIElement(out UIButton saida, parent.transform, "ZmBuilding", new Vector4(-40, -40, 30, 30));
+            saida.color = Color.black;
+            saida.focusedColor = Color.black;
+            saida.hoveredColor = Color.cyan;
+            saida.tooltipLocaleID = "ADR_ZERO_MARKER_DETAIL";
+            saida.eventDoubleClick += SetZeroMarkBuilding;
+            AdrUtils.initButtonSameSprite(saida, "ParkLevelStar");
+            saida.canFocus = false;
 
             return saida;
         }

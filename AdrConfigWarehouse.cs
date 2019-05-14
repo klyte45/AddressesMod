@@ -1,5 +1,7 @@
 ﻿using Klyte.Commons.Interfaces;
+using Klyte.Commons.Utils;
 using System.Linq;
+using UnityEngine;
 
 namespace Klyte.Addresses
 {
@@ -38,6 +40,7 @@ namespace Klyte.Addresses
             ROAD_NAME_FILENAME = 0x000100 | TYPE_STRING | DISTRICT_CONFIG,
             ZIPCODE_PREFIX = 0x000200 | TYPE_INT | DISTRICT_CONFIG,
             PREFIX_FILENAME = 0x000300 | TYPE_STRING | DISTRICT_CONFIG,
+            DISTRICT_COLOR = 0x000400 | TYPE_STRING | DISTRICT_CONFIG,
 
             ADDRESSING_GLOBAL_CONFIG = 0x000100 | GLOBAL_CONFIG,
             NEIGHBOR_GLOBAL_CONFIG = 0x000200 | GLOBAL_CONFIG,
@@ -51,6 +54,7 @@ namespace Klyte.Addresses
             ADDRESS_FORMAT_LINE3 = 0x05 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
             DISTRICT_PREFIX_FILE = 0x06 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
             DISTRICT_NAMING_FILE = 0x07 | ADDRESSING_GLOBAL_CONFIG | TYPE_STRING,
+            CITY_ZERO_BUILDING = 0x08 | ADDRESSING_GLOBAL_CONFIG | TYPE_INT,
 
 
             NEIGHBOR_CONFIG_AZIMUTHS_STOPS = 0x01 | TYPE_STRING | NEIGHBOR_GLOBAL_CONFIG,
@@ -106,6 +110,17 @@ namespace Klyte.Addresses
             {
                 return "E";
             }
+            if ((i & ConfigIndex.DISTRICT_COLOR) == ConfigIndex.DISTRICT_COLOR)
+            {
+                if ((i & ConfigIndex.DISTRICT_SUBITEM_DATA) == 0)
+                {
+                    return "000000";
+                }
+                else
+                {
+                    return getString(i & ~ConfigIndex.DISTRICT_SUBITEM_DATA);
+                }
+            }
             return base.getDefaultStringValueForProperty(i);
         }
 
@@ -116,6 +131,31 @@ namespace Klyte.Addresses
                 return (int)i & 0xff;
             }
             return 0;
+        }
+
+        private static Color?[] m_districtColorCache = new Color?[DistrictManager.MAX_DISTRICT_COUNT];
+
+        public static void InvalidateDistrictColor(ushort idx)
+        {
+            m_districtColorCache[idx] = null;
+        }
+
+        public static Color GetDistrictColor(ushort idx)
+        {
+            if (idx < DistrictManager.MAX_DISTRICT_COUNT)
+            {
+                if (m_districtColorCache[idx] == null)
+                {
+                    m_districtColorCache[idx] = ColorExtensions.FromRGB(getCurrentConfigString(ConfigIndex.DISTRICT_COLOR | (ConfigIndex)idx));
+                }
+                return m_districtColorCache[idx].Value;
+            }
+            return Color.clear;
+        }
+
+        public static int GetZeroMarkBuilding()
+        {
+            return getCurrentConfigInt(ConfigIndex.CITY_ZERO_BUILDING);
         }
     }
 }

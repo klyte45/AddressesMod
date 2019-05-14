@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.Overrides;
+using UnityEngine;
+using Klyte.Commons.Utils;
 
 namespace Klyte.Addresses.UI
 {
@@ -20,6 +22,7 @@ namespace Klyte.Addresses.UI
         private UIDropDown m_districtNameFile;
         private UIDropDown m_prefixesFile;
         private UITextField m_prefixPostalCodeDistrict;
+        private UIColorField m_colorDistrict;
 
         private UIHelperExtension m_uiHelperDistrict;
 
@@ -54,7 +57,12 @@ namespace Klyte.Addresses.UI
             m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("ADR_DISTRICT_POSTAL_CODE"), null, "", onChangePostalCodePrefixDistrict);
             m_prefixPostalCodeDistrict.numericalOnly = true;
             m_prefixPostalCodeDistrict.maxLength = 3;
-            
+
+            m_colorDistrict = m_uiHelperDistrict.AddColorPicker(Locale.Get("ADR_DISTRICT_COLOR"), Color.white, onChangeDistrictColor, out UILabel title);
+            m_colorDistrict.width = 20;
+            m_colorDistrict.height = 20;
+            AdrUtils.LimitWidth(title, 350);
+
             DistrictManagerOverrides.eventOnDistrictChanged += reloadDistricts;
             reloadDistricts();
         }
@@ -121,13 +129,18 @@ namespace Klyte.Addresses.UI
         {
             setDistrictPropertyInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX, val);
         }
+        private void onChangeDistrictColor(Color c)
+        {
+            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)) return;
+            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR | selectedDistrict, ColorExtensions.ToRGB(c));
+        }
 
         private void onChangePostalCodePrefixCity(string val)
         {
             if (!int.TryParse(val, out int valInt)) return;
             AdrConfigWarehouse.setCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_CITY_PREFIX, valInt);
         }
-        
+
         private void setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex configIndex, string value)
         {
             if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)) return;
@@ -197,6 +210,7 @@ namespace Klyte.Addresses.UI
             if (getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict))
             {
                 m_prefixPostalCodeDistrict.text = AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX | selectedDistrict).ToString();
+                m_colorDistrict.selectedColor = ColorExtensions.FromRGB(AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR | selectedDistrict));
             }
         }
 

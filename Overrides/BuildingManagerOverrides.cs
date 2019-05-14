@@ -91,7 +91,7 @@ namespace Klyte.Addresses.Overrides
                         __result = Singleton<InstanceManager>.instance.GetName(id);
                         if (__result != string.Empty)
                         {
-                            Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
+                            Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                             return false;
                         }
                     }
@@ -102,7 +102,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
-                        Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }
@@ -116,7 +116,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
-                        Klyte.Commons.Overrides.BuildingManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }
