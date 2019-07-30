@@ -1,26 +1,14 @@
-using ColossalFramework;
 using ColossalFramework.Globalization;
-using ColossalFramework.Math;
 using ColossalFramework.UI;
-using System;
-using UnityEngine;
-using System.Linq;
-using Klyte.Commons.Utils;
-using System.Collections.Generic;
-using Klyte.Addresses.Utils;
-using Klyte.Commons.Extensors;
-using ICities;
 using Klyte.Addresses.Extensors;
+using Klyte.Commons.Utils;
+using UnityEngine;
 
 namespace Klyte.Addresses.UI
 {
     public class AdrAzimuthTitleLineNeighbor : MonoBehaviour
     {
         private UIPanel m_container;
-        private UILabel m_cityId;
-        private UILabel m_azimuthInput;
-        private UILabel m_direction;
-        private UILabel m_generatedName;
 
 
         public void Awake()
@@ -34,37 +22,34 @@ namespace Klyte.Addresses.UI
             m_container.wrapLayout = false;
             m_container.name = "AzimuthEditorTitle";
 
-            CreateTitleLabel(out m_cityId, "CityId", "#", 30);
-            CreateTitleLabel(out m_azimuthInput, "StartAzimuth", Locale.Get("ADR_AZIMUTH_GRADOS_TITLE"), 50);
-            CreateTitleLabel(out m_direction, "Direction", Locale.Get("ADR_DIRECTION_TITLE"), 60);
-            CreateTitleLabel(out m_generatedName, "GenName", Locale.Get("ADR_GEN_NAME_TITLE"), 150);
+            CreateTitleLabel(out UILabel m_cityId, "CityId", "#", 30);
+            CreateTitleLabel(out UILabel m_azimuthInput, "StartAzimuth", Locale.Get("ADR_AZIMUTH_GRADOS_TITLE"), 50);
+            CreateTitleLabel(out UILabel m_direction, "Direction", Locale.Get("ADR_DIRECTION_TITLE"), 60);
+            CreateTitleLabel(out UILabel m_generatedName, "GenName", Locale.Get("ADR_GEN_NAME_TITLE"), 150);
 
-            KlyteUtils.createUIElement(out UIButton add, m_container.transform, "RegenName");
+            KlyteMonoUtils.CreateUIElement(out UIButton add, m_container.transform, "RegenName");
             add.textScale = 1f;
             add.width = 30;
             add.height = 30;
             add.tooltip = Locale.Get("ADR_ADD_REG_CITY");
-            AdrUtils.initButton(add, true, "ButtonMenu");
+            KlyteMonoUtils.InitButton(add, true, "ButtonMenu");
             add.isVisible = true;
             add.text = "+";
-            add.eventClick += (component, eventParam) =>
-            {
-                AdrNeighborhoodExtension.instance.SetAzimuth(99, 0);
-            };
+            add.eventClick += (component, eventParam) => AdrNeighborhoodExtension.SetAzimuth(99, 0);
         }
 
         private void CreateTitleLabel(out UILabel label, string name, string text, uint width)
         {
 
-            KlyteUtils.createUIElement(out UIPanel nameContainer, m_container.transform, "GenNameContainer");
+            KlyteMonoUtils.CreateUIElement(out UIPanel nameContainer, m_container.transform, "GenNameContainer");
             nameContainer.autoSize = false;
             nameContainer.width = width;
             nameContainer.height = 30;
             nameContainer.autoLayout = true;
             nameContainer.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            KlyteUtils.createUIElement(out label, nameContainer.transform, name);
-            KlyteUtils.LimitWidth(label, width);
+            KlyteMonoUtils.CreateUIElement(out label, nameContainer.transform, name);
+            KlyteMonoUtils.LimitWidth(label, width);
             label.autoSize = true;
             label.height = 30;
             label.padding = new RectOffset(3, 3, 4, 3);

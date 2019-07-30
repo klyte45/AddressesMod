@@ -1,8 +1,7 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Addresses.TextureAtlas;
-using Klyte.Addresses.Utils;
-using Klyte.Commons.UI;
+using Klyte.Commons.Utils;
 using UnityEngine;
 
 namespace Klyte.Addresses.UI
@@ -10,31 +9,28 @@ namespace Klyte.Addresses.UI
 
     public class AdrConfigPanel : UICustomControl
     {
-        private const int NUM_SERVICES = 0;
-        private static AdrConfigPanel instance;
 
-        public UIPanel controlContainer { get; private set; }
-        private UIPanel mainPanel;
+        public UIPanel ControlContainer { get; private set; }
+        private UIPanel m_mainPanel;
 
-        private UITabstrip m_StripMain;
+        private UITabstrip m_stripMain;
 
         #region Awake
-        private void Awake()
+        public void Awake()
         {
-            instance = this;
-            controlContainer = GetComponent<UIPanel>();
-            controlContainer.area = new Vector4(0, 0, 0, 0);
-            controlContainer.isVisible = false;
-            controlContainer.name = "AdrPanel";
+            ControlContainer = GetComponent<UIPanel>();
+            ControlContainer.area = new Vector4(0, 0, 0, 0);
+            ControlContainer.isVisible = false;
+            ControlContainer.name = "AdrPanel";
 
-            AdrUtils.createUIElement(out mainPanel, controlContainer.transform, "AdrListPanel", new Vector4(0, 0, 400, 600));
-            mainPanel.backgroundSprite = "MenuPanel2";
+            KlyteMonoUtils.CreateUIElement(out m_mainPanel, ControlContainer.transform, "AdrListPanel", new Vector4(0, 0, 400, 600));
+            m_mainPanel.backgroundSprite = "MenuPanel2";
             CreateTitleBar();
 
-            AdrUtils.createUIElement(out m_StripMain, mainPanel.transform, "AdrTabstrip", new Vector4(5, 45, mainPanel.width - 5, 40));
+            KlyteMonoUtils.CreateUIElement(out m_stripMain, m_mainPanel.transform, "AdrTabstrip", new Vector4(5, 45, m_mainPanel.width - 5, 40));
 
-            AdrUtils.createUIElement(out UITabContainer tabContainer, mainPanel.transform, "AdrTabContainer", new Vector4(5, 80, mainPanel.width - 5, mainPanel.height - 80));
-            m_StripMain.tabPages = tabContainer;
+            KlyteMonoUtils.CreateUIElement(out UITabContainer tabContainer, m_mainPanel.transform, "AdrTabContainer", new Vector4(5, 80, m_mainPanel.width - 5, m_mainPanel.height - 80));
+            m_stripMain.tabPages = tabContainer;
 
             CreateTab<AdrDistrictConfigTab>("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
             CreateTab<AdrNeighborConfigTab>("IconRightArrow", "ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor");
@@ -48,18 +44,18 @@ namespace Klyte.Addresses.UI
             tab.normalFgSprite = sprite;
             tab.tooltip = Locale.Get(localeKey);
 
-            AdrUtils.createUIElement(out UIPanel contentContainer, null);
+            KlyteMonoUtils.CreateUIElement(out UIPanel contentContainer, null);
             contentContainer.name = "Container";
-            contentContainer.area = new Vector4(15, 0, mainPanel.width - 30, mainPanel.height - 70);
-            m_StripMain.AddTab(objectName, tab.gameObject, contentContainer.gameObject);
-
-            AdrUtils.CreateScrollPanel(contentContainer, out UIScrollablePanel scrollablePanel, out UIScrollbar scrollbar, contentContainer.width - 20, contentContainer.height - 5, new Vector3()).self.gameObject.AddComponent<T>();
+            contentContainer.area = new Vector4(15, 0, m_mainPanel.width - 30, m_mainPanel.height - 70);
+            m_stripMain.AddTab(objectName, tab.gameObject, contentContainer.gameObject);
+                       
+            KlyteMonoUtils.CreateScrollPanel(contentContainer, out _, out _, contentContainer.width - 20, contentContainer.height - 5, new Vector3()).Self.gameObject.AddComponent<T>();
         }
 
         private static UIButton CreateTabTemplate()
         {
-            AdrUtils.createUIElement(out UIButton tabTemplate, null, "AdrTabTemplate");
-            AdrUtils.initButton(tabTemplate, false, "GenericTab");
+            KlyteMonoUtils.CreateUIElement(out UIButton tabTemplate, null, "AdrTabTemplate");
+            KlyteMonoUtils.InitButton(tabTemplate, false, "GenericTab");
             tabTemplate.autoSize = false;
             tabTemplate.height = 30;
             tabTemplate.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
@@ -68,50 +64,26 @@ namespace Klyte.Addresses.UI
 
         private void CreateTitleBar()
         {
-            AdrUtils.createUIElement(out UILabel titlebar, mainPanel.transform, "AdrListPanel", new Vector4(75, 10, mainPanel.width - 150, 20));
+            KlyteMonoUtils.CreateUIElement(out UILabel titlebar, m_mainPanel.transform, "AdrListPanel", new Vector4(75, 10, m_mainPanel.width - 150, 20));
             titlebar.autoSize = false;
-            titlebar.text = "Addresses v" + AddressesMod.version;
+            titlebar.text = "Addresses v" + AddressesMod.Version;
             titlebar.textAlignment = UIHorizontalAlignment.Center;
-            AdrUtils.createDragHandle(titlebar, KlyteModsPanel.instance.mainPanel);
 
-            AdrUtils.createUIElement(out UIButton closeButton, mainPanel.transform, "CloseButton", new Vector4(mainPanel.width - 37, 5, 32, 32));
-            AdrUtils.initButton(closeButton, false, "buttonclose", true);
+            KlyteMonoUtils.CreateUIElement(out UIButton closeButton, m_mainPanel.transform, "CloseButton", new Vector4(m_mainPanel.width - 37, 5, 32, 32));
+            KlyteMonoUtils.InitButton(closeButton, false, "buttonclose", true);
             closeButton.hoveredBgSprite = "buttonclosehover";
-            closeButton.eventClick += (x, y) =>
-            {
-                AddressesMod.instance.controller.CloseAdrPanel();
-            };
+            closeButton.eventClick += (x, y) => AddressesMod.Instance.Controller.CloseAdrPanel();
 
-            AdrUtils.createUIElement(out UISprite logo, mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));
-            logo.atlas = AdrCommonTextureAtlas.instance.atlas;
+            KlyteMonoUtils.CreateUIElement(out UISprite logo, m_mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));
+            logo.atlas = AdrCommonTextureAtlas.instance.Atlas;
             logo.spriteName = "AddressesIcon";
-            AdrUtils.createDragHandle(logo, KlyteModsPanel.instance.mainPanel);
-        }
-
-        private static UIComponent CreateContentTemplate(float width, float height)
-        {
-            AdrUtils.createUIElement(out UIPanel contentContainer, null);
-            contentContainer.name = "Container";
-            contentContainer.area = new Vector4(0, 0, width, height);
-            contentContainer.width = contentContainer.width - 20f;
-            contentContainer.height = contentContainer.height;
-            contentContainer.autoLayoutDirection = LayoutDirection.Vertical;
-            contentContainer.autoLayoutStart = LayoutStart.TopLeft;
-            contentContainer.autoLayoutPadding = new RectOffset(0, 0, 0, 0);
-            contentContainer.autoLayout = true;
-            contentContainer.clipChildren = true;
-            contentContainer.relativePosition = new Vector3(5, 0);
-            return contentContainer;
         }
         #endregion
 
 
-        public void SetActiveTab(int idx)
-        {
-            m_StripMain.selectedIndex = idx;
-        }
+        public void SetActiveTab(int idx) => m_stripMain.selectedIndex = idx;
 
-        private void Start()
+        public void Start()
         {
             SetActiveTab(-1);
             SetActiveTab(0);

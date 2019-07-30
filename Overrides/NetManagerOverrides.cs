@@ -1,38 +1,39 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using static Klyte.Commons.Utils.KlyteUtils;
+using static Klyte.Commons.Utils.SegmentUtils;
 
 namespace Klyte.Addresses.Overrides
 {
-    class NetManagerOverrides : Redirector<NetManagerOverrides>
+    internal class NetManagerOverrides : MonoBehaviour, IRedirectable
     {
-        private static MethodInfo roadBaseAiGenerateName = typeof(RoadBaseAI).GetMethod("GenerateStreetName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly | BindingFlags.GetField | BindingFlags.GetProperty);
+        private static readonly MethodInfo m_roadBaseAiGenerateName = typeof(RoadBaseAI).GetMethod("GenerateStreetName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly | BindingFlags.GetField | BindingFlags.GetProperty);
 
         #region Mod
 
+#pragma warning disable IDE0051 // Remover membros privados não utilizados
         private static bool GenerateSegmentName(ushort segmentID, ref string __result)
         {
-            var path = new List<ushort>();
+            List<ushort> path = new List<ushort>();
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, false);
         }
+#pragma warning restore IDE0051 // Remover membros privados não utilizados
 
         public static bool GetStreetNameForStation(ushort segmentID, ref string __result)
         {
-            var path = new List<ushort>();
+            List<ushort> path = new List<ushort>();
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, true);
         }
 
         public static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool removePrefix)
         {
-            AdrUtils.doLog($"[START {segmentID}]" + __result);
+            LogUtils.DoLog($"[START {segmentID}]" + __result);
             if ((NetManager.instance.m_segments.m_buffer[segmentID].m_flags & NetSegment.Flags.CustomName) != 0)
             {
                 if (usedQueue.Count == 0)
@@ -41,29 +42,36 @@ namespace Klyte.Addresses.Overrides
                 }
                 else
                 {
-                    InstanceID id = default(InstanceID);
+                    InstanceID id = default;
                     id.NetSegment = segmentID;
                     __result = Singleton<InstanceManager>.instance.GetName(id);
                     return false;
                 }
             }
-            var segment = NetManager.instance.m_segments.m_buffer[segmentID];
-            var info = segment.Info;
+            NetSegment segment = NetManager.instance.m_segments.m_buffer[segmentID];
+            NetInfo info = segment.Info;
             PrefabAI ai = info.GetAI();
             string format = null;
             Randomizer randomizer = new Randomizer(segment.m_nameSeed);
-            AdrConfigWarehouse.ConfigIndex district = (AdrConfigWarehouse.ConfigIndex)(DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
+            ushort district = (ushort) (DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
+            Xml.AdrDistrictConfig districtConfig = AdrController.CurrentConfig.GetConfigForDistrict(district);
+            Xml.AdrDistrictConfig cityConfig = AdrController.CurrentConfig.GetConfigForDistrict(0);
 
             if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
             {
-                var filenamePrefix = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME | district);
-                if ((filenamePrefix == null || !AdrController.loadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0) filenamePrefix = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME);
-                if (filenamePrefix != null && AdrController.loadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
+                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile;
+                ;
+                if ((filenamePrefix == null || !AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0)
                 {
-                    var currentPrefixFile = AdrController.loadedLocalesRoadPrefix[filenamePrefix];
-                    format = currentPrefixFile.getPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
+                    filenamePrefix = cityConfig.RoadConfig?.QualifierFile;
                 }
-                AdrUtils.doLog("selectedPrefix = {0}", format);
+
+                if (filenamePrefix != null && AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
+                {
+                    LocaleStruct.RoadPrefixFileIndexer currentPrefixFile = AdrController.LoadedLocalesRoadPrefix[filenamePrefix];
+                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte) (info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
+                }
+                LogUtils.DoLog("selectedPrefix = {0}", format);
                 if (format == null)
                 {
                     string key = DefaultPrefix(info, ai);
@@ -80,7 +88,10 @@ namespace Klyte.Addresses.Overrides
             if (removePrefix)
             {
                 format = Regex.Replace(format, "(?!\\{)(\\w+|\\.)(?!\\})", "");
-                if (format.IsNullOrWhiteSpace()) return true;
+                if (format.IsNullOrWhiteSpace())
+                {
+                    return true;
+                }
             }
 
             string genName = "";
@@ -94,13 +105,16 @@ namespace Klyte.Addresses.Overrides
             if (format.Contains("{0}"))
             {
                 GetGeneratedRoadName(segment, ai, district, out genName);
-                if (genName == null) return true;
+                if (genName == null)
+                {
+                    return true;
+                }
             }
             ushort sourceSeg = 0;
             ushort targetSeg = 0;
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
-                GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
 
                 sourceSeg = startRef.segmentReference;
                 targetSeg = endRef.segmentReference;
@@ -129,7 +143,7 @@ namespace Klyte.Addresses.Overrides
                 }
                 if (format.Contains("{7}"))//direction
                 {
-                    int cardinalDirection = KlyteUtils.GetCardinalDirection(startRef, endRef);
+                    int cardinalDirection = SegmentUtils.GetCardinalDirection(startRef, endRef);
 
                     direction = Locale.Get("KCM_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
                 }
@@ -146,7 +160,7 @@ namespace Klyte.Addresses.Overrides
                     targetDistrict = GetDistrictAt(endRef);
                 }
             }
-            if (AddressesMod.debugMode)
+            if (AddressesMod.DebugMode)
             {
                 __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, genName, sourceSeg, targetSeg, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
             }
@@ -154,20 +168,21 @@ namespace Klyte.Addresses.Overrides
             {
                 __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
             }
-            AdrUtils.doLog($"[END {segmentID}]" + __result);
+            LogUtils.DoLog($"[END {segmentID}]" + __result);
             return false;
 
         }
         private static string GetDistrictAt(ComparableRoad refer)
         {
             string sourceDistrict;
-            var node = NetManager.instance.m_nodes.m_buffer[refer.nodeReference];
-            AdrUtils.doLog($"[Node {refer.nodeReference}] Flags => " + NetManager.instance.m_nodes.m_buffer[refer.nodeReference].m_flags);
+            NetNode node = NetManager.instance.m_nodes.m_buffer[refer.nodeReference];
+            LogUtils.DoLog($"[Node {refer.nodeReference}] Flags => " + NetManager.instance.m_nodes.m_buffer[refer.nodeReference].m_flags);
             if ((NetManager.instance.m_nodes.m_buffer[refer.nodeReference].m_flags & NetNode.Flags.Outside) != 0)
             {
                 float angle = Vector2.zero.GetAngleToPoint(VectorUtils.XZ(node.m_position));
-                AdrUtils.doLog($"[Node {refer.nodeReference}] angle => {angle}, pos => {node.m_position} ");
-                sourceDistrict = OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out bool canTrust);
+                LogUtils.DoLog($"[Node {refer.nodeReference}] angle => {angle}, pos => {node.m_position} ");
+
+                sourceDistrict = OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out _);
             }
             else
             {
@@ -185,13 +200,13 @@ namespace Klyte.Addresses.Overrides
             return sourceDistrict;
         }
 
-        private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, AdrConfigWarehouse.ConfigIndex district, out string genName)
+        private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, ushort district, out string genName)
         {
-            var filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME | district);
-            if (string.IsNullOrEmpty(filename) || !AdrController.loadedLocalesRoadName.ContainsKey(filename))
+            string filename = AdrController.CurrentConfig.GetConfigForDistrict(district).RoadConfig?.NamesFile;
+            if (string.IsNullOrEmpty(filename) || !AdrController.LoadedLocalesRoadName.ContainsKey(filename))
             {
-                filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME);
-                if (string.IsNullOrEmpty(filename) || !AdrController.loadedLocalesRoadName.ContainsKey(filename))
+                filename = AdrController.CurrentConfig.GetConfigForDistrict(0).RoadConfig?.NamesFile;
+                if (string.IsNullOrEmpty(filename) || !AdrController.LoadedLocalesRoadName.ContainsKey(filename))
                 {
                     filename = null;
                 }
@@ -200,17 +215,17 @@ namespace Klyte.Addresses.Overrides
             Randomizer randomizer = new Randomizer(segment.m_nameSeed);
             if (filename != null)
             {
-                int range = AdrController.loadedLocalesRoadName[filename]?.Length ?? 0;
+                int range = AdrController.LoadedLocalesRoadName[filename]?.Length ?? 0;
                 if (range == 0)
                 {
                     genName = null;
                     return;
                 }
-                genName = AdrController.loadedLocalesRoadName[filename][randomizer.Int32((uint)range)];
+                genName = AdrController.LoadedLocalesRoadName[filename][randomizer.Int32((uint) range)];
             }
             else
             {
-                genName = roadBaseAiGenerateName.Invoke(ai, new object[] { randomizer })?.ToString();
+                genName = m_roadBaseAiGenerateName.Invoke(ai, new object[] { randomizer })?.ToString();
             }
         }
 
@@ -231,7 +246,7 @@ namespace Klyte.Addresses.Overrides
                 {
                     if (roadAi.m_enableZoning)
                     {
-                        if ((info.m_setVehicleFlags & Vehicle.Flags.OnGravel) != (Vehicle.Flags)0)
+                        if ((info.m_setVehicleFlags & Vehicle.Flags.OnGravel) != 0)
                         {
                             text = "ROAD_NAME_PATTERN";
                         }
@@ -257,7 +272,7 @@ namespace Klyte.Addresses.Overrides
                     }
                 }
 
-                if (ai is DamAI damAi)
+                if (ai is DamAI)
                 {
                     if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
                     {
@@ -279,21 +294,20 @@ namespace Klyte.Addresses.Overrides
         #endregion
 
         #region Hooking
-        public static readonly MethodInfo GenerateSegmentNameMethod = typeof(NetManager).GetMethod("GenerateSegmentName", allFlags);
-        public override void AwakeBody()
-        {
-            AdrUtils.doLog("Loading NetManager Overrides");
-            #region RoadBaseAI Hooks
-            MethodInfo preRename = typeof(NetManagerOverrides).GetMethod("GenerateSegmentName", allFlags);
+        public static readonly MethodInfo GenerateSegmentNameMethod = typeof(NetManager).GetMethod("GenerateSegmentName", RedirectorUtils.allFlags);
 
-            AddRedirect(GenerateSegmentNameMethod, preRename);
+        public Redirector RedirectorInstance { get; } = new Redirector();
+
+        public void Awake()
+        {
+            LogUtils.DoLog("Loading NetManager Overrides");
+            #region RoadBaseAI Hooks
+            MethodInfo preRename = typeof(NetManagerOverrides).GetMethod("GenerateSegmentName", RedirectorUtils.allFlags);
+
+            RedirectorInstance.AddRedirect(GenerateSegmentNameMethod, preRename);
             #endregion
         }
 
-        public override void doLog(string text, params object[] param)
-        {
-            AdrUtils.doLog(text, param);
-        }
         #endregion
 
     }

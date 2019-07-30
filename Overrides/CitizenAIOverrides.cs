@@ -1,29 +1,31 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
 using System.Reflection;
+using UnityEngine;
 
 namespace Klyte.Addresses.Overrides
 {
-    class CitizenAIOVerrides : Redirector<CitizenAIOVerrides>
+    internal class CitizenAIOVerrides : MonoBehaviour, IRedirectable
     {
+        public Redirector RedirectorInstance { get; } = new Redirector();
         #region Mod
         public static bool GenerateCitizenName(uint citizenID, byte family, ref string __result)
         {
             Randomizer randomizer = new Randomizer(citizenID);
-            Randomizer randomizer2 = new Randomizer((int)family);
-            var isMale = Citizen.GetGender(citizenID) == Citizen.Gender.Male;
+            Randomizer randomizer2 = new Randomizer(family);
+            bool isMale = Citizen.GetGender(citizenID) == Citizen.Gender.Male;
 
             string name, surname;
 
             if (isMale)
             {
-                string filenameFirst = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.MALE_FIRSTNAME_FILE);
-                if (AdrController.loadedLocalesCitizenFirstNameMasc.ContainsKey(filenameFirst))
+                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.MaleNamesFile;
+                if (AdrController.LoadedLocalesCitizenFirstNameMasc.ContainsKey(filenameFirst))
                 {
-                    var arrLen = AdrController.loadedLocalesCitizenFirstNameMasc[filenameFirst].Length;
-                    name = AdrController.loadedLocalesCitizenFirstNameMasc[filenameFirst][randomizer.Int32((uint)arrLen)];
+                    int arrLen = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst].Length;
+                    name = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst][randomizer.Int32((uint) arrLen)];
 
                 }
                 else
@@ -35,11 +37,11 @@ namespace Klyte.Addresses.Overrides
             else
             {
 
-                string filenameFirst = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.FEMALE_FIRSTNAME_FILE);
-                if (AdrController.loadedLocalesCitizenFirstNameFem.ContainsKey(filenameFirst))
+                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.FemaleNamesFile;
+                if (AdrController.LoadedLocalesCitizenFirstNameFem.ContainsKey(filenameFirst))
                 {
-                    var arrLen = AdrController.loadedLocalesCitizenFirstNameFem[filenameFirst].Length;
-                    name = AdrController.loadedLocalesCitizenFirstNameFem[filenameFirst][randomizer.Int32((uint)arrLen)];
+                    int arrLen = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst].Length;
+                    name = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst][randomizer.Int32((uint) arrLen)];
 
                 }
                 else
@@ -48,12 +50,12 @@ namespace Klyte.Addresses.Overrides
                 }
 
             }
-            string filenameLast = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.LASTNAME_FILE);
+            string filenameLast = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.SurnamesFile;
 
-            if (AdrController.loadedLocalesCitizenLastName.ContainsKey(filenameLast))
+            if (AdrController.LoadedLocalesCitizenLastName.ContainsKey(filenameLast))
             {
-                var arrLen = AdrController.loadedLocalesCitizenLastName[filenameLast].Length;
-                surname = AdrController.loadedLocalesCitizenLastName[filenameLast][randomizer2.Int32((uint)arrLen)];
+                int arrLen = AdrController.LoadedLocalesCitizenLastName[filenameLast].Length;
+                surname = AdrController.LoadedLocalesCitizenLastName[filenameLast][randomizer2.Int32((uint) arrLen)];
             }
             else
             {
@@ -74,21 +76,17 @@ namespace Klyte.Addresses.Overrides
         #endregion
 
         #region Hooking
-        public override void AwakeBody()
+        public void Awake()
         {
-            AdrUtils.doLog("Loading CitizenAI Overrides");
+            LogUtils.DoLog("Loading CitizenAI Overrides");
             #region CitizenAI Hooks
-            MethodInfo preRename = typeof(CitizenAIOVerrides).GetMethod("GenerateCitizenName", allFlags);
-            var GetNameMethod = typeof(CitizenAI).GetMethod("GenerateCitizenName", allFlags);
-            AdrUtils.doLog($"Overriding GetName ({GetNameMethod} => {preRename})");
-            AddRedirect(GetNameMethod, preRename);
+            MethodInfo preRename = typeof(CitizenAIOVerrides).GetMethod("GenerateCitizenName", RedirectorUtils.allFlags);
+            MethodInfo GetNameMethod = typeof(CitizenAI).GetMethod("GenerateCitizenName", RedirectorUtils.allFlags);
+            LogUtils.DoLog($"Overriding GetName ({GetNameMethod} => {preRename})");
+            RedirectorInstance.AddRedirect(GetNameMethod, preRename);
             #endregion
         }
 
-        public override void doLog(string text, params object[] param)
-        {
-            AdrUtils.doLog(text, param);
-        }
         #endregion
 
 

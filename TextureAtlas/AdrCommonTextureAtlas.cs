@@ -1,25 +1,17 @@
-﻿using ColossalFramework;
-using ColossalFramework.UI;
-using Klyte.Addresses.Utils;
+﻿using Klyte.Addresses.Utils;
 using Klyte.Commons.Interfaces;
-using Klyte.Commons.Utils;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
+using static Klyte.Commons.TextureAtlas.CommonTextureAtlas;
 
 namespace Klyte.Addresses.TextureAtlas
 {
-    public class AdrCommonTextureAtlas : TextureAtlasDescriptor<AdrCommonTextureAtlas, AdrResourceLoader>
+    public class AdrCommonTextureAtlas : TextureAtlasDescriptor<AdrCommonTextureAtlas, AdrResourceLoader, SpriteNames>
     {
         protected override string ResourceName => "UI.Images.sprites.png";
         protected override string CommonName => "AddressesSprites";
-        public override string[] SpriteNames => new string[] {
-                    "AddressesIcon","AddressesIconSmall","ToolbarIconGroup6Hovered","ToolbarIconGroup6Focused","HelicopterIndicator","RemoveUnwantedIcon","24hLineIcon", "PerHourIcon"
-                };
+
+        private enum SpriteNames
+        {
+            AddressesIcon, AddressesIconSmall, ToolbarIconGroup6Hovered, ToolbarIconGroup6Focused, HelicopterIndicator, RemoveUnwantedIcon, Icon24hLine, PerHourIcon
+        };
     }
 }

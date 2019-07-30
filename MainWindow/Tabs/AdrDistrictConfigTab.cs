@@ -1,25 +1,24 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
+using Klyte.Addresses.Overrides;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Klyte.Addresses.Utils;
-using Klyte.Commons.Overrides;
 using UnityEngine;
-using Klyte.Commons.Utils;
 
 namespace Klyte.Addresses.UI
 {
 
     internal class AdrDistrictConfigTab : UICustomControl
     {
-        public UIComponent mainContainer { get; private set; }
+        public UIComponent MainContainer { get; private set; }
 
         private UIDropDown m_selectDistrict;
         private Dictionary<string, int> m_cachedDistricts;
         private string m_lastSelectedItem;
-        private UIDropDown m_districtNameFile;
+        private UIDropDown m_roadNameFile;
         private UIDropDown m_prefixesFile;
         private UITextField m_prefixPostalCodeDistrict;
         private UIColorField m_colorDistrict;
@@ -27,44 +26,44 @@ namespace Klyte.Addresses.UI
         private UIHelperExtension m_uiHelperDistrict;
 
         #region Awake
-        private void Awake()
+        public void Awake()
         {
-            mainContainer = GetComponent<UIComponent>();
+            MainContainer = GetComponent<UIComponent>();
 
-            m_uiHelperDistrict = new UIHelperExtension(mainContainer);
+            m_uiHelperDistrict = new UIHelperExtension(MainContainer);
 
-            ((UIScrollablePanel)m_uiHelperDistrict.self).autoLayoutDirection = LayoutDirection.Horizontal;
-            ((UIScrollablePanel)m_uiHelperDistrict.self).wrapLayout = true;
-            ((UIScrollablePanel)m_uiHelperDistrict.self).width = 370;
+            ((UIScrollablePanel) m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
+            ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
+            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = 370;
 
-            m_cachedDistricts = AdrUtils.getValidDistricts();
+            m_cachedDistricts = DistrictUtils.GetValidDistricts();
             m_selectDistrict = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
             m_selectDistrict.width = 370;
             m_uiHelperDistrict.AddSpace(30);
 
-            m_districtNameFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_NAME_FILE", new String[0], -1, onChangeSelectedRoadName);
-            m_districtNameFile.width = 370;
+            m_roadNameFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_DISTRICT_NAME_FILE", new string[0], -1, OnChangeSelectedRoadName);
+            m_roadNameFile.width = 370;
             m_uiHelperDistrict.AddSpace(1);
-            AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), reloadOptionsRoad), 380);
+            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsRoad), 380);
             m_uiHelperDistrict.AddSpace(20);
 
-            m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_STREETS_PREFIXES_NAME_FILE", new String[0], -1, onChangeSelectedRoadPrefix);
+            m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("ADR_STREETS_PREFIXES_NAME_FILE", new string[0], -1, OnChangeSelectedRoadPrefix);
             m_prefixesFile.width = 370;
             m_uiHelperDistrict.AddSpace(1);
-            AdrUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("ADR_STREETS_PREFIXES_FILES_RELOAD"), reloadOptionsRoadPrefix), 380);
+            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("ADR_STREETS_PREFIXES_FILES_RELOAD"), ReloadOptionsRoadPrefix), 380);
             m_uiHelperDistrict.AddSpace(40);
 
-            m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("ADR_DISTRICT_POSTAL_CODE"), null, "", onChangePostalCodePrefixDistrict);
+            m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("ADR_DISTRICT_POSTAL_CODE"), null, "", OnChangePostalCodePrefixDistrict);
             m_prefixPostalCodeDistrict.numericalOnly = true;
             m_prefixPostalCodeDistrict.maxLength = 3;
 
-            m_colorDistrict = m_uiHelperDistrict.AddColorPicker(Locale.Get("ADR_DISTRICT_COLOR"), Color.white, onChangeDistrictColor, out UILabel title);
+            m_colorDistrict = m_uiHelperDistrict.AddColorPicker(Locale.Get("ADR_DISTRICT_COLOR"), Color.white, OnChangeDistrictColor, out UILabel title);
             m_colorDistrict.width = 20;
             m_colorDistrict.height = 20;
-            AdrUtils.LimitWidth(title, 350);
+            KlyteMonoUtils.LimitWidth(title, 350);
 
-            DistrictManagerOverrides.eventOnDistrictChanged += reloadDistricts;
-            reloadDistricts();
+            DistrictManagerOverrides.EventOnDistrictChanged += ReloadDistricts;
+            ReloadDistricts();
         }
 
         public void Start()
@@ -74,120 +73,81 @@ namespace Klyte.Addresses.UI
         }
         #endregion
 
-        private void reloadOptionsRoad()
+
+        private Xml.AdrDistrictConfig GetDistrictConfig()
         {
-            if (getSelectedConfigIndex() < 0) return;
-            AdrController.LoadLocalesRoadNames();
-            AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
-            List<string> items = AdrController.loadedLocalesRoadName.Keys.ToList();
-            items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME" : "ADR_DEFAULT_CITY_FILE_NAME"));
-            m_districtNameFile.items = items.ToArray();
-            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME | currentSelectedDistrict);
-            if (items.Contains(filename))
+            ushort currentSelectedDistrict = GetSelectedConfigIndex();
+            return AdrController.CurrentConfig.GetConfigForDistrict(currentSelectedDistrict);
+        }
+
+        private void ReloadFiles(Action reloadAction, string selectedOption, List<string> referenceList, UIDropDown ddRef, string optionZeroText)
+        {
+            reloadAction();
+            referenceList.Insert(0, optionZeroText);
+            ddRef.items = referenceList.ToArray();
+            if (referenceList.Contains(selectedOption))
             {
-                m_districtNameFile.selectedValue = filename;
+                ddRef.selectedValue = selectedOption;
             }
             else
             {
-                m_districtNameFile.selectedIndex = 0;
+                ddRef.selectedIndex = 0;
             }
         }
+        private void ReloadOptionsRoad() => ReloadFiles(
+            AdrController.LoadLocalesRoadNames,
+            GetDistrictConfig()?.RoadConfig?.NamesFile,
+            AdrController.LoadedLocalesRoadName.Keys.ToList(),
+            m_roadNameFile,
+            Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME" : "ADR_DEFAULT_CITY_FILE_NAME")
+            );
 
-        private void reloadOptionsRoadPrefix()
+        private void ReloadOptionsRoadPrefix() => ReloadFiles(
+            AdrController.LoadLocalesRoadPrefix,
+            GetDistrictConfig()?.RoadConfig?.QualifierFile,
+            AdrController.LoadedLocalesRoadPrefix.Keys.ToList(),
+            m_prefixesFile,
+            Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME_PREFIX" : "ADR_DEFAULT_CITY_FILE_NAME_PREFIX")
+            );
+
+
+
+        private void OnChangeSelectedRoadPrefix(int idx)
         {
-            if (getSelectedConfigIndex() < 0) return;
-            AdrController.LoadLocalesRoadPrefix();
-            List<string> items = AdrController.loadedLocalesRoadPrefix.Keys.ToList();
-            AdrConfigWarehouse.ConfigIndex currentSelectedDistrict = (AdrConfigWarehouse.ConfigIndex)(getSelectedConfigIndex());
-            items.Insert(0, Locale.Get(m_selectDistrict.selectedIndex == 0 ? "ADR_DEFAULT_FILE_NAME_PREFIX" : "ADR_DEFAULT_CITY_FILE_NAME_PREFIX"));
-            m_prefixesFile.items = items.ToArray();
-            string filename = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME | currentSelectedDistrict);
-            if (items.Contains(filename))
+            GetDistrictConfig().RoadConfig.QualifierFile = idx > 0 ? m_prefixesFile.selectedValue : null;
+            SegmentUtils.UpdateSegmentNamesView();
+        }
+
+        private void OnChangeSelectedRoadName(int idx)
+        {
+            GetDistrictConfig().RoadConfig.NamesFile = idx > 0 ? m_roadNameFile.selectedValue : null;
+            SegmentUtils.UpdateSegmentNamesView();
+        }
+
+        private void OnChangePostalCodePrefixDistrict(string val)
+        {
+            if (int.TryParse(val, out int intval))
             {
-                m_prefixesFile.selectedValue = filename;
+                GetDistrictConfig().ZipcodePrefix = intval;
+            }
+        }
+        private void OnChangeDistrictColor(Color c) => GetDistrictConfig().DistrictColor = c;
+
+        private ushort GetSelectedConfigIndex()
+        {
+            if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
+            {
+                return (ushort) (m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
             }
             else
-            {
-                m_prefixesFile.selectedIndex = 0;
-            }
-        }
-
-
-        private void onChangeSelectedRoadPrefix(int idx)
-        {
-            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.PREFIX_FILENAME, idx > 0 ? m_prefixesFile.selectedValue : null);
-            AdrUtils.UpdateSegmentNamesView();
-        }
-
-        private void onChangeSelectedRoadName(int idx)
-        {
-            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.ROAD_NAME_FILENAME, idx > 0 ? m_districtNameFile.selectedValue : null);
-            AdrUtils.UpdateSegmentNamesView();
-        }
-
-        private void onChangePostalCodePrefixDistrict(string val)
-        {
-            setDistrictPropertyInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX, val);
-        }
-        private void onChangeDistrictColor(Color c)
-        {
-            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)) return;
-            setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR | selectedDistrict, ColorExtensions.ToRGB(c));
-        }
-
-        private void onChangePostalCodePrefixCity(string val)
-        {
-            if (!int.TryParse(val, out int valInt)) return;
-            AdrConfigWarehouse.setCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_CITY_PREFIX, valInt);
-        }
-
-        private void setDistrictPropertyString(AdrConfigWarehouse.ConfigIndex configIndex, string value)
-        {
-            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)) return;
-            AdrConfigWarehouse.setCurrentConfigString(configIndex | selectedDistrict, value);
-        }
-
-        private void setDistrictPropertyInt(AdrConfigWarehouse.ConfigIndex configIndex, string value)
-        {
-            if (!getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict) || !int.TryParse(value, out int valInt)) return;
-            AdrConfigWarehouse.setCurrentConfigInt(configIndex | selectedDistrict, valInt);
-        }
-
-        private bool getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict)
-        {
-            selectedDistrict = 0;
-            if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
-            {
-                selectedDistrict = (AdrConfigWarehouse.ConfigIndex)(m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
-            }
-            else if (m_selectDistrict.selectedIndex != 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private int getSelectedConfigIndex()
-        {
-            if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
-            {
-                return (m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
-            }
-            else if (m_selectDistrict.selectedIndex == 0)
             {
                 return 0;
-            }
-            else
-            {
-                return -1;
             }
         }
 
 
         private void OnDistrictSelect(int x)
         {
-            String oldSel = m_lastSelectedItem;
             try
             {
                 m_lastSelectedItem = m_selectDistrict.items[x];
@@ -205,31 +165,20 @@ namespace Klyte.Addresses.UI
                 }
             }
             //load district info
-            reloadOptionsRoadPrefix();
-            reloadOptionsRoad();
-            if (getSelectedDistrict(out AdrConfigWarehouse.ConfigIndex selectedDistrict))
-            {
-                m_prefixPostalCodeDistrict.text = AdrConfigWarehouse.getCurrentConfigInt(AdrConfigWarehouse.ConfigIndex.ZIPCODE_PREFIX | selectedDistrict).ToString();
-                m_colorDistrict.selectedColor = ColorExtensions.FromRGB(AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_COLOR | selectedDistrict));
-            }
+            ReloadOptionsRoadPrefix();
+            ReloadOptionsRoad();
+            m_prefixPostalCodeDistrict.text = GetDistrictConfig().ZipcodePrefix?.ToString("%03d") ?? "";
+            m_colorDistrict.selectedColor = GetDistrictConfig().DistrictColor;
+
         }
 
 
-        private void reloadDistricts()
+        private void ReloadDistricts()
         {
-            m_cachedDistricts = AdrUtils.getValidDistricts();
+            m_cachedDistricts = DistrictUtils.GetValidDistricts();
             m_selectDistrict.items = m_cachedDistricts.Keys.OrderBy(x => x).ToArray();
             m_selectDistrict.selectedValue = m_lastSelectedItem;
-            AdrUtils.UpdateSegmentNamesView();
-        }
-
-        public int getCurrentSelectedDistrictId()
-        {
-            if (m_lastSelectedItem == null || !m_cachedDistricts.ContainsKey(m_lastSelectedItem))
-            {
-                return -1;
-            }
-            return m_cachedDistricts[m_lastSelectedItem];
+            SegmentUtils.UpdateSegmentNamesView();
         }
 
     }

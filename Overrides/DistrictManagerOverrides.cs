@@ -1,35 +1,39 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
+using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace Klyte.Addresses.Overrides
 {
-    class DistrictManagerOverrides : Redirector<DistrictManagerOverrides>
+    internal class DistrictManagerOverrides : MonoBehaviour, IRedirectable
     {
+        public Redirector RedirectorInstance { get; } = new Redirector();
         #region Mod
+#pragma warning disable IDE0051 // Remover membros privados não utilizados
         private static bool GenerateName(int district, DistrictManager __instance, ref string __result)
         {
             Randomizer randomizer = new Randomizer(__instance.m_districts.m_buffer[district].m_randomSeed);
             string format, arg;
-            string filenamePrefix = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_PREFIX_FILE);
-            string filenameName = AdrConfigWarehouse.getCurrentConfigString(AdrConfigWarehouse.ConfigIndex.DISTRICT_NAMING_FILE);
+            string filenamePrefix = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.QualifierFile;
+            string filenameName = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.NamesFile;
 
-            if (AdrController.loadedLocalesDistrictPrefix.ContainsKey(filenamePrefix))
+            if (AdrController.LoadedLocalesDistrictPrefix.ContainsKey(filenamePrefix))
             {
-                var arrLen = AdrController.loadedLocalesDistrictPrefix[filenamePrefix].Length;
-                format = AdrController.loadedLocalesDistrictPrefix[filenamePrefix][randomizer.Int32((uint)arrLen)];
+                int arrLen = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix].Length;
+                format = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix][randomizer.Int32((uint) arrLen)];
             }
             else
             {
                 format = Locale.Get("DISTRICT_PATTERN", randomizer.Int32(Locale.Count("DISTRICT_PATTERN")));
             }
 
-            if (AdrController.loadedLocalesDistrictName.ContainsKey(filenameName))
+            if (AdrController.LoadedLocalesDistrictName.ContainsKey(filenameName))
             {
-                var arrLen = AdrController.loadedLocalesDistrictName[filenameName].Length;
-                arg = AdrController.loadedLocalesDistrictName[filenameName][randomizer.Int32((uint)arrLen)];
+                int arrLen = AdrController.LoadedLocalesDistrictName[filenameName].Length;
+                arg = AdrController.LoadedLocalesDistrictName[filenameName][randomizer.Int32((uint) arrLen)];
             }
             else
             {
@@ -39,25 +43,48 @@ namespace Klyte.Addresses.Overrides
             __result = StringUtils.SafeFormat(format, arg);
             return false;
         }
+#pragma warning restore IDE0051 // Remover membros privados não utilizados
 
         #endregion
 
         #region Hooking
-        public override void AwakeBody()
+        public void Awake()
         {
-            AdrUtils.doLog("Loading BuildingAI Overrides");
-            #region RoadBaseAI Hooks
-            MethodInfo preRename = typeof(DistrictManagerOverrides).GetMethod("GenerateName", allFlags);
-            var GetNameMethod = typeof(DistrictManager).GetMethod("GenerateName", allFlags);
-            AdrUtils.doLog($"Overriding GetName ({GetNameMethod} => {preRename})");
-            AddRedirect(GetNameMethod, preRename);
+            LogUtils.DoLog("Loading District Overrides");
+            #region District Hooks
+            MethodInfo preRename = typeof(DistrictManagerOverrides).GetMethod("GenerateName", RedirectorUtils.allFlags);
+            MethodInfo GetNameMethod = typeof(DistrictManager).GetMethod("GenerateName", RedirectorUtils.allFlags);
+            LogUtils.DoLog($"Overriding GetName ({GetNameMethod} => {preRename})");
+            RedirectorInstance.AddRedirect(GetNameMethod, preRename);
+
+
+            MethodInfo posChange = typeof(DistrictManagerOverrides).GetMethod("OnDistrictChanged", RedirectorUtils.allFlags);
+
+            RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("SetDistrictName", RedirectorUtils.allFlags), null, posChange);
+            RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("AreaModified", RedirectorUtils.allFlags), null, posChange);
             #endregion
         }
+        #endregion
 
-        public override void doLog(string text, params object[] param)
+        #region Events
+        public static event Action EventOnDistrictChanged;
+        private static int m_cooldown;
+        public static void OnDistrictChanged() => m_cooldown = 15;
+
+        public void Update()
         {
-            AdrUtils.doLog(text, param);
+            if (m_cooldown == 1)
+            {
+
+                EventOnDistrictChanged?.Invoke();
+
+            }
+            if (m_cooldown > 0)
+            {
+                m_cooldown--;
+            }
         }
+
         #endregion
 
 

@@ -1,97 +1,53 @@
 ﻿using ColossalFramework;
 using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
 namespace Klyte.Addresses.Overrides
 {
-    class BuildingManagerOverrides : Redirector<BuildingManagerOverrides>
+    internal class BuildingManagerOverrides : MonoBehaviour, IRedirectable
     {
         #region Mod
 
-        private static bool GetNameStation(ref string __result, ushort buildingID, InstanceID caller)
+#pragma warning disable IDE0051 // Remover membros privados não utilizados
+        private static bool GetNameStation(ref string __result, ushort buildingID)
         {
-            AdrUtils.doLog($"START {buildingID}");
+            LogUtils.DoLog($"START {buildingID}");
             if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is TransportStationAI || BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is CargoStationAI)
             {
 
                 if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is TransportStationAI transportStationAI)
                 {
-                    switch (transportStationAI.m_transportInfo.m_transportType)
+                    if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(transportStationAI.m_transportInfo.m_transportType, transportStationAI.m_transportInfo.m_vehicleType, transportStationAI))
                     {
-                        case TransportInfo.TransportType.Airplane:
-                            if (transportStationAI.m_transportInfo.m_vehicleType == VehicleInfo.VehicleType.Blimp)
-                            {
-                                if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_BLIMP)) return true;
-                            }
-                            else if (transportStationAI.m_transportInfo.m_vehicleType == VehicleInfo.VehicleType.Plane)
-                            {
-                                if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_AIRPLANE)) return true;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                            break;
-                        case TransportInfo.TransportType.CableCar:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_CABLE_CAR)) return true;
-                            break;
-                        case TransportInfo.TransportType.Metro:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_METRO)) return true;
-                            break;
-                        case TransportInfo.TransportType.Monorail:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_MONORAIL)) return true;
-                            break;
-                        case TransportInfo.TransportType.Ship:
-                            if (transportStationAI.m_transportInfo.m_vehicleType == VehicleInfo.VehicleType.Ship)
-                            {
-                                if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_SHIP)) return true;
-                            }
-                            else if (transportStationAI.m_transportInfo.m_vehicleType == VehicleInfo.VehicleType.Ferry)
-                            {
-                                if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_FERRY)) return true;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                            break;
-                        case TransportInfo.TransportType.Train:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_STATIONS_TRAIN)) return true;
-                            break;
-                        default:
-                            return true;
+                        return true;
                     }
                 }
                 if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is CargoStationAI cargoStationAI)
                 {
-                    switch (cargoStationAI.m_transportInfo.m_transportType)
+                    if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(cargoStationAI.m_transportInfo.m_transportType, cargoStationAI.m_transportInfo.m_vehicleType, cargoStationAI))
                     {
-                        case TransportInfo.TransportType.Ship:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_CARGO_SHIP)) return true;
-                            break;
-                        case TransportInfo.TransportType.Train:
-                            if (!AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_CUSTOM_NAMING_CARGO_TRAIN)) return true;
-                            break;
-                        default:
-                            return true;
+                        return true;
                     }
                 }
-                var sidewalk = BuildingManager.instance.m_buildings.m_buffer[buildingID].CalculateSidewalkPosition();
-                AdrUtils.GetNearestSegment(sidewalk, out Vector3 targetPosition, out float targetLength, out ushort targetSegmentId);
-                var crossingSegmentList = AdrUtils.GetCrossingPath(targetSegmentId);
+                Vector3 sidewalk = BuildingManager.instance.m_buildings.m_buffer[buildingID].CalculateSidewalkPosition();
+                SegmentUtils.GetNearestSegment(sidewalk, out _, out _, out ushort targetSegmentId);
+                List<ushort> crossingSegmentList = SegmentUtils.GetCrossingPath(targetSegmentId);
                 crossingSegmentList.Add(targetSegmentId);
                 foreach (ushort segId in crossingSegmentList)
                 {
-                    if ((NetManager.instance.m_segments.m_buffer[(int)segId].m_flags & NetSegment.Flags.CustomName) != NetSegment.Flags.None)
+                    if ((NetManager.instance.m_segments.m_buffer[segId].m_flags & NetSegment.Flags.CustomName) != NetSegment.Flags.None)
                     {
-                        InstanceID id = default(InstanceID);
+                        InstanceID id = default;
                         id.NetSegment = segId;
                         __result = Singleton<InstanceManager>.instance.GetName(id);
                         if (__result != string.Empty)
                         {
-                            Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
+                            InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                             return false;
                         }
                     }
@@ -102,7 +58,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
-                        Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }
@@ -116,7 +72,7 @@ namespace Klyte.Addresses.Overrides
                     }
                     else
                     {
-                        Klyte.Commons.Overrides.InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
                         return false;
                     }
                 }
@@ -126,45 +82,109 @@ namespace Klyte.Addresses.Overrides
 
         }
 
-        private static bool GetNameRico(ref string __result, ushort buildingID, InstanceID caller)
+        private static bool GetNameRico(ref string __result, ushort buildingID)
         {
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is ResidentialBuildingAI && !AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_ADDRESS_NAMING_RES)) return true;
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is IndustrialBuildingAI && !AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_ADDRESS_NAMING_IND)) return true;
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is CommercialBuildingAI && !AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_ADDRESS_NAMING_COM)) return true;
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is OfficeBuildingAI && !AdrConfigWarehouse.getCurrentConfigBool(AdrConfigWarehouse.ConfigIndex.ENABLE_ADDRESS_NAMING_OFF)) return true;
-            var sidewalk = BuildingManager.instance.m_buildings.m_buffer[buildingID].CalculateSidewalkPosition();
-            AdrUtils.getAddressLines(sidewalk, BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position, out string[] addressLines);
-            if (addressLines.Length == 0) return true;
+            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is ResidentialBuildingAI)
+            {
+                if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
+                {
+                    return true;
+                }
+            }
+            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is IndustrialBuildingAI)
+            {
+                if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
+                {
+                    return true;
+                }
+            }
+            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is CommercialBuildingAI)
+            {
+                if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
+                {
+                    return true;
+                }
+            }
+            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is OfficeBuildingAI)
+            {
+                if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
+
+            Vector3 sidewalk = BuildingManager.instance.m_buildings.m_buffer[buildingID].CalculateSidewalkPosition();
+            AdrUtils.GetAddressLines(sidewalk, BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position, out string[] addressLines);
+            if (addressLines.Length == 0)
+            {
+                return true;
+            }
+
             __result = addressLines[0];
             return false;
         }
+
+        private static void OnBuildingCreated(ref ushort building)
+        {
+            ushort building_ = building;
+
+            new AsyncAction(() => EventBuildingCreated?.Invoke(building_)).Execute();
+        }
+        private static void OnBuildingReleased(ref ushort building)
+        {
+            ushort building_ = building;
+            new AsyncAction(() => EventBuidlingReleased?.Invoke(building_)).Execute();
+        }
+
+#pragma warning restore IDE0051 // Remover membros privados não utilizados
         #endregion
 
         #region Hooking
-        private static readonly MethodInfo GetNameMethod = typeof(BuildingAI).GetMethod("GenerateName", allFlags);
-        private static readonly MethodInfo GetNameMethodRes = typeof(ResidentialBuildingAI).GetMethod("GenerateName", allFlags);
-        private static readonly MethodInfo GetNameMethodInd = typeof(IndustrialBuildingAI).GetMethod("GenerateName", allFlags);
-        private static readonly MethodInfo GetNameMethodCom = typeof(CommercialBuildingAI).GetMethod("GenerateName", allFlags);
-        private static readonly MethodInfo GetNameMethodOff = typeof(OfficeBuildingAI).GetMethod("GenerateName", allFlags);
-        //private static readonly MethodInfo GetNameMethodExt = typeof(IndustrialExtractorAI).GetMethod("GenerateName", allFlags);
-        public override void AwakeBody()
-        {
-            AdrUtils.doLog("Loading BuildingAI Overrides");
-            #region RoadBaseAI Hooks
-            MethodInfo preRename = typeof(BuildingManagerOverrides).GetMethod("GetNameStation", allFlags);
-            MethodInfo preRenameRico = typeof(BuildingManagerOverrides).GetMethod("GetNameRico", allFlags);
-            AdrUtils.doLog($"Overriding GetName ({GetNameMethod} => {preRename})");
-            AddRedirect(GetNameMethod, preRename);
-            AddRedirect(GetNameMethodRes, preRenameRico);
-            AddRedirect(GetNameMethodInd, preRenameRico);
-            AddRedirect(GetNameMethodCom, preRenameRico);
-            AddRedirect(GetNameMethodOff, preRenameRico);
-            #endregion
-        }
+        private static readonly MethodInfo m_getNameMethod = typeof(BuildingAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
+        private static readonly MethodInfo m_getNameMethodRes = typeof(ResidentialBuildingAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
+        private static readonly MethodInfo m_getNameMethodInd = typeof(IndustrialBuildingAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
+        private static readonly MethodInfo m_getNameMethodCom = typeof(CommercialBuildingAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
+        private static readonly MethodInfo m_getNameMethodOff = typeof(OfficeBuildingAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
 
-        public override void doLog(string text, params object[] param)
+        public Redirector RedirectorInstance { get; } = new Redirector();
+
+
+        #endregion
+
+        #region Events
+        public static event Action<ushort> EventBuildingCreated;
+        public static event Action<ushort> EventBuidlingReleased;
+
+        #endregion
+
+        #region Hooking
+
+        public void Awake()
         {
-            AdrUtils.doLog(text, param);
+            LogUtils.DoLog("Loading Building Manager Overrides");
+            #region BuildingManager Hooks
+            MethodInfo OnBuildingCreated = GetType().GetMethod("OnBuildingCreated", RedirectorUtils.allFlags);
+            MethodInfo OnBuildingReleased = GetType().GetMethod("OnBuildingReleased", RedirectorUtils.allFlags);
+
+            RedirectorInstance.AddRedirect(typeof(BuildingManager).GetMethod("CreateBuilding", RedirectorUtils.allFlags), null, OnBuildingCreated);
+            RedirectorInstance.AddRedirect(typeof(BuildingManager).GetMethod("ReleaseBuilding", RedirectorUtils.allFlags), null, OnBuildingReleased);
+            #endregion
+
+            #region RoadBaseAI Hooks
+            MethodInfo preRename = typeof(BuildingManagerOverrides).GetMethod("GetNameStation", RedirectorUtils.allFlags);
+            MethodInfo preRenameRico = typeof(BuildingManagerOverrides).GetMethod("GetNameRico", RedirectorUtils.allFlags);
+            LogUtils.DoLog($"Overriding GetName ({m_getNameMethod} => {preRename})");
+            RedirectorInstance.AddRedirect(m_getNameMethod, preRename);
+            RedirectorInstance.AddRedirect(m_getNameMethodRes, preRenameRico);
+            RedirectorInstance.AddRedirect(m_getNameMethodInd, preRenameRico);
+            RedirectorInstance.AddRedirect(m_getNameMethodCom, preRenameRico);
+            RedirectorInstance.AddRedirect(m_getNameMethodOff, preRenameRico);
+            #endregion
+
         }
         #endregion
 

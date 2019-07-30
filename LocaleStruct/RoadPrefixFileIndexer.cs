@@ -1,38 +1,35 @@
 ﻿using ColossalFramework.Math;
-using Klyte.Addresses.Utils;
-using System;
+using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using static Klyte.Addresses.Utils.AdrUtils;
-using static Klyte.Commons.Utils.KlyteUtils;
+using static Klyte.Commons.Utils.SegmentUtils;
 
 namespace Klyte.Addresses.LocaleStruct
 {
     internal class RoadPrefixFileIndexer
     {
-        List<RoadPrefixFileItem> prefixes = new List<RoadPrefixFileItem>();
+        private readonly List<RoadPrefixFileItem> m_prefixes = new List<RoadPrefixFileItem>();
 
         private RoadPrefixFileIndexer() { }
 
-        public object Length => prefixes.Count;
+        public object Length => m_prefixes.Count;
 
         public static RoadPrefixFileIndexer Parse(string[] file)
         {
             RoadPrefixFileIndexer result = new RoadPrefixFileIndexer();
-            foreach (var line in file)
+            foreach (string line in file)
             {
-                var item = RoadPrefixFileItem.Parse(line);
+                RoadPrefixFileItem item = RoadPrefixFileItem.Parse(line);
                 if (item != null)
                 {
-                    result.prefixes.Add(item);
+                    result.m_prefixes.Add(item);
                 }
             }
             return result;
         }
 
-        public string getPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand, ushort segmentId)
+        public string GetPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand, ushort segmentId)
         {
             Highway highway = Highway.ANY;
             RoadType type = RoadType.NONE;
@@ -58,7 +55,7 @@ namespace Klyte.Addresses.LocaleStruct
             }
             if (type == RoadType.NONE)
             {
-                AdrUtils.doLog($"AI NAO IDENTIFICADA: {ai}");
+                LogUtils.DoLog($"AI NAO IDENTIFICADA: {ai}");
                 return null;
             }
 
@@ -69,8 +66,8 @@ namespace Klyte.Addresses.LocaleStruct
             bool hasEnd = true;
             if (wayVal == OneWay.TRUE && lanes <= 2)
             {
-                AdrUtils.GetSegmentRoadEdges(segmentId, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
-                AdrUtils.doLog($"OneWay s={startRef}; e= {endRef}");
+                SegmentUtils.GetSegmentRoadEdges(segmentId, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                LogUtils.DoLog($"OneWay s={startRef}; e= {endRef}");
                 if (startRef.segmentReference == 0 || endRef.segmentReference == 0)
                 {
                     hasStart = startRef.segmentReference != 0;
@@ -80,7 +77,7 @@ namespace Klyte.Addresses.LocaleStruct
                   (NetManager.instance.m_segments.m_buffer[endRef.segmentReference].Info.GetAI() is RoadBaseAI baseAiTarget && baseAiTarget.m_highwayRules))
 
                 {
-                    switch (startRef.compareTo(endRef))
+                    switch (startRef.CompareTo(endRef))
                     {
                         case 1:
                             linking = LinkingType.FROM_BIG;
@@ -95,7 +92,7 @@ namespace Klyte.Addresses.LocaleStruct
                 }
             }
 
-            var filterResult = prefixes.Where(x =>
+            List<RoadPrefixFileItem> filterResult = m_prefixes.Where(x =>
                 (x.roadType & type) != 0
                 && (x.oneWay & wayVal) != 0
                 && (x.symmetry & symVal) != 0
@@ -110,7 +107,7 @@ namespace Klyte.Addresses.LocaleStruct
             ).ToList();
             if (filterResult.Count == 0 && linking != LinkingType.NO_LINKING)
             {
-                filterResult = prefixes.Where(x =>
+                filterResult = m_prefixes.Where(x =>
                    (x.roadType & type) != 0
                    && (x.oneWay & wayVal) != 0
                    && (x.symmetry & symVal) != 0
@@ -124,13 +121,13 @@ namespace Klyte.Addresses.LocaleStruct
                    && lanes < x.maxLanes
                ).ToList();
             }
-            AdrUtils.doLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} = {filterResult?.Count}");
+            LogUtils.DoLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} = {filterResult?.Count}");
             if (filterResult?.Count == 0)
             {
                 return null;
             }
 
-            return filterResult[rand.Int32((uint)(filterResult.Count))].name;
+            return filterResult[rand.Int32((uint) (filterResult.Count))].name;
         }
 
 
@@ -159,7 +156,7 @@ namespace Klyte.Addresses.LocaleStruct
                     item.highway = Highway.FALSE;
                 }
 
-                var matchesLinkingType = Regex.Matches(kv[0], @"[fie]");
+                MatchCollection matchesLinkingType = Regex.Matches(kv[0], @"[fie]");
                 if (matchesLinkingType?.Count > 0)
                 {
                     item.oneWay = OneWay.TRUE;
@@ -209,7 +206,7 @@ namespace Klyte.Addresses.LocaleStruct
                 item.requireSource = kv[1].Contains("{1}") || kv[1].Contains("{3}") || kv[1].Contains("{4}");
                 item.requireTarget = kv[1].Contains("{2}");
 
-                var matchesRoad = Regex.Matches(kv[0], @"[GBTD]");
+                MatchCollection matchesRoad = Regex.Matches(kv[0], @"[GBTD]");
                 if (matchesRoad?.Count > 0)
                 {
                     item.roadType = RoadType.NONE;
@@ -233,7 +230,7 @@ namespace Klyte.Addresses.LocaleStruct
                     }
 
                 }
-                var matchesWidth = Regex.Matches(kv[0], @"\[([0-9]{0,3}),([0-9]{0,3})\]");
+                MatchCollection matchesWidth = Regex.Matches(kv[0], @"\[([0-9]{0,3}),([0-9]{0,3})\]");
                 if (matchesWidth?.Count > 0)
                 {
                     Match m = matchesWidth[0];
@@ -246,7 +243,7 @@ namespace Klyte.Addresses.LocaleStruct
                         item.maxWidth = maxWidth;
                     }
                 }
-                var matchesWidthSingle = Regex.Matches(kv[0], @"\[([0-9]{0,3})\]");
+                MatchCollection matchesWidthSingle = Regex.Matches(kv[0], @"\[([0-9]{0,3})\]");
                 if (matchesWidthSingle?.Count > 0)
                 {
                     Match m = matchesWidth[0];
@@ -256,7 +253,7 @@ namespace Klyte.Addresses.LocaleStruct
                         item.maxWidth = ++minWidth;
                     }
                 }
-                var matchesLanes = Regex.Matches(kv[0], @"\(([0-9]{0,3}),([0-9]{0,3})\)");
+                MatchCollection matchesLanes = Regex.Matches(kv[0], @"\(([0-9]{0,3}),([0-9]{0,3})\)");
                 if (matchesLanes?.Count > 0)
                 {
                     Match m = matchesLanes[0];
@@ -269,7 +266,7 @@ namespace Klyte.Addresses.LocaleStruct
                         item.maxLanes = maxLanes;
                     }
                 }
-                var matchesLanesSingle = Regex.Matches(kv[0], @"\(([0-9]{0,3})\)");
+                MatchCollection matchesLanesSingle = Regex.Matches(kv[0], @"\(([0-9]{0,3})\)");
                 if (matchesLanesSingle?.Count > 0)
                 {
                     Match m = matchesLanesSingle[0];
@@ -297,25 +294,28 @@ namespace Klyte.Addresses.LocaleStruct
             public string name;
         }
 
-        enum Symmetry : byte
+        private enum Symmetry : byte
         {
             ANY = 3,
             TRUE = 1,
             FALSE = 2
         }
-        enum OneWay : byte
+
+        private enum OneWay : byte
         {
             ANY = 3,
             TRUE = 1,
             FALSE = 2
         }
-        enum Highway : byte
+
+        private enum Highway : byte
         {
             ANY = 3,
             TRUE = 1,
             FALSE = 2
         }
-        enum RoadType : byte
+
+        private enum RoadType : byte
         {
             NONE = 0,
             GROUND = 1,
@@ -324,7 +324,8 @@ namespace Klyte.Addresses.LocaleStruct
             DAM = 8,
             ANY = GROUND | BRIDGE | TUNNEL | DAM
         }
-        enum LinkingType : byte
+
+        private enum LinkingType : byte
         {
             NONE = 0,
             FROM_SMALL = 1,

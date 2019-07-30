@@ -1,21 +1,16 @@
-using ColossalFramework;
-using ColossalFramework.Globalization;
-using ColossalFramework.Math;
 using ColossalFramework.UI;
-using System;
-using UnityEngine;
-using System.Linq;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
-using Klyte.Addresses.Utils;
+using System.Linq;
+using UnityEngine;
 
 namespace Klyte.Addresses.UI
 {
     public class AdrMapBordersChart : MonoBehaviour
     {
-        private UIPanel container;
-        private UISprite cityMap;
-        private UIRadialChartExtended bordersInformation;
+        private UIPanel m_container;
+        private UISprite m_cityMap;
+        private UIRadialChartExtended m_bordersInformation;
 
         public void SetValues(List<Tuple<int, Color>> locations360)
         {
@@ -24,33 +19,33 @@ namespace Klyte.Addresses.UI
             {
                 locations360.Insert(0, Tuple.New(0, locations360.Last().Second));
             }
-            if (locations360.Count != bordersInformation.sliceCount)
+            if (locations360.Count != m_bordersInformation.sliceCount)
             {
-                while (bordersInformation.sliceCount > 0)
+                while (m_bordersInformation.sliceCount > 0)
                 {
-                    bordersInformation.RemoveSlice(0);
+                    m_bordersInformation.RemoveSlice(0);
                 }
-                foreach (var loc in locations360)
+                foreach (Tuple<int, Color> loc in locations360)
                 {
-                    bordersInformation.AddSlice(loc.Second, loc.Second);
+                    m_bordersInformation.AddSlice(loc.Second, loc.Second);
                 }
             }
             else
             {
-                for (int i = 0; i < bordersInformation.sliceCount; i++)
+                for (int i = 0; i < m_bordersInformation.sliceCount; i++)
                 {
-                    bordersInformation.GetSlice(i).innerColor = locations360[i].Second;
-                    bordersInformation.GetSlice(i).outterColor = locations360[i].Second;
+                    m_bordersInformation.GetSlice(i).innerColor = locations360[i].Second;
+                    m_bordersInformation.GetSlice(i).outterColor = locations360[i].Second;
                 }
             }
 
             List<int> targetValues = locations360.Select(x => x.First * 100 / 360).ToList();
-            bordersInformation.SetValuesStarts(targetValues.ToArray());
+            m_bordersInformation.SetValuesStarts(targetValues.ToArray());
         }
 
         public void Awake()
         {
-            AdrUtils.doLog("AWAKE AdrMapBordersChart !");
+            LogUtils.DoLog("AWAKE AdrMapBordersChart !");
             UIPanel panel = transform.gameObject.AddComponent<UIPanel>();
             panel.width = 370;
             panel.height = 70;
@@ -59,28 +54,28 @@ namespace Klyte.Addresses.UI
             panel.wrapLayout = false;
             panel.tooltipLocaleID = "ADR_CITY_NEIGHBORHOOD";
 
-            KlyteUtils.createUIElement(out container, transform, "NeighborhoodContainer");
-            container.relativePosition = new Vector3(panel.width / 2f - 35, 0);
-            container.width = 70;
-            container.height = 70;
-            container.autoLayout = false;
-            container.useCenter = true;
-            container.wrapLayout = false;
-            container.tooltipLocaleID = "ADR_CITY_NEIGHBORHOOD";
+            KlyteMonoUtils.CreateUIElement(out m_container, transform, "NeighborhoodContainer");
+            m_container.relativePosition = new Vector3((panel.width / 2f) - 35, 0);
+            m_container.width = 70;
+            m_container.height = 70;
+            m_container.autoLayout = false;
+            m_container.useCenter = true;
+            m_container.wrapLayout = false;
+            m_container.tooltipLocaleID = "ADR_CITY_NEIGHBORHOOD";
 
-            KlyteUtils.createUIElement(out bordersInformation, container.transform, "Neighbors");
-            bordersInformation.spriteName = "EmptySprite";
-            bordersInformation.relativePosition = new Vector3(0, 0);
-            bordersInformation.width = 70;
-            bordersInformation.height = 70;
+            KlyteMonoUtils.CreateUIElement(out m_bordersInformation, m_container.transform, "Neighbors");
+            m_bordersInformation.spriteName = "EmptySprite";
+            m_bordersInformation.relativePosition = new Vector3(0, 0);
+            m_bordersInformation.width = 70;
+            m_bordersInformation.height = 70;
 
-            KlyteUtils.createUIElement(out cityMap, bordersInformation.transform, "City");
-            cityMap.spriteName = "EmptySprite";
-            cityMap.relativePosition = new Vector3(5, 5);
-            cityMap.color = Color.gray;
-            cityMap.width = 60;
-            cityMap.height = 60;
-            cityMap.tooltipLocaleID = "ADR_CITY_AREA";
+            KlyteMonoUtils.CreateUIElement(out m_cityMap, m_bordersInformation.transform, "City");
+            m_cityMap.spriteName = "EmptySprite";
+            m_cityMap.relativePosition = new Vector3(5, 5);
+            m_cityMap.color = Color.gray;
+            m_cityMap.width = 60;
+            m_cityMap.height = 60;
+            m_cityMap.tooltipLocaleID = "ADR_CITY_AREA";
         }
     }
 

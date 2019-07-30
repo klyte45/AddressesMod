@@ -1,17 +1,11 @@
-using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
 using ColossalFramework.UI;
-using System;
-using UnityEngine;
-using System.Linq;
-using Klyte.Commons.Utils;
-using System.Collections.Generic;
-using Klyte.Addresses.Utils;
-using Klyte.Commons.Extensors;
 using ICities;
 using Klyte.Addresses.Extensors;
 using Klyte.Addresses.Overrides;
+using Klyte.Commons.Utils;
+using UnityEngine;
 
 namespace Klyte.Addresses.UI
 {
@@ -35,14 +29,14 @@ namespace Klyte.Addresses.UI
             m_cityId.text = (id % 100).ToString();
             m_cityId.color = c;
             m_azimuthInput.eventTextChanged -= SendText;
-            m_azimuthInput.text = AdrNeighborhoodExtension.instance.GetAzimuth(m_id).ToString();
+            m_azimuthInput.text = AdrNeighborhoodExtension.GetAzimuth(m_id).ToString();
             m_azimuthInput.eventTextChanged += SendText;
             m_die.isVisible = m_id > 0;
         }
 
         public void SetCardinalAngle(float angle)
         {
-            m_direction.text = CardinalPoint.getCardinalPoint16(angle);
+            m_direction.text = CardinalPoint.GetCardinalPoint16(angle);
             m_generatedName.text = OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out bool canTrust);
             if (!canTrust)
             {
@@ -50,15 +44,9 @@ namespace Klyte.Addresses.UI
             }
         }
 
-        public string getCurrentVal()
-        {
-            return m_azimuthInput.text;
-        }
+        public string GetCurrentVal() => m_azimuthInput.text;
 
-        public void setTextColor(Color c)
-        {
-            m_azimuthInput.color = c;
-        }
+        public void SetTextColor(Color c) => m_azimuthInput.color = c;
 
         public void Awake()
         {
@@ -71,7 +59,7 @@ namespace Klyte.Addresses.UI
             m_container.wrapLayout = false;
             m_container.name = "AzimuthInputLine";
 
-            KlyteUtils.createUIElement(out m_cityId, m_container.transform, "CityId");
+            KlyteMonoUtils.CreateUIElement(out m_cityId, m_container.transform, "CityId");
             m_cityId.autoSize = false;
             m_cityId.relativePosition = new Vector3(0, 0);
             m_cityId.backgroundSprite = "EmptySprite";
@@ -82,8 +70,8 @@ namespace Klyte.Addresses.UI
             m_cityId.useOutline = true;
             m_cityId.textAlignment = UIHorizontalAlignment.Center;
 
-            KlyteUtils.createUIElement(out m_azimuthInput, m_container.transform, "StartAzimuth");
-            KlyteUtils.uiTextFieldDefaults(m_azimuthInput);
+            KlyteMonoUtils.CreateUIElement(out m_azimuthInput, m_container.transform, "StartAzimuth");
+            KlyteMonoUtils.UiTextFieldDefaults(m_azimuthInput);
             m_azimuthInput.normalBgSprite = "OptionsDropboxListbox";
             m_azimuthInput.width = 50;
             m_azimuthInput.height = 28;
@@ -93,7 +81,7 @@ namespace Klyte.Addresses.UI
             m_azimuthInput.text = "0";
             m_azimuthInput.eventTextChanged += SendText;
 
-            KlyteUtils.createUIElement(out m_direction, m_container.transform, "Direction");
+            KlyteMonoUtils.CreateUIElement(out m_direction, m_container.transform, "Direction");
             m_direction.autoSize = false;
             m_direction.width = 60;
             m_direction.height = 30;
@@ -101,14 +89,14 @@ namespace Klyte.Addresses.UI
             m_direction.textAlignment = UIHorizontalAlignment.Center;
             m_direction.padding = new RectOffset(3, 3, 5, 3);
 
-            KlyteUtils.createUIElement(out UIPanel nameContainer, m_container.transform, "GenNameContainer");
+            KlyteMonoUtils.CreateUIElement(out UIPanel nameContainer, m_container.transform, "GenNameContainer");
             nameContainer.autoSize = false;
             nameContainer.width = 150;
             nameContainer.height = 30;
             nameContainer.autoLayout = true;
             nameContainer.autoLayoutDirection = LayoutDirection.Horizontal;
 
-            KlyteUtils.createUIElement(out m_generatedName, nameContainer.transform, "GenName");
+            KlyteMonoUtils.CreateUIElement(out m_generatedName, nameContainer.transform, "GenName");
             m_generatedName.autoSize = true;
             m_generatedName.height = 30;
             m_generatedName.textScale = 1.125f;
@@ -116,33 +104,33 @@ namespace Klyte.Addresses.UI
             m_generatedName.text = "???";
             m_generatedName.textAlignment = UIHorizontalAlignment.Center;
             m_generatedName.minimumSize = new Vector2(150, 0);
-            AdrUtils.LimitWidth(m_generatedName, 150);
+            KlyteMonoUtils.LimitWidth(m_generatedName, 150);
 
-            KlyteUtils.createUIElement(out m_regenerateName, m_container.transform, "RegenName");
+            KlyteMonoUtils.CreateUIElement(out m_regenerateName, m_container.transform, "RegenName");
             m_regenerateName.textScale = 1f;
             m_regenerateName.width = 30;
             m_regenerateName.height = 30;
             m_regenerateName.tooltip = Locale.Get("ADR_REGENERATE_NAME");
-            AdrUtils.initButton(m_regenerateName, true, "ButtonMenu");
+            KlyteMonoUtils.InitButton(m_regenerateName, true, "ButtonMenu");
             m_regenerateName.isVisible = true;
             m_regenerateName.text = "R";
             m_regenerateName.eventClick += (component, eventParam) =>
             {
-                AdrNeighborhoodExtension.instance.SetSeed(m_id, new Randomizer(new System.Random().Next()).UInt32(0xFEFFFFFF));
+                AdrNeighborhoodExtension.SetSeed(m_id, new Randomizer(new System.Random().Next()).UInt32(0xFEFFFFFF));
                 OnRegenerate?.Invoke();
             };
 
-            KlyteUtils.createUIElement(out m_die, m_container.transform, "Delete");
+            KlyteMonoUtils.CreateUIElement(out m_die, m_container.transform, "Delete");
             m_die.textScale = 1f;
             m_die.width = 30;
             m_die.height = 30;
             m_die.tooltip = Locale.Get("ADR_DELETE_STOP_NEIGHBOR");
-            AdrUtils.initButton(m_die, true, "ButtonMenu");
+            KlyteMonoUtils.InitButton(m_die, true, "ButtonMenu");
             m_die.isVisible = true;
             m_die.text = "X";
             m_die.eventClick += (component, eventParam) =>
             {
-                AdrNeighborhoodExtension.instance.SafeCleanEntry(m_id);
+                AdrNeighborhoodExtension.SafeCleanEntry(m_id);
                 OnDie?.Invoke();
             };
 
