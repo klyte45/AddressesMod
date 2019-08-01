@@ -52,7 +52,7 @@ namespace Klyte.Addresses.UI
             panel.autoLayout = false;
             panel.useCenter = true;
             panel.wrapLayout = false;
-            panel.tooltipLocaleID = "ADR_CITY_NEIGHBORHOOD";
+            panel.tooltipLocaleID = "K45_ADR_CITY_NEIGHBORHOOD";
 
             KlyteMonoUtils.CreateUIElement(out m_container, transform, "NeighborhoodContainer");
             m_container.relativePosition = new Vector3((panel.width / 2f) - 35, 0);
@@ -61,7 +61,7 @@ namespace Klyte.Addresses.UI
             m_container.autoLayout = false;
             m_container.useCenter = true;
             m_container.wrapLayout = false;
-            m_container.tooltipLocaleID = "ADR_CITY_NEIGHBORHOOD";
+            m_container.tooltipLocaleID = "K45_ADR_CITY_NEIGHBORHOOD";
 
             KlyteMonoUtils.CreateUIElement(out m_bordersInformation, m_container.transform, "Neighbors");
             m_bordersInformation.spriteName = "EmptySprite";
@@ -75,7 +75,7 @@ namespace Klyte.Addresses.UI
             m_cityMap.color = Color.gray;
             m_cityMap.width = 60;
             m_cityMap.height = 60;
-            m_cityMap.tooltipLocaleID = "ADR_CITY_AREA";
+            m_cityMap.tooltipLocaleID = "K45_ADR_CITY_AREA";
         }
     }
 

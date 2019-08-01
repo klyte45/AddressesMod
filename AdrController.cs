@@ -204,7 +204,7 @@ namespace Klyte.Addresses
             KlyteMonoUtils.CreateUIElement(out UIButton saida, parent.transform, "AddressesIcon", new Vector4(5, -40, 30, 30));
             saida.atlas = AdrCommonTextureAtlas.instance.Atlas;
             saida.color = Color.white;
-            saida.tooltipLocaleID = "ADR_BUILDING_ADDRESS";
+            saida.tooltipLocaleID = "K45_ADR_BUILDING_ADDRESS";
             KlyteMonoUtils.InitButtonSameSprite(saida, "AddressesIcon");
 
             KlyteMonoUtils.CreateUIElement(out UILabel addressContainer, saida.transform, "Address");
@@ -225,7 +225,7 @@ namespace Klyte.Addresses
             saida.color = Color.black;
             saida.focusedColor = Color.black;
             saida.hoveredColor = Color.cyan;
-            saida.tooltipLocaleID = "ADR_ZERO_MARKER_DETAIL";
+            saida.tooltipLocaleID = "K45_ADR_ZERO_MARKER_DETAIL";
             saida.eventDoubleClick += SetZeroMarkBuilding;
             KlyteMonoUtils.InitButtonSameSprite(saida, "ParkLevelStar");
             saida.canFocus = false;

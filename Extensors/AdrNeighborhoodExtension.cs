@@ -2,6 +2,7 @@
 using Klyte.Addresses.Xml;
 using System.Linq;
 
+
 namespace Klyte.Addresses.Extensors
 {
 
@@ -36,12 +37,12 @@ namespace Klyte.Addresses.Extensors
                 return null;
             }
 
-            IOrderedEnumerable<AdrNeighborDetailConfig> sortedArray = NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth);
-            if (angle < sortedArray.First().Azimuth)
+            AdrNeighborDetailConfig[] sortedArray = NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth).ToArray();
+            if (angle < sortedArray[0].Azimuth)
             {
-                return new Randomizer(sortedArray.Last().Seed);
+                return new Randomizer(sortedArray[sortedArray.Length - 1].Seed);
             }
-            return new Randomizer(sortedArray.Where(x => x.Azimuth < angle).Last().Seed);
+            return new Randomizer(NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth).Where(x => x.Azimuth < angle).LastOrDefault()?.Seed ?? 0);
 
         }
         #endregion

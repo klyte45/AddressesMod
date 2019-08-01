@@ -1,4 +1,6 @@
-﻿using ColossalFramework.Math;
+﻿using ColossalFramework;
+using ColossalFramework.Globalization;
+using ColossalFramework.Math;
 using Klyte.Addresses.Extensors;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
@@ -23,7 +25,7 @@ namespace Klyte.Addresses.Overrides
         public static string GetNameBasedInAngle(float angle, out bool canTrust)
         {
             InstanceID caller = new InstanceID();
-            GetNameBasedInAngle(null, out string result, ref caller, angle, out canTrust);
+            GetNameBasedInAngle(m_defaultAI, out string result, ref caller, angle, out canTrust);
             return result;
         }
 
@@ -50,12 +52,79 @@ namespace Klyte.Addresses.Overrides
             return false;
         }
 
-        private static string OriginalGenerateName(OutsideConnectionAI __instance, InstanceID caller) => typeof(OutsideConnectionAI).GetMethod("GenerateName").Invoke(__instance, new object[] { 0u, caller })?.ToString();
 
+        private static string OriginalGenerateName(OutsideConnectionAI __instance, InstanceID caller)
+        {
+            CityNameGroups.Environment cityNameGroups = Singleton<BuildingManager>.instance.m_cityNameGroups;
+            if (cityNameGroups == null)
+            {
+                return null;
+            }
+            int num = 0;
+            if (__instance.m_useCloseNames)
+            {
+                num += cityNameGroups.m_closeDistance.Length;
+            }
+            if (__instance.m_useMediumNames)
+            {
+                num += cityNameGroups.m_mediumDistance.Length;
+            }
+            if (__instance.m_useFarNames)
+            {
+                num += cityNameGroups.m_farDistance.Length;
+            }
+            if (num != 0)
+            {
+                Randomizer randomizer = new Randomizer(caller.Index);
+                num = randomizer.Int32((uint) num);
+                string text = null;
+                if (text == null && __instance.m_useCloseNames)
+                {
+                    if (num < cityNameGroups.m_closeDistance.Length)
+                    {
+                        text = cityNameGroups.m_closeDistance[num];
+                    }
+                    else
+                    {
+                        num -= cityNameGroups.m_closeDistance.Length;
+                    }
+                }
+                if (text == null && __instance.m_useMediumNames)
+                {
+                    if (num < cityNameGroups.m_mediumDistance.Length)
+                    {
+                        text = cityNameGroups.m_mediumDistance[num];
+                    }
+                    else
+                    {
+                        num -= cityNameGroups.m_mediumDistance.Length;
+                    }
+                }
+                if (text == null && __instance.m_useFarNames)
+                {
+                    if (num < cityNameGroups.m_farDistance.Length)
+                    {
+                        text = cityNameGroups.m_farDistance[num];
+                    }
+                }
+                uint range = Locale.Count("CONNECTIONS_PATTERN", text);
+                string format = Locale.Get("CONNECTIONS_PATTERN", text, randomizer.Int32(range));
+                uint range2 = Locale.Count("CONNECTIONS_NAME", text);
+                string arg = Locale.Get("CONNECTIONS_NAME", text, randomizer.Int32(range2));
+                return StringUtils.SafeFormat(format, arg);
+            }
+            return null;
+        }
         #endregion
 
         #region Hooking
         public static readonly MethodInfo GenerateNameMethod = typeof(OutsideConnectionAI).GetMethod("GenerateName", RedirectorUtils.allFlags);
+        private static readonly OutsideConnectionAI m_defaultAI = new OutsideConnectionAI
+        {
+            m_useCloseNames = true,
+            m_useFarNames = true,
+            m_useMediumNames = true
+        };
 
         public Redirector RedirectorInstance { get; } = new Redirector();
 

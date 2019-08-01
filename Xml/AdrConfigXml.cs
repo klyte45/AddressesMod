@@ -3,8 +3,8 @@ using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
 using Klyte.Commons.Utils;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -14,7 +14,7 @@ using static VehicleInfo;
 namespace Klyte.Addresses.Xml
 {
     [XmlRoot("adrConfig")]
-    internal class AdrConfigXml
+    public class AdrConfigXml
     {
         [XmlElement("global")]
         public AdrGlobalConfig GlobalConfig { get; set; } = new AdrGlobalConfig();
@@ -23,28 +23,29 @@ namespace Klyte.Addresses.Xml
         [XmlArrayItem("district")]
         public List<AdrDistrictConfig> DistrictConfigs
         {
-            get => m_districtConfigsDict.Values.ToList();
-            set => m_districtConfigsDict = value.ToDictionary(x => x.Id, x => x);
+            get => m_districtConfigs;
+
+            set => m_districtConfigs = value;
         }
+
         [XmlIgnore]
-        private Dictionary<ushort, AdrDistrictConfig> m_districtConfigsDict = new Dictionary<ushort, AdrDistrictConfig>();
+        private List<AdrDistrictConfig> m_districtConfigs = null;
 
         public AdrDistrictConfig GetConfigForDistrict(ushort districtId)
         {
-            if (!m_districtConfigsDict.TryGetValue(districtId, out AdrDistrictConfig result))
+            if (m_districtConfigs.Where(x => x.Id == districtId).Count() == 0)
             {
-                m_districtConfigsDict[districtId] = new AdrDistrictConfig
+                m_districtConfigs.Add(new AdrDistrictConfig
                 {
                     Id = districtId
-                };
-                return m_districtConfigsDict[districtId];
+                });
             }
-            return result;
+            return m_districtConfigs.Where(x => x.Id == districtId).FirstOrDefault();
         }
     }
 
     [XmlRoot("adrGlobalConfig")]
-    internal class AdrGlobalConfig
+    public class AdrGlobalConfig
     {
         [XmlElement("addressing")]
         public AdrAddressingConfig AddressingConfig { get; set; } = new AdrAddressingConfig();
@@ -60,7 +61,7 @@ namespace Klyte.Addresses.Xml
     }
 
     [XmlRoot("adrAddressingConfig")]
-    internal class AdrAddressingConfig
+    public class AdrAddressingConfig
     {
         [XmlAttribute("zipcodeFormat")]
         public string ZipcodeFormat { get; set; } = "GCEDF-AJ";
@@ -98,30 +99,20 @@ namespace Klyte.Addresses.Xml
 
 
     [XmlRoot("adrNeighborhoodConfig")]
-    internal class AdrNeighborhoodConfig
+    public class AdrNeighborhoodConfig
     {
         [XmlArray("neighbors")]
         [XmlArrayItem("neighbor")]
-        public ReadOnlyCollection<AdrNeighborDetailConfig> Neighbors
-        {
-            get => m_adrNeighbors.AsReadOnly();
-            set {
-                m_adrNeighbors = new List<AdrNeighborDetailConfig>();
-                m_adrNeighbors.AddRange(value);
-            }
-        }
-
-        [XmlIgnore]
-        private List<AdrNeighborDetailConfig> m_adrNeighbors = new List<AdrNeighborDetailConfig>();
+        public List<AdrNeighborDetailConfig> Neighbors { get; set; }
 
         public void AddToNeigborsListAt(int idx, AdrNeighborDetailConfig adrNeighbor)
         {
-            m_adrNeighbors.Insert(idx, adrNeighbor);
+            Neighbors.Insert(Math.Min(idx, Neighbors.Count), adrNeighbor);
             GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
         }
         public void RemoveNeighborAtIndex(int idx)
         {
-            m_adrNeighbors.RemoveAt(idx);
+            Neighbors.RemoveAt(idx);
             GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
         }
 
@@ -129,7 +120,7 @@ namespace Klyte.Addresses.Xml
         public string NamesFile { get; set; }
     }
 
-    internal class AdrNeighborDetailConfig
+    public class AdrNeighborDetailConfig
     {
         [XmlAttribute("nameSeed")]
         public uint Seed
@@ -157,7 +148,7 @@ namespace Klyte.Addresses.Xml
     }
 
     [XmlRoot("adrBuildingConfig")]
-    internal class AdrBuildingConfig
+    public class AdrBuildingConfig
     {
         [XmlElement("stationsNameGeneration")]
         public AdrStationNamesGenerationConfig StationsNameGenerationConfig { get; set; } = new AdrStationNamesGenerationConfig();
@@ -166,7 +157,7 @@ namespace Klyte.Addresses.Xml
         public AdrRicoNamesGenerationConfig RicoNamesGenerationConfig { get; set; } = new AdrRicoNamesGenerationConfig();
     }
 
-    internal class AdrStationNamesGenerationConfig
+    public class AdrStationNamesGenerationConfig
     {
         [XmlAttribute("trainPassenger")]
         public bool TrainsPassenger { get; set; }
@@ -238,7 +229,7 @@ namespace Klyte.Addresses.Xml
 
     }
 
-    internal class AdrRicoNamesGenerationConfig
+    public class AdrRicoNamesGenerationConfig
     {
         [XmlAttribute("industry")]
         public GenerationMethod Industry { get; set; }
@@ -257,7 +248,7 @@ namespace Klyte.Addresses.Xml
     }
 
     [XmlRoot("adrCitizenConfig")]
-    internal class AdrCitizenConfig
+    public class AdrCitizenConfig
     {
         [XmlAttribute("maleNamesFile")]
         public string MaleNamesFile { get; set; }
@@ -271,7 +262,7 @@ namespace Klyte.Addresses.Xml
     }
 
     [XmlRoot("adrDistrictConfig")]
-    internal class AdrDistrictConfig
+    public class AdrDistrictConfig
     {
         [XmlAttribute("id")]
         public ushort Id { get; set; }
@@ -297,7 +288,7 @@ namespace Klyte.Addresses.Xml
         }
     }
 
-    internal class AdrGeneralQualifierConfig
+    public class AdrGeneralQualifierConfig
     {
         [XmlAttribute("namesFile")]
         public string NamesFile { get; set; }

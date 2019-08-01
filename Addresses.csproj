@@ -1,58 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3518655D-2922-4E78-8875-C38CE7B15ADF}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Klyte.Addresses</RootNamespace>
-    <AssemblyName>KlyteAddresses</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\ServiceVehiclesManager\ServiceVehiclesManager.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
+    <LangVersion>8.0</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>8.0</LangVersion>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Klyte.Addresses</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>KlyteAddresses</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Addresses.cs" />
@@ -96,6 +70,7 @@
     <Compile Include="commons\Utils\StructExtensions\NetSegmentExtensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector2Extensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector3Extensions.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\CallbackableList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\CardinalPoint .cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\NumberArrays.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\Range.cs" />
@@ -169,8 +144,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\Images\lineFormat.png" />
-    <Resource Include="UI\Images\lineFormat.psd" />
     <EmbeddedResource Include="UI\Images\sprites.png" />
     <Resource Include="UI\Images\sprites.psd" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
@@ -188,15 +161,16 @@
     <EmbeddedResource Include="UI\i18n\ru.properties" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="commons\README.md" />
-    <None Include="commons\UI\i18n\en.properties" />
-    <None Include="commons\UI\i18n\fr.properties" />
-    <None Include="commons\UI\i18n\pt.properties" />
-    <None Include="commons\UI\i18n\ru.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\en.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\fr.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\pt.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\ru.properties" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="commons\UI\Images\sprites.png" />
+    <EmbeddedResource Include="commons\UI\Images\sprites.png" />
     <Content Include="commons\UI\Images\sprites.psd" />
     <Content Include="commons\UI\VersionNotes.txt" />
   </ItemGroup>
@@ -205,6 +179,9 @@
     <PreBuildEvent>del /Q "Q:\Steam\steamapps\workshop\content\255710\1322787091\*"
 del /Q "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ADR\*"
 del /Q "$(ProjectDir)\_requiredDLLs"</PreBuildEvent>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <ProjectGuid>{3518655D-2922-4E78-8875-C38CE7B15ADF}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(TargetDir)0Harmony.dll" "$(ProjectDir)\_requiredDLLs\"

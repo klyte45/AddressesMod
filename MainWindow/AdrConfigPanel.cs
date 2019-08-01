@@ -32,10 +32,10 @@ namespace Klyte.Addresses.UI
             KlyteMonoUtils.CreateUIElement(out UITabContainer tabContainer, m_mainPanel.transform, "AdrTabContainer", new Vector4(5, 80, m_mainPanel.width - 5, m_mainPanel.height - 80));
             m_stripMain.tabPages = tabContainer;
 
-            CreateTab<AdrDistrictConfigTab>("ToolbarIconDistrict", "ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
-            CreateTab<AdrNeighborConfigTab>("IconRightArrow", "ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor");
-            CreateTab<AdrCitizenConfigTab>("IconCitizen", "ADR_CONFIG_CITIZEN_TAB", "AdrCitizen");
-            CreateTab<AdrGlobalConfigTab>("ToolbarIconZoomOutGlobe", "ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
+            CreateTab<AdrDistrictConfigTab>("ToolbarIconDistrict", "K45_ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
+            CreateTab<AdrNeighborConfigTab>("IconRightArrow", "K45_ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor");
+            CreateTab<AdrCitizenConfigTab>("IconCitizen", "K45_ADR_CONFIG_CITIZEN_TAB", "AdrCitizen");
+            CreateTab<AdrGlobalConfigTab>("ToolbarIconZoomOutGlobe", "K45_ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
         }
 
         private void CreateTab<T>(string sprite, string localeKey, string objectName) where T : UICustomControl

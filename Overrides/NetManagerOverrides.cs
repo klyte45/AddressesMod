@@ -145,7 +145,7 @@ namespace Klyte.Addresses.Overrides
                 {
                     int cardinalDirection = SegmentUtils.GetCardinalDirection(startRef, endRef);
 
-                    direction = Locale.Get("KCM_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
+                    direction = Locale.Get("K45_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
                 }
             }
             if (format.Contains("{5}") || format.Contains("{6}"))

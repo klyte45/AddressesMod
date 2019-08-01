@@ -110,7 +110,7 @@ namespace Klyte.Addresses.UI
             m_regenerateName.textScale = 1f;
             m_regenerateName.width = 30;
             m_regenerateName.height = 30;
-            m_regenerateName.tooltip = Locale.Get("ADR_REGENERATE_NAME");
+            m_regenerateName.tooltip = Locale.Get("K45_ADR_REGENERATE_NAME");
             KlyteMonoUtils.InitButton(m_regenerateName, true, "ButtonMenu");
             m_regenerateName.isVisible = true;
             m_regenerateName.text = "R";
@@ -124,7 +124,7 @@ namespace Klyte.Addresses.UI
             m_die.textScale = 1f;
             m_die.width = 30;
             m_die.height = 30;
-            m_die.tooltip = Locale.Get("ADR_DELETE_STOP_NEIGHBOR");
+            m_die.tooltip = Locale.Get("K45_ADR_DELETE_STOP_NEIGHBOR");
             KlyteMonoUtils.InitButton(m_die, true, "ButtonMenu");
             m_die.isVisible = true;
             m_die.text = "X";

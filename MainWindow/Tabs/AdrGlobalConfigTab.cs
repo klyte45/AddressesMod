@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
+using Klyte.Addresses.ModShared;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
 using System;
@@ -35,32 +36,32 @@ namespace Klyte.Addresses.UI
             ((UIScrollablePanel) m_uiHelperGlobal.Self).wrapLayout = true;
             ((UIScrollablePanel) m_uiHelperGlobal.Self).width = 370;
 
-            m_districtPrefixGenFile = m_uiHelperGlobal.AddDropdownLocalized("ADR_DISTRICT_GEN_PREFIX_FILE", new string[0], -1, OnChangeSelectedDistrictPrefix);
+            m_districtPrefixGenFile = m_uiHelperGlobal.AddDropdownLocalized("K45_ADR_DISTRICT_GEN_PREFIX_FILE", new string[0], -1, OnChangeSelectedDistrictPrefix);
             m_districtPrefixGenFile.width = 370;
             m_uiHelperGlobal.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperGlobal.AddButton(Locale.Get("ADR_DISTRICT_GEN_PREFIX_FILES_RELOAD"), ReloadDistrictPrefixesFiles), 380);
+            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperGlobal.AddButton(Locale.Get("K45_ADR_DISTRICT_GEN_PREFIX_FILES_RELOAD"), ReloadDistrictPrefixesFiles), 380);
             m_uiHelperGlobal.AddSpace(20);
 
-            m_districtNameGenFile = m_uiHelperGlobal.AddDropdownLocalized("ADR_DISTRICT_GEN_NAME_FILE", new string[0], -1, OnChangeSelectedDistrictName);
+            m_districtNameGenFile = m_uiHelperGlobal.AddDropdownLocalized("K45_ADR_DISTRICT_GEN_NAME_FILE", new string[0], -1, OnChangeSelectedDistrictName);
             m_districtNameGenFile.width = 370;
             m_uiHelperGlobal.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperGlobal.AddButton(Locale.Get("ADR_DISTRICT_GEN_NAME_FILES_RELOAD"), ReloadDistrictNamesFiles), 380);
+            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperGlobal.AddButton(Locale.Get("K45_ADR_DISTRICT_GEN_NAME_FILES_RELOAD"), ReloadDistrictNamesFiles), 380);
             m_uiHelperGlobal.AddSpace(20);
 
             ReloadDistrictPrefixesFiles();
             ReloadDistrictNamesFiles();
 
-            m_prefixPostalCodeCity = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_CITY_POSTAL_CODE"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeCityPrefix.ToString("%03d"), OnChangePostalCodePrefixCity);
+            m_prefixPostalCodeCity = m_uiHelperGlobal.AddTextField(Locale.Get("K45_ADR_CITY_POSTAL_CODE"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeCityPrefix.ToString("D3"), OnChangePostalCodePrefixCity);
             m_prefixPostalCodeCity.numericalOnly = true;
             m_prefixPostalCodeCity.maxLength = 3;
 
-            m_postalCodeFormat = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_POSTAL_CODE_FORMAT"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat, OnChangePostalCodeFormat);
+            m_postalCodeFormat = m_uiHelperGlobal.AddTextField(Locale.Get("K45_ADR_POSTAL_CODE_FORMAT"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat, OnChangePostalCodeFormat);
             m_prefixPostalCodeCity.maxLength = 3;
 
             string[] formatExplain = new string[12];
             for (int i = 0; i < formatExplain.Length; i++)
             {
-                formatExplain[i] = Locale.Get("ADR_POSTAL_CODE_FORMAT_LEGEND", i);
+                formatExplain[i] = Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_LEGEND", i);
             }
 
             KlyteMonoUtils.CreateUIElement(out UILabel formatExplanation, m_uiHelperGlobal.Self.transform, "FormatText");
@@ -74,7 +75,7 @@ namespace Klyte.Addresses.UI
             string[] obs = new string[2];
             for (int i = 0; i < obs.Length; i++)
             {
-                obs[i] = Locale.Get("ADR_POSTAL_CODE_FORMAT_OBSERVATION", i);
+                obs[i] = Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_OBSERVATION", i);
             }
 
             KlyteMonoUtils.CreateUIElement(out UILabel obsExplanation, m_uiHelperGlobal.Self.transform, "ObsText");
@@ -90,14 +91,14 @@ namespace Klyte.Addresses.UI
             obsExplanation.text = string.Join(Environment.NewLine, obs);
 
             m_uiHelperGlobal.AddSpace(20);
-            m_uiHelperGlobal.AddLabel(Locale.Get("ADR_ADDRESS_LINES"));
-            m_addressLine1Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE1"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine1, OnChangeAddressLine1);
-            m_addressLine2Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE2"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine2, OnChangeAddressLine2);
-            m_addressLine3Format = m_uiHelperGlobal.AddTextField(Locale.Get("ADR_ADDRESS_LINE3"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine3, OnChangeAddressLine3);
+            m_uiHelperGlobal.AddLabel(Locale.Get("K45_ADR_ADDRESS_LINES"));
+            m_addressLine1Format = m_uiHelperGlobal.AddTextField(Locale.Get("K45_ADR_ADDRESS_LINE1"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine1, OnChangeAddressLine1);
+            m_addressLine2Format = m_uiHelperGlobal.AddTextField(Locale.Get("K45_ADR_ADDRESS_LINE2"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine2, OnChangeAddressLine2);
+            m_addressLine3Format = m_uiHelperGlobal.AddTextField(Locale.Get("K45_ADR_ADDRESS_LINE3"), null, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine3, OnChangeAddressLine3);
             string[] formatExplainAddress = new string[6];
             for (int i = 0; i < formatExplainAddress.Length; i++)
             {
-                formatExplainAddress[i] = Locale.Get("ADR_ADDRESS_FORMAT_LEGEND", i);
+                formatExplainAddress[i] = Locale.Get("K45_ADR_ADDRESS_FORMAT_LEGEND", i);
             }
 
             KlyteMonoUtils.CreateUIElement(out UILabel formatExplainAddressLabel, m_uiHelperGlobal.Self.transform, "FormatText");
@@ -112,35 +113,30 @@ namespace Klyte.Addresses.UI
 
 
             m_uiHelperGlobal.AddSpace(20);
-            m_uiHelperGlobal.AddLabel(Locale.Get("ADR_BUILDING_CONFIGURATIONS"));
+            m_uiHelperGlobal.AddLabel(Locale.Get("K45_ADR_BUILDING_CONFIGURATIONS"));
 
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_TRAIN_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsPassenger, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsPassenger = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_MONORAIL_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Monorail, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Monorail = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_METRO_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Metro, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Metro = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_CABLE_CAR_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.CableCar, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.CableCar = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_FERRY_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Ferry, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Ferry = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_SHIP_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipPassenger, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipPassenger = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_BLIMP_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Blimp, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Blimp = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_AUTONAME_AIRPLANE_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplanePassenger, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplanePassenger = x);
-
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_CUSTOM_NAMING_CARGO_SHIP", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipCargo, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipCargo = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_CUSTOM_NAMING_CARGO_TRAIN", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsCargo, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsCargo = x);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_CUSTOM_NAMING_CARGO_AIRPLANE", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplaneCargo, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplaneCargo = x);
-
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_ADDRESS_NAMING_RES", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence == GenerationMethod.ADDRESS, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_ADDRESS_NAMING_IND", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry == GenerationMethod.ADDRESS, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_ADDRESS_NAMING_COM", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce == GenerationMethod.ADDRESS, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE);
-            m_uiHelperGlobal.AddCheckboxLocale("ADR_ENABLE_ADDRESS_NAMING_OFF", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office == GenerationMethod.ADDRESS, (x) => AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE);
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_TRAIN_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsPassenger,             (x) => { AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsPassenger = x ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_MONORAIL_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Monorail,                 (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Monorail = x         ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_METRO_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Metro,                       (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Metro = x            ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_CABLE_CAR_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.CableCar,                (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.CableCar = x         ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_FERRY_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Ferry,                       (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Ferry = x            ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_SHIP_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipPassenger,                (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipPassenger = x    ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_BLIMP_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Blimp,                       (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.Blimp = x            ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_AUTONAME_AIRPLANE_STATIONS", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplanePassenger,        (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplanePassenger = x;AdrEvents.TriggerBuildingNameStrategyChanged();});
+                                                                                                                                                                                                                                                                                                                                                                     
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_CUSTOM_NAMING_CARGO_SHIP", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipCargo,           (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.ShipCargo = x        ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_CUSTOM_NAMING_CARGO_TRAIN", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsCargo,        (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.TrainsCargo = x      ;AdrEvents.TriggerBuildingNameStrategyChanged();});
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_CUSTOM_NAMING_CARGO_AIRPLANE", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplaneCargo,   (x) => {AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.AirplaneCargo = x    ;AdrEvents.TriggerBuildingNameStrategyChanged(); });
 
 
 
-
-
-
-
-
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_ADDRESS_NAMING_RES", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence == GenerationMethod.ADDRESS,    (x) =>{AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE ;AdrEvents.TriggerBuildingNameStrategyChanged();}  );
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_ADDRESS_NAMING_IND", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry == GenerationMethod.ADDRESS,     (x) =>{AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE  ;AdrEvents.TriggerBuildingNameStrategyChanged();}  );
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_ADDRESS_NAMING_COM", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce == GenerationMethod.ADDRESS,     (x) =>{AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE  ;AdrEvents.TriggerBuildingNameStrategyChanged();}  );
+            m_uiHelperGlobal.AddCheckboxLocale("K45_ADR_ENABLE_ADDRESS_NAMING_OFF", AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office == GenerationMethod.ADDRESS,       (x) =>{AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE; AdrEvents.TriggerBuildingNameStrategyChanged(); });
         }
         #endregion
+
 
 
         private void OnChangePostalCodePrefixCity(string val)
@@ -194,7 +190,7 @@ namespace Klyte.Addresses.UI
             AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.QualifierFile,
             AdrController.LoadedLocalesDistrictPrefix.Keys.ToList(),
             m_districtPrefixGenFile,
-            Locale.Get("ADR_DEFAULT_FILE_NAME")
+            Locale.Get("K45_ADR_DEFAULT_FILE_NAME")
             );
 
         private void ReloadDistrictNamesFiles() => ReloadFiles(
@@ -202,7 +198,7 @@ namespace Klyte.Addresses.UI
             AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.NamesFile,
             AdrController.LoadedLocalesDistrictName.Keys.ToList(),
             m_districtNameGenFile,
-            Locale.Get("ADR_DEFAULT_FILE_NAME")
+            Locale.Get("K45_ADR_DEFAULT_FILE_NAME")
             );
 
 

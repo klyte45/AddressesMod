@@ -31,9 +31,9 @@ namespace Klyte.Addresses.UI
             ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
             ((UIScrollablePanel) m_uiHelperDistrict.Self).width = 370;
 
-            CreateGroupFileSelect("ADR_CITIZEN_MALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameMasc, ReloadMaleNameFiles, out m_maleFiles);
-            CreateGroupFileSelect("ADR_CITIZEN_FEMALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameFem, ReloadFemaleNameFiles, out m_femaleFiles);
-            CreateGroupFileSelect("ADR_CITIZEN_LAST_NAME_FILE", OnChangeSelectedCitizenLastName, ReloadLastNameFiles, out m_lastNameFiles);
+            CreateGroupFileSelect("K45_ADR_CITIZEN_MALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameMasc, ReloadMaleNameFiles, out m_maleFiles);
+            CreateGroupFileSelect("K45_ADR_CITIZEN_FEMALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameFem, ReloadFemaleNameFiles, out m_femaleFiles);
+            CreateGroupFileSelect("K45_ADR_CITIZEN_LAST_NAME_FILE", OnChangeSelectedCitizenLastName, ReloadLastNameFiles, out m_lastNameFiles);
 
         }
 
@@ -70,14 +70,14 @@ namespace Klyte.Addresses.UI
             AdrController.CurrentConfig.GlobalConfig.CitizenConfig.MaleNamesFile,
             AdrController.LoadedLocalesCitizenFirstNameMasc.Keys.ToList(),
             m_maleFiles,
-            Locale.Get("ADR_DEFAULT_FILE_NAME")
+            Locale.Get("K45_ADR_DEFAULT_FILE_NAME")
             );
         private void ReloadFemaleNameFiles() => ReloadFiles(
             AdrController.LoadLocalesCitizenFirstNameFemale,
             AdrController.CurrentConfig.GlobalConfig.CitizenConfig.FemaleNamesFile,
             AdrController.LoadedLocalesCitizenFirstNameFem.Keys.ToList(),
             m_femaleFiles,
-            Locale.Get("ADR_DEFAULT_FILE_NAME")
+            Locale.Get("K45_ADR_DEFAULT_FILE_NAME")
             );
 
         private void ReloadLastNameFiles() => ReloadFiles(
@@ -85,7 +85,7 @@ namespace Klyte.Addresses.UI
             AdrController.CurrentConfig.GlobalConfig.CitizenConfig.SurnamesFile,
             AdrController.LoadedLocalesCitizenLastName.Keys.ToList(),
             m_lastNameFiles,
-            Locale.Get("ADR_DEFAULT_FILE_NAME")
+            Locale.Get("K45_ADR_DEFAULT_FILE_NAME")
             );
 
 

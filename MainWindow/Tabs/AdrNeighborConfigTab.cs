@@ -30,10 +30,10 @@ namespace Klyte.Addresses.UI
             ((UIScrollablePanel) m_uiHelperNeighbors.Self).wrapLayout = true;
             ((UIScrollablePanel) m_uiHelperNeighbors.Self).width = 370;
 
-            m_neighborFileSelect = m_uiHelperNeighbors.AddDropdownLocalized("ADR_REGION_CITIES_FILE", new string[0], -1, OnChangeSelectedNeighborFile);
+            m_neighborFileSelect = m_uiHelperNeighbors.AddDropdownLocalized("K45_ADR_REGION_CITIES_FILE", new string[0], -1, OnChangeSelectedNeighborFile);
             m_neighborFileSelect.width = 370;
             m_uiHelperNeighbors.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperNeighbors.AddButton(Locale.Get("ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsFilesNeighbor), 380);
+            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperNeighbors.AddButton(Locale.Get("K45_ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsFilesNeighbor), 380);
             m_uiHelperNeighbors.AddSpace(10);
 
             UILabel titleLabel = m_uiHelperNeighbors.AddLabel("");
@@ -41,7 +41,7 @@ namespace Klyte.Addresses.UI
             titleLabel.textAlignment = UIHorizontalAlignment.Center;
             titleLabel.minimumSize = new Vector2(370, 0);
             KlyteMonoUtils.LimitWidth(titleLabel, 370);
-            titleLabel.localeID = "ADR_AZIMUTH_EDITOR_TITLE";
+            titleLabel.localeID = "K45_ADR_AZIMUTH_EDITOR_TITLE";
 
             m_uiHelperNeighbors.AddSpace(5);
             KlyteMonoUtils.CreateElement(out m_borderChart, m_uiHelperNeighbors.Self.transform, "NeighborArea");
@@ -193,7 +193,7 @@ namespace Klyte.Addresses.UI
         {
             AdrController.LoadLocalesNeighborName();
             List<string> items = AdrController.LoadedLocalesNeighborName.Keys.ToList();
-            items.Insert(0, Locale.Get("ADR_DEFAULT_CITIES_REGIONAL_NAMES"));
+            items.Insert(0, Locale.Get("K45_ADR_DEFAULT_CITIES_REGIONAL_NAMES"));
             m_neighborFileSelect.items = items.ToArray();
             string filename = AdrController.CurrentConfig.GlobalConfig.NeighborhoodConfig.NamesFile;
             if (items.Contains(filename))

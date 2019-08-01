@@ -23,15 +23,15 @@ namespace Klyte.Addresses.UI
             m_container.name = "AzimuthEditorTitle";
 
             CreateTitleLabel(out UILabel m_cityId, "CityId", "#", 30);
-            CreateTitleLabel(out UILabel m_azimuthInput, "StartAzimuth", Locale.Get("ADR_AZIMUTH_GRADOS_TITLE"), 50);
-            CreateTitleLabel(out UILabel m_direction, "Direction", Locale.Get("ADR_DIRECTION_TITLE"), 60);
-            CreateTitleLabel(out UILabel m_generatedName, "GenName", Locale.Get("ADR_GEN_NAME_TITLE"), 150);
+            CreateTitleLabel(out UILabel m_azimuthInput, "StartAzimuth", Locale.Get("K45_ADR_AZIMUTH_GRADOS_TITLE"), 50);
+            CreateTitleLabel(out UILabel m_direction, "Direction", Locale.Get("K45_ADR_DIRECTION_TITLE"), 60);
+            CreateTitleLabel(out UILabel m_generatedName, "GenName", Locale.Get("K45_ADR_GEN_NAME_TITLE"), 150);
 
             KlyteMonoUtils.CreateUIElement(out UIButton add, m_container.transform, "RegenName");
             add.textScale = 1f;
             add.width = 30;
             add.height = 30;
-            add.tooltip = Locale.Get("ADR_ADD_REG_CITY");
+            add.tooltip = Locale.Get("K45_ADR_ADD_REG_CITY");
             KlyteMonoUtils.InitButton(add, true, "ButtonMenu");
             add.isVisible = true;
             add.text = "+";

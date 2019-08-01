@@ -9,14 +9,13 @@ using Klyte.Commons.Utils;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using static Klyte.Commons.TextureAtlas.CommonTextureAtlas;
 
 [assembly: AssemblyVersion("2.0.0.0")]
 
 namespace Klyte.Addresses
 {
 
-    public class AddressesMod : BasicIUserMod<AddressesMod, AdrResourceLoader, AdrController, AdrCommonTextureAtlas, AdrConfigPanel, SpriteNames>
+    public class AddressesMod : BasicIUserMod<AddressesMod, AdrResourceLoader, AdrController, AdrCommonTextureAtlas, AdrConfigPanel, AdrCommonTextureAtlas.SpriteNames>
     {
 
         public AddressesMod() => Construct();
@@ -35,20 +34,20 @@ namespace Klyte.Addresses
 
         public override void TopSettingsUI(UIHelperExtension helper)
         {
-            UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("ADR_GENERAL_INFO"));
-            AddFolderButton(RoadPath, group8, "ADR_ROAD_NAME_FILES_PATH_TITLE");
-            AddFolderButton(RoadPrefixPath, group8, "ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE");
-            AddFolderButton(NeigborsPath, group8, "ADR_NEIGHBOR_CITIES_NAME_FILES_PATH_TITLE");
-            AddFolderButton(DistrictPrefixPath, group8, "ADR_DISTRICT_PREFIXES_FILES_PATH_TITLE");
-            AddFolderButton(DistrictNamePath, group8, "ADR_DISTRICT_NAME_FILES_PATH_TITLE");
-            AddFolderButton(CitizenFirstNameMascPath, group8, "ADR_CITIZEN_FIRST_NAME_MASC_FILES_PATH_TITLE");
-            AddFolderButton(CitizenFirstNameFemPath, group8, "ADR_CITIZEN_FIRST_NAME_FEM_FILES_PATH_TITLE");
-            AddFolderButton(CitizenLastNamePath, group8, "ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
+            UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("K45_ADR_GENERAL_INFO"));
+            AddFolderButton(RoadPath, group8, "K45_ADR_ROAD_NAME_FILES_PATH_TITLE");
+            AddFolderButton(RoadPrefixPath, group8, "K45_ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE");
+            AddFolderButton(NeigborsPath, group8, "K45_ADR_NEIGHBOR_CITIES_NAME_FILES_PATH_TITLE");
+            AddFolderButton(DistrictPrefixPath, group8, "K45_ADR_DISTRICT_PREFIXES_FILES_PATH_TITLE");
+            AddFolderButton(DistrictNamePath, group8, "K45_ADR_DISTRICT_NAME_FILES_PATH_TITLE");
+            AddFolderButton(CitizenFirstNameMascPath, group8, "K45_ADR_CITIZEN_FIRST_NAME_MASC_FILES_PATH_TITLE");
+            AddFolderButton(CitizenFirstNameFemPath, group8, "K45_ADR_CITIZEN_FIRST_NAME_FEM_FILES_PATH_TITLE");
+            AddFolderButton(CitizenLastNamePath, group8, "K45_ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
 
 
-            UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("ADR_ADDITIONAL_FILES_SOURCE"));
-            group7.AddLabel(Locale.Get("ADR_GET_FILES_GITHUB"));
-            group7.AddButton(Locale.Get("ADR_GO_TO_GITHUB"), () => Application.OpenURL("https://github.com/klyte45/AddressesFiles"));
+            UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("K45_ADR_ADDITIONAL_FILES_SOURCE"));
+            group7.AddLabel(Locale.Get("K45_ADR_GET_FILES_GITHUB"));
+            group7.AddButton(Locale.Get("K45_ADR_GO_TO_GITHUB"), () => Application.OpenURL("https://github.com/klyte45/AddressesFiles"));
         }
 
         private static void AddFolderButton(string filePath, UIHelperExtension helper, string localeId)

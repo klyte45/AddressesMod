@@ -21,7 +21,7 @@ namespace Klyte.Addresses.Overrides
 
             if (isMale)
             {
-                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.MaleNamesFile;
+                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.MaleNamesFile ?? "";
                 if (AdrController.LoadedLocalesCitizenFirstNameMasc.ContainsKey(filenameFirst))
                 {
                     int arrLen = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst].Length;
@@ -37,7 +37,7 @@ namespace Klyte.Addresses.Overrides
             else
             {
 
-                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.FemaleNamesFile;
+                string filenameFirst = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.FemaleNamesFile ?? "";
                 if (AdrController.LoadedLocalesCitizenFirstNameFem.ContainsKey(filenameFirst))
                 {
                     int arrLen = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst].Length;
@@ -50,7 +50,7 @@ namespace Klyte.Addresses.Overrides
                 }
 
             }
-            string filenameLast = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.SurnamesFile;
+            string filenameLast = AdrController.CurrentConfig?.GlobalConfig?.CitizenConfig?.SurnamesFile ?? "";
 
             if (AdrController.LoadedLocalesCitizenLastName.ContainsKey(filenameLast))
             {
