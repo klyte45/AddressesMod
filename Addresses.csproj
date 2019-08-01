@@ -70,7 +70,6 @@
     <Compile Include="commons\Utils\StructExtensions\NetSegmentExtensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector2Extensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector3Extensions.cs" />
-    <Compile Include="commons\Utils\UtilitiesClasses\CallbackableList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\CardinalPoint .cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\NumberArrays.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\Range.cs" />
@@ -161,7 +160,6 @@
     <EmbeddedResource Include="UI\i18n\ru.properties" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="commons\README.md" />
     <EmbeddedResource Include="commons\UI\i18n\en.properties" />
     <EmbeddedResource Include="commons\UI\i18n\fr.properties" />

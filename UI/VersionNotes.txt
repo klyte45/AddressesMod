@@ -1,4 +1,5 @@
-﻿v1.5
-	- Campus DLC update
-	- Added zero marker feature (for future use)
-	- Added color district feature (for future use)
+﻿v2.0
+	- Removed Klyte Commons' dependency!
+	- New location! Now use the K button to access the mod screen. Double click to move it.
+	- Added new option for building name generation: Cargo Airports
+	- Integration with DTP (soon!)

@@ -175,7 +175,7 @@ namespace Klyte.Addresses.UI
             //load district info
             ReloadOptionsRoadPrefix();
             ReloadOptionsRoad();
-            m_prefixPostalCodeDistrict.text = GetDistrictConfig().ZipcodePrefix?.ToString("%03d") ?? "";
+            m_prefixPostalCodeDistrict.text = GetDistrictConfig().ZipcodePrefix?.ToString("D3") ?? "";
             m_colorDistrict.selectedColor = GetDistrictConfig().DistrictColor;
 
         }

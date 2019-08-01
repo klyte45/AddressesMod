@@ -29,7 +29,7 @@ namespace Klyte.Addresses.Xml
         }
 
         [XmlIgnore]
-        private List<AdrDistrictConfig> m_districtConfigs = null;
+        private List<AdrDistrictConfig> m_districtConfigs = new List<AdrDistrictConfig>();
 
         public AdrDistrictConfig GetConfigForDistrict(ushort districtId)
         {
@@ -37,7 +37,8 @@ namespace Klyte.Addresses.Xml
             {
                 m_districtConfigs.Add(new AdrDistrictConfig
                 {
-                    Id = districtId
+                    Id = districtId,
+                    ZipcodePrefix = districtId % 1000
                 });
             }
             return m_districtConfigs.Where(x => x.Id == districtId).FirstOrDefault();
@@ -103,7 +104,7 @@ namespace Klyte.Addresses.Xml
     {
         [XmlArray("neighbors")]
         [XmlArrayItem("neighbor")]
-        public List<AdrNeighborDetailConfig> Neighbors { get; set; }
+        public List<AdrNeighborDetailConfig> Neighbors { get; set; } = new List<AdrNeighborDetailConfig>();
 
         public void AddToNeigborsListAt(int idx, AdrNeighborDetailConfig adrNeighbor)
         {
