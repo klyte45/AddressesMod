@@ -3,3 +3,5 @@
 	- New location! Now use the K button to access the mod screen. Double click to move it.
 	- Added new option for building name generation: Cargo Airports
 	- Integration with DTP (soon!)
+Patch 2.0.1
+	- Fixed the null pointers on searching files in unset configurations
