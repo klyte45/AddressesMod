@@ -16,7 +16,7 @@ namespace Klyte.Addresses.Overrides
 #pragma warning disable IDE0051 // Remover membros privados não utilizados
         private static bool GenerateNameOverride(OutsideConnectionAI __instance, ushort buildingID, ref string __result, ref InstanceID caller)
         {
-            float angle = Vector2.zero.GetAngleToPoint(VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position));
+            var angle = Vector2.zero.GetAngleToPoint(VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position));
             LogUtils.DoLog($"[buildingID {buildingID}] angle => {angle}, pos => {BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position} ");
 
             return GetNameBasedInAngle(__instance, out __result, ref caller, angle, out _);
@@ -24,8 +24,8 @@ namespace Klyte.Addresses.Overrides
 #pragma warning restore IDE0051 // Remover membros privados não utilizados
         public static string GetNameBasedInAngle(float angle, out bool canTrust)
         {
-            InstanceID caller = new InstanceID();
-            GetNameBasedInAngle(m_defaultAI, out string result, ref caller, angle, out canTrust);
+            var caller = new InstanceID();
+            GetNameBasedInAngle(m_defaultAI, out var result, ref caller, angle, out canTrust);
             return result;
         }
 
@@ -38,7 +38,7 @@ namespace Klyte.Addresses.Overrides
                 canTrust = false;
                 return false;
             }
-            string fileName = AdrController.CurrentConfig.GlobalConfig.NeighborhoodConfig.NamesFile;
+            var fileName = AdrController.CurrentConfig.GlobalConfig.NeighborhoodConfig.NamesFile ?? "";
             if (fileName == null || !AdrController.LoadedLocalesNeighborName.ContainsKey(fileName))
             {
                 caller.Index = (uint) randomizer.GetValueOrDefault().seed;
@@ -46,7 +46,7 @@ namespace Klyte.Addresses.Overrides
                 canTrust = true;
                 return false;
             }
-            string[] file = AdrController.LoadedLocalesNeighborName[fileName];
+            var file = AdrController.LoadedLocalesNeighborName[fileName];
             __result = file[randomizer.GetValueOrDefault().Int32((uint) file.Length)];
             canTrust = true;
             return false;
@@ -60,7 +60,7 @@ namespace Klyte.Addresses.Overrides
             {
                 return null;
             }
-            int num = 0;
+            var num = 0;
             if (__instance.m_useCloseNames)
             {
                 num += cityNameGroups.m_closeDistance.Length;
@@ -75,7 +75,7 @@ namespace Klyte.Addresses.Overrides
             }
             if (num != 0)
             {
-                Randomizer randomizer = new Randomizer(caller.Index);
+                var randomizer = new Randomizer(caller.Index);
                 num = randomizer.Int32((uint) num);
                 string text = null;
                 if (text == null && __instance.m_useCloseNames)
@@ -107,10 +107,10 @@ namespace Klyte.Addresses.Overrides
                         text = cityNameGroups.m_farDistance[num];
                     }
                 }
-                uint range = Locale.Count("CONNECTIONS_PATTERN", text);
-                string format = Locale.Get("CONNECTIONS_PATTERN", text, randomizer.Int32(range));
-                uint range2 = Locale.Count("CONNECTIONS_NAME", text);
-                string arg = Locale.Get("CONNECTIONS_NAME", text, randomizer.Int32(range2));
+                var range = Locale.Count("CONNECTIONS_PATTERN", text);
+                var format = Locale.Get("CONNECTIONS_PATTERN", text, randomizer.Int32(range));
+                var range2 = Locale.Count("CONNECTIONS_NAME", text);
+                var arg = Locale.Get("CONNECTIONS_NAME", text, randomizer.Int32(range2));
                 return StringUtils.SafeFormat(format, arg);
             }
             return null;

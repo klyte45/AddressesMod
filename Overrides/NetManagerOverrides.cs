@@ -59,7 +59,7 @@ namespace Klyte.Addresses.Overrides
 
             if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
             {
-                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile;
+                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile ??"";
                 ;
                 if ((filenamePrefix == null || !AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0)
                 {
@@ -202,7 +202,7 @@ namespace Klyte.Addresses.Overrides
 
         private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, ushort district, out string genName)
         {
-            string filename = AdrController.CurrentConfig.GetConfigForDistrict(district).RoadConfig?.NamesFile;
+            string filename = AdrController.CurrentConfig.GetConfigForDistrict(district).RoadConfig?.NamesFile ?? "";
             if (string.IsNullOrEmpty(filename) || !AdrController.LoadedLocalesRoadName.ContainsKey(filename))
             {
                 filename = AdrController.CurrentConfig.GetConfigForDistrict(0).RoadConfig?.NamesFile;

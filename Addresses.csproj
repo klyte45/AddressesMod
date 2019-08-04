@@ -174,7 +174,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del /Q "Q:\Steam\steamapps\workshop\content\255710\1322787091\*"
+    <PreBuildEvent>del /Q "S:\Steam\steamapps\workshop\content\255710\1322787091\*"
 del /Q "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ADR\*"
 del /Q "$(ProjectDir)\_requiredDLLs"</PreBuildEvent>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -185,6 +185,6 @@ del /Q "$(ProjectDir)\_requiredDLLs"</PreBuildEvent>
     <PostBuildEvent>xcopy /Y "$(TargetDir)0Harmony.dll" "$(ProjectDir)\_requiredDLLs\"
 xcopy /Y "$(TargetPath)" "$(ProjectDir)\_requiredDLLs\"
 xcopy /Y "$(ProjectDir)\_requiredDLLs\*" "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ADR\"
-xcopy /Y "$(ProjectDir)\_requiredDLLs\*"  "Q:\Steam\steamapps\workshop\content\255710\1322787091\"</PostBuildEvent>
+xcopy /Y "$(ProjectDir)\_requiredDLLs\*"  "S:\Steam\steamapps\workshop\content\255710\1322787091\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

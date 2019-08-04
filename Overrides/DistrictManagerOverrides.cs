@@ -20,7 +20,7 @@ namespace Klyte.Addresses.Overrides
             string filenamePrefix = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.QualifierFile;
             string filenameName = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.NamesFile;
 
-            if (AdrController.LoadedLocalesDistrictPrefix.ContainsKey(filenamePrefix))
+            if (AdrController.LoadedLocalesDistrictPrefix.ContainsKey(filenamePrefix ?? ""))
             {
                 int arrLen = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix].Length;
                 format = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix][randomizer.Int32((uint) arrLen)];
@@ -30,7 +30,7 @@ namespace Klyte.Addresses.Overrides
                 format = Locale.Get("DISTRICT_PATTERN", randomizer.Int32(Locale.Count("DISTRICT_PATTERN")));
             }
 
-            if (AdrController.LoadedLocalesDistrictName.ContainsKey(filenameName))
+            if (AdrController.LoadedLocalesDistrictName.ContainsKey(filenameName ?? ""))
             {
                 int arrLen = AdrController.LoadedLocalesDistrictName[filenameName].Length;
                 arg = AdrController.LoadedLocalesDistrictName[filenameName][randomizer.Int32((uint) arrLen)];
