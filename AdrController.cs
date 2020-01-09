@@ -4,7 +4,6 @@ using ColossalFramework.UI;
 using ICities;
 using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.Overrides;
-using Klyte.Addresses.TextureAtlas;
 using Klyte.Addresses.Utils;
 using Klyte.Addresses.Xml;
 using Klyte.Commons.Extensors;
@@ -89,13 +88,13 @@ namespace Klyte.Addresses
 
             BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;
 
-            Type dtbHookableType = Type.GetType("Klyte.DynamicTextProps.Utils.DTPHookable, KlyteDynamicTextProps");
+            var dtbHookableType = Type.GetType("Klyte.DynamicTextProps.Utils.DTPHookable, KlyteDynamicTextProps");
             if (dtbHookableType != null)
             {
                 dtbHookableType.GetField("GetStreetSuffix", RedirectorUtils.allFlags).SetValue(null, new Func<ushort, string>((ushort idx) =>
                 {
                     string result = "";
-                    List<ushort> usedQueue = new List<ushort>();
+                    var usedQueue = new List<ushort>();
                     NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
 
                     return result;
@@ -202,10 +201,9 @@ namespace Klyte.Addresses
         private UIButton InitBuildingEditOnWorldInfoPanel(UIComponent parent)
         {
             KlyteMonoUtils.CreateUIElement(out UIButton saida, parent.transform, "AddressesIcon", new Vector4(5, -40, 30, 30));
-            saida.atlas = AdrCommonTextureAtlas.instance.Atlas;
             saida.color = Color.white;
             saida.tooltipLocaleID = "K45_ADR_BUILDING_ADDRESS";
-            KlyteMonoUtils.InitButtonSameSprite(saida, "AddressesIcon");
+            KlyteMonoUtils.InitButtonSameSprite(saida, AddressesMod.Instance.IconName);
 
             KlyteMonoUtils.CreateUIElement(out UILabel addressContainer, saida.transform, "Address");
             addressContainer.autoSize = false;
@@ -253,7 +251,7 @@ namespace Klyte.Addresses
             {
                 return;
             }
-            using MemoryStream memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID));
+            using var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID));
             byte[] storage = memoryStream.ToArray();
             Deserialize(System.Text.Encoding.UTF8.GetString(storage));
         }

@@ -1,6 +1,5 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Addresses.TextureAtlas;
 using Klyte.Commons.Utils;
 using UnityEngine;
 
@@ -48,7 +47,7 @@ namespace Klyte.Addresses.UI
             contentContainer.name = "Container";
             contentContainer.area = new Vector4(15, 0, m_mainPanel.width - 30, m_mainPanel.height - 70);
             m_stripMain.AddTab(objectName, tab.gameObject, contentContainer.gameObject);
-                       
+
             KlyteMonoUtils.CreateScrollPanel(contentContainer, out _, out _, contentContainer.width - 20, contentContainer.height - 5, new Vector3()).Self.gameObject.AddComponent<T>();
         }
 
@@ -75,8 +74,7 @@ namespace Klyte.Addresses.UI
             closeButton.eventClick += (x, y) => AddressesMod.Instance.Controller.CloseAdrPanel();
 
             KlyteMonoUtils.CreateUIElement(out UISprite logo, m_mainPanel.transform, "AddressesIcon", new Vector4(22, 5f, 32, 32));
-            logo.atlas = AdrCommonTextureAtlas.instance.Atlas;
-            logo.spriteName = "AddressesIcon";
+            logo.spriteName = AddressesMod.Instance.IconName;
         }
         #endregion
 

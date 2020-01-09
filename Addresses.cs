@@ -1,8 +1,6 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Addresses.TextureAtlas;
 using Klyte.Addresses.UI;
-using Klyte.Addresses.Utils;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
@@ -10,19 +8,20 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.1.2")]
+[assembly: AssemblyVersion("2.0.2.0")]
 
 namespace Klyte.Addresses
 {
 
-    public class AddressesMod : BasicIUserMod<AddressesMod, AdrResourceLoader, AdrController, AdrCommonTextureAtlas, AdrConfigPanel, AdrCommonTextureAtlas.SpriteNames>
+    public class AddressesMod : BasicIUserMod<AddressesMod, AdrController, AdrConfigPanel>
     {
 
         public AddressesMod() => Construct();
+        public override string IconName { get; } = "K45_ADRIcon";
 
 
-        public override string SimpleName => "Addresses & Names Mod";
-        public override string Description => "Allow road name generation customization.";
+        public override string SimpleName { get; } = "Addresses & Names Mod";
+        public override string Description { get; } = "Allow road name generation customization.";
 
         public override void DoErrorLog(string fmt, params object[] args) => LogUtils.DoErrorLog(fmt, args);
 
@@ -54,7 +53,7 @@ namespace Klyte.Addresses
         {
             FileInfo fileInfo = FileUtils.EnsureFolderCreation(filePath);
             helper.AddLabel(Locale.Get(localeId) + ":");
-            UIButton namesFilesButton = ((UIButton) helper.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName)));
+            var namesFilesButton = ((UIButton) helper.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName)));
             namesFilesButton.textColor = Color.yellow;
             KlyteMonoUtils.LimitWidth(namesFilesButton, 710);
             namesFilesButton.text = fileInfo.FullName + Path.DirectorySeparatorChar;
@@ -80,7 +79,6 @@ namespace Klyte.Addresses
         public static string CitizenFirstNameMascPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_MASC_SUBFOLDER_NAME;
         public static string CitizenFirstNameFemPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME;
         public static string CitizenLastNamePath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_LAST_NAME_SUBFOLDER_NAME;
-
 
     }
 
