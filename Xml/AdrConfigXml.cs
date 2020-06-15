@@ -88,7 +88,7 @@ namespace Klyte.Addresses.Xml
             get => m_savedZeroMarkBuilding; set {
                 if (m_savedZeroMarkBuilding != value)
                 {
-                    AdrEvents.TriggerZeroMarkerBuildingChange();
+                    AdrShared.TriggerZeroMarkerBuildingChange();
                 }
                 m_savedZeroMarkBuilding = value;
             }

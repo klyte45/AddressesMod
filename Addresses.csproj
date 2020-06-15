@@ -114,7 +114,7 @@
     <Compile Include="MainWindow\Tabs\AdrGlobalConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrNeighborConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrDistrictConfigTab.cs" />
-    <Compile Include="ModShared\AdrEvents.cs" />
+    <Compile Include="ModShared\AdrShared.cs" />
     <Compile Include="Overrides\CitizenAIOverrides.cs" />
     <Compile Include="Overrides\DistrictManagerOverrides.cs" />
     <Compile Include="Overrides\BuildingManagerOverrides.cs" />

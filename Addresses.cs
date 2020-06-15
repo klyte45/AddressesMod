@@ -8,7 +8,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.2.1")]
+[assembly: AssemblyVersion("2.0.3.*")]
 
 namespace Klyte.Addresses
 {

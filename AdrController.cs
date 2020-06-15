@@ -86,41 +86,7 @@ namespace Klyte.Addresses
 
             InitNearLinesOnWorldInfoPanel();
 
-            BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;
-
-            var dtbHookableType = Type.GetType("Klyte.DynamicTextProps.Utils.DTPHookable, KlyteDynamicTextProps");
-            if (dtbHookableType != null)
-            {
-                dtbHookableType.GetField("GetStreetSuffix", RedirectorUtils.allFlags).SetValue(null, new Func<ushort, string>((ushort idx) =>
-                {
-                    string result = "";
-                    var usedQueue = new List<ushort>();
-                    NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
-
-                    return result;
-                }));
-                dtbHookableType.GetField("GetDistrictColor", RedirectorUtils.allFlags).SetValue(null, new Func<ushort, Color>((ushort idx) =>
-                {
-                    Color color = AdrController.CurrentConfig.GetConfigForDistrict(idx).DistrictColor;
-                    if (color == default)
-                    {
-                        return AdrController.CurrentConfig.GetConfigForDistrict(0).DistrictColor;
-                    }
-                    return color;
-                }));
-                dtbHookableType.GetField("GetStartPoint", RedirectorUtils.allFlags).SetValue(null, new Func<Vector2>(() =>
-                {
-                    ushort buildingZM = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZeroMarkBuilding;
-                    if (buildingZM == 0)
-                    {
-                        return Vector2.zero;
-                    }
-                    else
-                    {
-                        return BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
-                    }
-                }));
-            }
+            BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;            
         }
 
         private void RemoveZeroMarker(ushort building)

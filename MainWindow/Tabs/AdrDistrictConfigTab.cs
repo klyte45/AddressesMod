@@ -117,14 +117,14 @@ namespace Klyte.Addresses.UI
         {
             GetDistrictConfig().RoadConfig.QualifierFile = idx > 0 ? m_prefixesFile.selectedValue : null;
             SegmentUtils.UpdateSegmentNamesView();
-            AdrEvents.TriggerRoadNamingChange();
+            AdrShared.TriggerRoadNamingChange();
         }
 
         private void OnChangeSelectedRoadName(int idx)
         {
             GetDistrictConfig().RoadConfig.NamesFile = idx > 0 ? m_roadNameFile.selectedValue : null;
             SegmentUtils.UpdateSegmentNamesView();
-            AdrEvents.TriggerRoadNamingChange();
+            AdrShared.TriggerRoadNamingChange();
         }
 
         private void OnChangePostalCodePrefixDistrict(string val)
@@ -132,13 +132,13 @@ namespace Klyte.Addresses.UI
             if (int.TryParse(val, out int intval))
             {
                 GetDistrictConfig().ZipcodePrefix = intval;
-                AdrEvents.TriggerRoadNamingChange();
+                AdrShared.TriggerRoadNamingChange();
             }
         }
         private void OnChangeDistrictColor(Color c)
         {
             GetDistrictConfig().DistrictColor = c;
-            AdrEvents.TriggerDistrictColorChanged();
+            AdrShared.TriggerDistrictColorChanged();
         }
 
         private ushort GetSelectedConfigIndex()
