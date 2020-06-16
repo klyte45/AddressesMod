@@ -1,6 +1,5 @@
 ﻿using ColossalFramework;
 using Klyte.Addresses.ModShared;
-using Klyte.Addresses.Overrides;
 using Klyte.Addresses.UI;
 using Klyte.Commons.Utils;
 using System;
@@ -65,20 +64,46 @@ namespace Klyte.Addresses.Xml
     public class AdrAddressingConfig
     {
         [XmlAttribute("zipcodeFormat")]
-        public string ZipcodeFormat { get; set; } = "GCEDF-AJ";
-
+        public string ZipcodeFormat
+        {
+            get => m_zipcodeFormat; set {
+                m_zipcodeFormat = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
         [XmlAttribute("zipcodeCityPrefix")]
-        public int ZipcodeCityPrefix { get; set; }
+        public int ZipcodeCityPrefix
+        {
+            get => m_zipcodeCityPrefix; set {
+                m_zipcodeCityPrefix = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
 
         [XmlElement("addressLine1")]
-        public string AddressLine1 { get; set; } = "A, B";
-
+        public string AddressLine1
+        {
+            get => m_addressLine1; set {
+                m_addressLine1 = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
         [XmlElement("addressLine2")]
-        public string AddressLine2 { get; set; } = "[D - ]C";
-
+        public string AddressLine2
+        {
+            get => m_addressLine2; set {
+                m_addressLine2 = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
         [XmlElement("addressLine3")]
-        public string AddressLine3 { get; set; } = "E";
-
+        public string AddressLine3
+        {
+            get => m_addressLine3; set {
+                m_addressLine3 = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
         [XmlElement("districts")]
         public AdrGeneralQualifierConfig DistrictsConfig { get; set; } = new AdrGeneralQualifierConfig();
 
@@ -96,6 +121,11 @@ namespace Klyte.Addresses.Xml
 
         [XmlIgnore]
         private ushort m_savedZeroMarkBuilding;
+        private string m_zipcodeFormat = "GCEDF-AJ";
+        private string m_addressLine1 = "A, B";
+        private string m_addressLine2 = "[D - ]C";
+        private string m_addressLine3 = "E";
+        private int m_zipcodeCityPrefix;
     }
 
 
@@ -272,30 +302,54 @@ namespace Klyte.Addresses.Xml
         public AdrGeneralQualifierConfig RoadConfig { get; set; } = new AdrGeneralQualifierConfig();
 
         [XmlAttribute("zipcodePrefix")]
-        public int? ZipcodePrefix { get; set; }
+        public int? ZipcodePrefix
+        {
+            get => m_zipcodePrefix; set {
+                m_zipcodePrefix = value;
+                AdrShared.TriggerPostalCodeChanged();
+            }
+        }
 
         [XmlIgnore]
         public Color DistrictColor { get => m_cachedColor; set => SetDistrictColor(value); }
         [XmlIgnore]
         private Color m_cachedColor;
+        private int? m_zipcodePrefix;
 
         [XmlAttribute("color")]
-        public string DistrictColorStr { get => m_cachedColor == default ? null : ColorExtensions.ToRGB(DistrictColor); set => SetDistrictColor(value.IsNullOrWhiteSpace() ? default : (Color) ColorExtensions.FromRGB(value)); }
+        public string DistrictColorStr { get => m_cachedColor == default ? null : ColorExtensions.ToRGB(DistrictColor); set => SetDistrictColor(value.IsNullOrWhiteSpace() ? default : (Color)ColorExtensions.FromRGB(value)); }
 
         private void SetDistrictColor(Color c)
         {
-            DistrictManagerOverrides.OnDistrictChanged();
             m_cachedColor = c;
+            AdrShared.TriggerDistrictChanged();
         }
     }
 
     public class AdrGeneralQualifierConfig
     {
+        private string m_namesFile;
+        private string m_qualifierFile;
+
         [XmlAttribute("namesFile")]
-        public string NamesFile { get; set; }
+        public string NamesFile
+        {
+            get => m_namesFile; set {
+                m_namesFile = value;
+                AdrShared.TriggerRoadNamingChange();
+                AdrShared.TriggerDistrictChanged();
+            }
+        }
 
         [XmlAttribute("qualifierFile")]
-        public string QualifierFile { get; set; }
+        public string QualifierFile
+        {
+            get => m_qualifierFile; set {
+                m_qualifierFile = value;
+                AdrShared.TriggerRoadNamingChange();
+                AdrShared.TriggerDistrictChanged();
+            }
+        }
     }
 }
 

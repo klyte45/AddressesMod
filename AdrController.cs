@@ -2,6 +2,7 @@
 using ColossalFramework.UI;
 using ICities;
 using Klyte.Addresses.LocaleStruct;
+using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.Utils;
 using Klyte.Addresses.Xml;
@@ -72,6 +73,8 @@ namespace Klyte.Addresses
         public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
         public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
 
+        public AdrShared SharedInstance;
+
         public void Awake()
         {
             LoadLocalesRoadNames();
@@ -86,6 +89,8 @@ namespace Klyte.Addresses
             InitNearLinesOnWorldInfoPanel();
 
             BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;
+
+            SharedInstance = gameObject.AddComponent<AdrShared>();
         }
 
         private void RemoveZeroMarker(ushort building)

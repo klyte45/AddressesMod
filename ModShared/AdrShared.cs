@@ -7,18 +7,20 @@ using UnityEngine;
 
 namespace Klyte.Addresses.ModShared
 {
-    public static class AdrShared
+    public class AdrShared : MonoBehaviour
     {
-        public static event Action EventZeroMarkerBuildingChange;
-        public static event Action EventRoadNamingChange;
-        public static event Action EventDistrictColorChanged;
-        public static event Action EventBuildingNameStrategyChanged;
+        public static AdrShared Instance => AddressesMod.Controller?.SharedInstance;
+        public event Action EventZeroMarkerBuildingChange;
+        public event Action EventRoadNamingChange;
+        public event Action EventDistrictChanged;
+        public event Action EventBuildingNameStrategyChanged;
+        public event Action EventPostalCodeChanged;
 
-
-        public static void TriggerZeroMarkerBuildingChange() => EventZeroMarkerBuildingChange?.Invoke();
-        public static void TriggerRoadNamingChange() => EventRoadNamingChange?.Invoke();
-        public static void TriggerDistrictColorChanged() => EventDistrictColorChanged?.Invoke();
-        public static void TriggerBuildingNameStrategyChanged() => EventBuildingNameStrategyChanged?.Invoke();
+        internal static void TriggerPostalCodeChanged() => Instance?.EventPostalCodeChanged?.Invoke();
+        internal static void TriggerZeroMarkerBuildingChange() => Instance?.EventZeroMarkerBuildingChange?.Invoke();
+        internal static void TriggerRoadNamingChange() => Instance?.EventRoadNamingChange?.Invoke();
+        internal static void TriggerDistrictChanged() => Instance?.EventDistrictChanged?.Invoke();
+        internal static void TriggerBuildingNameStrategyChanged() => Instance?.EventBuildingNameStrategyChanged?.Invoke();
 
         public static string GetStreetSuffix(ushort idx)
         {
@@ -26,7 +28,7 @@ namespace Klyte.Addresses.ModShared
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
 
-            return GetStreetFull(idx).Replace(GetStreetQualifier(idx), "");
+            return GetStreetFull(idx).Replace(GetStreetQualifier(idx), "").Trim();
         }
         public static string GetStreetFull(ushort idx)
         {
@@ -42,7 +44,7 @@ namespace Klyte.Addresses.ModShared
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
 
-            return result;
+            return GetStreetFull(idx).Replace(result, "").Trim();
         }
 
         public static Color GetDistrictColor(ushort idx)

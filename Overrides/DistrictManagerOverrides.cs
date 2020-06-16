@@ -1,8 +1,8 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Math;
+using Klyte.Addresses.ModShared;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
-using System;
 using System.Reflection;
 using UnityEngine;
 
@@ -63,35 +63,13 @@ namespace Klyte.Addresses.Overrides
             RedirectorInstance.AddRedirect(GetNameMethod, preRename);
 
 
-            MethodInfo posChange = typeof(DistrictManagerOverrides).GetMethod("OnDistrictChanged", RedirectorUtils.allFlags);
+            MethodInfo posChange = typeof(AdrShared).GetMethod("TriggerDistrictChanged", RedirectorUtils.allFlags);
 
             RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("SetDistrictName", RedirectorUtils.allFlags), null, posChange);
             RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("AreaModified", RedirectorUtils.allFlags), null, posChange);
             #endregion
         }
-        #endregion
-
-        #region Events
-        public static event Action EventOnDistrictChanged;
-        private static int m_cooldown;
-        public static void OnDistrictChanged() => m_cooldown = 15;
-
-        public void Update()
-        {
-            if (m_cooldown == 1)
-            {
-
-                EventOnDistrictChanged?.Invoke();
-
-            }
-            if (m_cooldown > 0)
-            {
-                m_cooldown--;
-            }
-        }
-
-        #endregion
-
+        #endregion        
 
         /*
          * private string GenerateName(int district)

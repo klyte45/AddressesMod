@@ -1,7 +1,6 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Addresses.ModShared;
-using Klyte.Addresses.Overrides;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Utils;
 using System;
@@ -34,9 +33,9 @@ namespace Klyte.Addresses.UI
 
             m_uiHelperDistrict = new UIHelperExtension(MainContainer);
 
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = DefaultWidth;
+            ((UIScrollablePanel)m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
+            ((UIScrollablePanel)m_uiHelperDistrict.Self).wrapLayout = true;
+            ((UIScrollablePanel)m_uiHelperDistrict.Self).width = DefaultWidth;
 
             m_cachedDistricts = DistrictUtils.GetValidDistricts();
             m_selectDistrict = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
@@ -46,13 +45,13 @@ namespace Klyte.Addresses.UI
             m_roadNameFile = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_DISTRICT_NAME_FILE", new string[0], -1, OnChangeSelectedRoadName);
             m_roadNameFile.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsRoad), 380);
+            KlyteMonoUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsRoad), 380);
             m_uiHelperDistrict.AddSpace(20);
 
             m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_STREETS_PREFIXES_NAME_FILE", new string[0], -1, OnChangeSelectedRoadPrefix);
             m_prefixesFile.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_STREETS_PREFIXES_FILES_RELOAD"), ReloadOptionsRoadPrefix), 380);
+            KlyteMonoUtils.LimitWidth((UIButton)m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_STREETS_PREFIXES_FILES_RELOAD"), ReloadOptionsRoadPrefix), 380);
             m_uiHelperDistrict.AddSpace(40);
 
             m_prefixPostalCodeDistrict = m_uiHelperDistrict.AddTextField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), null, "", OnChangePostalCodePrefixDistrict);
@@ -64,7 +63,6 @@ namespace Klyte.Addresses.UI
             m_colorDistrict.height = 20;
             KlyteMonoUtils.LimitWidth(title, 350);
 
-            DistrictManagerOverrides.EventOnDistrictChanged += ReloadDistricts;
             ReloadDistricts();
         }
 
@@ -72,9 +70,19 @@ namespace Klyte.Addresses.UI
         {
             m_selectDistrict.selectedIndex = -1;
             m_selectDistrict.selectedIndex = 0;
+            AdrShared.Instance.EventDistrictChanged += () => dirty = true;
         }
         #endregion
+        private bool dirty;
 
+        private void Update()
+        {
+            if (dirty)
+            {
+                ReloadDistricts();
+                dirty = false;
+            }
+        }
 
         private Xml.AdrDistrictConfig GetDistrictConfig()
         {
@@ -118,14 +126,12 @@ namespace Klyte.Addresses.UI
         {
             GetDistrictConfig().RoadConfig.QualifierFile = idx > 0 ? m_prefixesFile.selectedValue : null;
             SegmentUtils.UpdateSegmentNamesView();
-            AdrShared.TriggerRoadNamingChange();
         }
 
         private void OnChangeSelectedRoadName(int idx)
         {
             GetDistrictConfig().RoadConfig.NamesFile = idx > 0 ? m_roadNameFile.selectedValue : null;
             SegmentUtils.UpdateSegmentNamesView();
-            AdrShared.TriggerRoadNamingChange();
         }
 
         private void OnChangePostalCodePrefixDistrict(string val)
@@ -133,20 +139,15 @@ namespace Klyte.Addresses.UI
             if (int.TryParse(val, out int intval))
             {
                 GetDistrictConfig().ZipcodePrefix = intval;
-                AdrShared.TriggerRoadNamingChange();
             }
         }
-        private void OnChangeDistrictColor(Color c)
-        {
-            GetDistrictConfig().DistrictColor = c;
-            AdrShared.TriggerDistrictColorChanged();
-        }
+        private void OnChangeDistrictColor(Color c) => GetDistrictConfig().DistrictColor = c;
 
         private ushort GetSelectedConfigIndex()
         {
             if (m_cachedDistricts.ContainsKey(m_selectDistrict.selectedValue))
             {
-                return (ushort) (m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
+                return (ushort)(m_cachedDistricts[m_selectDistrict.selectedValue] & 0xFF);
             }
             else
             {
@@ -189,7 +190,6 @@ namespace Klyte.Addresses.UI
             m_selectDistrict.selectedValue = m_lastSelectedItem;
             SegmentUtils.UpdateSegmentNamesView();
         }
-
     }
 
 
