@@ -66,7 +66,7 @@ namespace Klyte.Addresses.LocaleStruct
             bool hasEnd = true;
             if (wayVal == OneWay.TRUE && lanes <= 2)
             {
-                SegmentUtils.GetSegmentRoadEdges(segmentId, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                SegmentUtils.GetSegmentRoadEdges(segmentId, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef, out _);
                 LogUtils.DoLog($"OneWay s={startRef}; e= {endRef}");
                 if (startRef.segmentReference == 0 || endRef.segmentReference == 0)
                 {

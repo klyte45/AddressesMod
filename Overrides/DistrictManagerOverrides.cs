@@ -15,6 +15,11 @@ namespace Klyte.Addresses.Overrides
 #pragma warning disable IDE0051 // Remover membros privados não utilizados
         private static bool GenerateName(int district, DistrictManager __instance, ref string __result)
         {
+            if (AddressesMod.Controller == null)
+            {
+                return true;
+            }
+
             Randomizer randomizer = new Randomizer(__instance.m_districts.m_buffer[district].m_randomSeed);
             string format, arg;
             string filenamePrefix = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.QualifierFile;
@@ -23,7 +28,7 @@ namespace Klyte.Addresses.Overrides
             if (AdrController.LoadedLocalesDistrictPrefix.ContainsKey(filenamePrefix ?? ""))
             {
                 int arrLen = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix].Length;
-                format = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix][randomizer.Int32((uint) arrLen)];
+                format = AdrController.LoadedLocalesDistrictPrefix[filenamePrefix][randomizer.Int32((uint)arrLen)];
             }
             else
             {
@@ -33,7 +38,7 @@ namespace Klyte.Addresses.Overrides
             if (AdrController.LoadedLocalesDistrictName.ContainsKey(filenameName ?? ""))
             {
                 int arrLen = AdrController.LoadedLocalesDistrictName[filenameName].Length;
-                arg = AdrController.LoadedLocalesDistrictName[filenameName][randomizer.Int32((uint) arrLen)];
+                arg = AdrController.LoadedLocalesDistrictName[filenameName][randomizer.Int32((uint)arrLen)];
             }
             else
             {

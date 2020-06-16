@@ -53,13 +53,13 @@ namespace Klyte.Addresses.Overrides
             PrefabAI ai = info.GetAI();
             string format = null;
             Randomizer randomizer = new Randomizer(segment.m_nameSeed);
-            ushort district = (ushort) (DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
+            ushort district = (ushort)(DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
             Xml.AdrDistrictConfig districtConfig = AdrController.CurrentConfig.GetConfigForDistrict(district);
             Xml.AdrDistrictConfig cityConfig = AdrController.CurrentConfig.GetConfigForDistrict(0);
 
             if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
             {
-                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile ??"";
+                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile ?? "";
                 ;
                 if ((filenamePrefix == null || !AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0)
                 {
@@ -69,7 +69,7 @@ namespace Klyte.Addresses.Overrides
                 if (filenamePrefix != null && AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
                 {
                     LocaleStruct.RoadPrefixFileIndexer currentPrefixFile = AdrController.LoadedLocalesRoadPrefix[filenamePrefix];
-                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte) (info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
+                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
                 }
                 LogUtils.DoLog("selectedPrefix = {0}", format);
                 if (format == null)
@@ -114,7 +114,7 @@ namespace Klyte.Addresses.Overrides
             ushort targetSeg = 0;
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
-                SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef);
+                SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef, out _);
 
                 sourceSeg = startRef.segmentReference;
                 targetSeg = endRef.segmentReference;
@@ -150,7 +150,7 @@ namespace Klyte.Addresses.Overrides
             }
             if (format.Contains("{5}") || format.Contains("{6}"))
             {
-                GetSegmentRoadEdges(segmentID, false, false, false, out ComparableRoad startRef, out ComparableRoad endRef);
+                GetSegmentRoadEdges(segmentID, false, false, false, out ComparableRoad startRef, out ComparableRoad endRef, out _);
                 if (format.Contains("{5}"))//source district
                 {
                     sourceDistrict = GetDistrictAt(startRef);
@@ -221,7 +221,7 @@ namespace Klyte.Addresses.Overrides
                     genName = null;
                     return;
                 }
-                genName = AdrController.LoadedLocalesRoadName[filename][randomizer.Int32((uint) range)];
+                genName = AdrController.LoadedLocalesRoadName[filename][randomizer.Int32((uint)range)];
             }
             else
             {

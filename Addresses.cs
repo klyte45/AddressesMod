@@ -8,7 +8,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.3.*")]
+[assembly: AssemblyVersion("2.0.3.0")]
 
 namespace Klyte.Addresses
 {
@@ -16,7 +16,6 @@ namespace Klyte.Addresses
     public class AddressesMod : BasicIUserMod<AddressesMod, AdrController, AdrConfigPanel>
     {
 
-        public AddressesMod() => Construct();
         public override string IconName { get; } = "K45_ADRIcon";
 
 
@@ -27,10 +26,7 @@ namespace Klyte.Addresses
 
         public override void DoLog(string fmt, params object[] args) => LogUtils.DoLog(fmt, args);
 
-        public override void LoadSettings()
-        {
-        }
-
+    
         public override void TopSettingsUI(UIHelperExtension helper)
         {
             UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("K45_ADR_GENERAL_INFO"));

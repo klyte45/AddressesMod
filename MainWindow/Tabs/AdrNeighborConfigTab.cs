@@ -19,6 +19,7 @@ namespace Klyte.Addresses.UI
         private AdrMapBordersChart m_borderChart;
         private List<AdrAzimuthEditorLineNeighbor> m_borderCities = new List<AdrAzimuthEditorLineNeighbor>();
         private UIDropDown m_neighborFileSelect;
+        private float DefaultWidth { get; } = 420;
 
         #region Awake
         public void Awake()
@@ -28,10 +29,10 @@ namespace Klyte.Addresses.UI
 
             ((UIScrollablePanel) m_uiHelperNeighbors.Self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel) m_uiHelperNeighbors.Self).wrapLayout = true;
-            ((UIScrollablePanel) m_uiHelperNeighbors.Self).width = 370;
+            ((UIScrollablePanel) m_uiHelperNeighbors.Self).width = DefaultWidth;
 
             m_neighborFileSelect = m_uiHelperNeighbors.AddDropdownLocalized("K45_ADR_REGION_CITIES_FILE", new string[0], -1, OnChangeSelectedNeighborFile);
-            m_neighborFileSelect.width = 370;
+            m_neighborFileSelect.width = DefaultWidth;
             m_uiHelperNeighbors.AddSpace(1);
             KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperNeighbors.AddButton(Locale.Get("K45_ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsFilesNeighbor), 380);
             m_uiHelperNeighbors.AddSpace(10);
@@ -39,8 +40,8 @@ namespace Klyte.Addresses.UI
             UILabel titleLabel = m_uiHelperNeighbors.AddLabel("");
             titleLabel.autoSize = true;
             titleLabel.textAlignment = UIHorizontalAlignment.Center;
-            titleLabel.minimumSize = new Vector2(370, 0);
-            KlyteMonoUtils.LimitWidth(titleLabel, 370);
+            titleLabel.minimumSize = new Vector2(DefaultWidth, 0);
+            KlyteMonoUtils.LimitWidth(titleLabel, DefaultWidth);
             titleLabel.localeID = "K45_ADR_AZIMUTH_EDITOR_TITLE";
 
             m_uiHelperNeighbors.AddSpace(5);

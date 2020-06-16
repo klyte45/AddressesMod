@@ -19,6 +19,7 @@ namespace Klyte.Addresses.UI
         private UIDropDown m_lastNameFiles;
 
         private UIHelperExtension m_uiHelperDistrict;
+        private float DefaultWidth { get; } = 420;
 
         #region Awake
         public void Awake()
@@ -29,7 +30,7 @@ namespace Klyte.Addresses.UI
 
             ((UIScrollablePanel) m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = 370;
+            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = DefaultWidth;
 
             CreateGroupFileSelect("K45_ADR_CITIZEN_MALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameMasc, ReloadMaleNameFiles, out m_maleFiles);
             CreateGroupFileSelect("K45_ADR_CITIZEN_FEMALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameFem, ReloadFemaleNameFiles, out m_femaleFiles);
@@ -41,7 +42,7 @@ namespace Klyte.Addresses.UI
         private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, OnButtonClicked onReload, out UIDropDown dropDown)
         {
             dropDown = m_uiHelperDistrict.AddDropdownLocalized(i18n, new string[0], -1, onChanged);
-            dropDown.width = 370;
+            dropDown.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(1);
             KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get(i18n + "S_RELOAD"), onReload), 380);
             m_uiHelperDistrict.AddSpace(20);

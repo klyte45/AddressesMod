@@ -25,6 +25,7 @@ namespace Klyte.Addresses.UI
         private UIColorField m_colorDistrict;
 
         private UIHelperExtension m_uiHelperDistrict;
+        private float DefaultWidth { get; } = 420;
 
         #region Awake
         public void Awake()
@@ -35,21 +36,21 @@ namespace Klyte.Addresses.UI
 
             ((UIScrollablePanel) m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
             ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = 370;
+            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = DefaultWidth;
 
             m_cachedDistricts = DistrictUtils.GetValidDistricts();
             m_selectDistrict = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_DISTRICT_TITLE", m_cachedDistricts.Keys.OrderBy(x => x).ToArray(), 0, OnDistrictSelect);
-            m_selectDistrict.width = 370;
+            m_selectDistrict.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(30);
 
             m_roadNameFile = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_DISTRICT_NAME_FILE", new string[0], -1, OnChangeSelectedRoadName);
-            m_roadNameFile.width = 370;
+            m_roadNameFile.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(1);
             KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_ROAD_NAME_FILES_RELOAD"), ReloadOptionsRoad), 380);
             m_uiHelperDistrict.AddSpace(20);
 
             m_prefixesFile = m_uiHelperDistrict.AddDropdownLocalized("K45_ADR_STREETS_PREFIXES_NAME_FILE", new string[0], -1, OnChangeSelectedRoadPrefix);
-            m_prefixesFile.width = 370;
+            m_prefixesFile.width = DefaultWidth;
             m_uiHelperDistrict.AddSpace(1);
             KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get("K45_ADR_STREETS_PREFIXES_FILES_RELOAD"), ReloadOptionsRoadPrefix), 380);
             m_uiHelperDistrict.AddSpace(40);

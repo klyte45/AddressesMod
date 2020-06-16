@@ -1,12 +1,11 @@
 ﻿using ColossalFramework;
-using ColossalFramework.Math;
 using ColossalFramework.UI;
 using ICities;
 using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.Utils;
 using Klyte.Addresses.Xml;
-using Klyte.Commons.Extensors;
+using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ using UnityEngine;
 
 namespace Klyte.Addresses
 {
-    public class AdrController : MonoBehaviour, ISerializableDataExtension
+    public class AdrController : BaseController<AddressesMod, AdrController>, ISerializableDataExtension
     {
 
 
@@ -86,7 +85,7 @@ namespace Klyte.Addresses
 
             InitNearLinesOnWorldInfoPanel();
 
-            BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;            
+            BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;
         }
 
         private void RemoveZeroMarker(ushort building)
@@ -161,7 +160,7 @@ namespace Klyte.Addresses
         {
             CurrentConfig.GlobalConfig.AddressingConfig.ZeroMarkBuilding = GetWipBuildingInstanceId(component.GetComponentInParent<WorldInfoPanel>()).Building;
             component.color = Color.white;
-            ((UIButton) component).focusedColor = component.color;
+            ((UIButton)component).focusedColor = component.color;
         }
 
         private UIButton InitBuildingEditOnWorldInfoPanel(UIComponent parent)
