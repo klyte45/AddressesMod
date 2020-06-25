@@ -102,6 +102,7 @@
     <Compile Include="commons\Utils\StructExtensions\Int32Extensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\NetSegmentExtensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\PathUnitExtensions.cs" />
+    <Compile Include="commons\Utils\StructExtensions\StringExtensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector2Extensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector3Extensions.cs" />
     <Compile Include="commons\Utils\TabCommons.cs" />
@@ -251,7 +252,6 @@
     <EmbeddedResource Include="commons\UI\Images\%25K45_TrapezeIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\%25K45_TriangleIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\bordersDescriptor.txt" />
-    <EmbeddedResource Include="commons\UI\Images\lineFormat.png" />
     <EmbeddedResource Include="UI\Images\%25K45_ADRIcon.png" />
     <Resource Include="UI\Images\sprites.psd" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
@@ -270,6 +270,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="commons\README.md" />
+    <None Include="commons\UI\i18n\cn.properties" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -287,12 +288,11 @@
     <Content Include="commons\UI\Images\%25K45_QuestionMark.png" />
     <Content Include="commons\UI\Images\%25K45_Right.png" />
     <Content Include="commons\UI\Images\%25K45_Settings.png" />
+    <Content Include="commons\UI\Images\%25K45_Steam.png" />
     <Content Include="commons\UI\Images\%25K45_Unlock.png" />
     <Content Include="commons\UI\Images\%25K45_Up.png" />
     <Content Include="commons\UI\Images\%25K45_X.png" />
     <Content Include="commons\UI\Images\base.psd" />
-    <Content Include="commons\UI\Images\lineFormat.psd" />
-    <Content Include="commons\UI\Images\lineFormats.psd" />
     <Content Include="commons\UI\Images\sprites.psd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

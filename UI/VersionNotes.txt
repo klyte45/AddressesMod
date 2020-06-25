@@ -1,4 +1,6 @@
-﻿<color #AA44FF>ADRv2.0.3</color>
+﻿<color #AA44FF>ADRv2.0.4</color>
+	- Activated integration features with Write The Signs
+<color #888888>ADRv2.0.3
 	- Updated code to 6th Gen of my mods
 	- Now you can leave to main menu from game at any time!
 	- Added russian translation (thanks to <color yellow>9050metro</color>)
@@ -7,7 +9,7 @@
 	
 	<color yellow>Note: It replaces Dynamic Text Props integrations, so they won't work together anymore...</color>
 
-<color #888888>2.0.1
+2.0.1
 	- Fixed the null pointers on searching files in unset configurations
 2.0.0
 	- Removed Klyte Commons' dependency!
