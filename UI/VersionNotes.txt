@@ -1,6 +1,10 @@
-﻿<color #AA44FF>ADRv2.0.4</color>
+﻿<color #AA44FF>ADRv2.0.5</color>
+	- NEW FEATURE: Use brackets [] to select what is the "important part" of a road name in qualifiers file - useful for Write The Signs.
+		<color yellow>EX:</color> <color green>[{0}] Street</color> will make the content of the placeholder {0} to be recognized as main road name in Write The Signs mod.
+	- Minor bugifixing in integration features with Write The Signs
+<color #888888>2.0.4
 	- Activated integration features with Write The Signs
-<color #888888>ADRv2.0.3
+2.0.3
 	- Updated code to 6th Gen of my mods
 	- Now you can leave to main menu from game at any time!
 	- Added russian translation (thanks to <color yellow>9050metro</color>)
