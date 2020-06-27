@@ -51,47 +51,11 @@ namespace Klyte.Addresses.Overrides
             NetSegment segment = NetManager.instance.m_segments.m_buffer[segmentID];
             NetInfo info = segment.Info;
             PrefabAI ai = info.GetAI();
-            string format = null;
-            Randomizer randomizer = new Randomizer(segment.m_nameSeed);
-            ushort district = (ushort)(DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
-            Xml.AdrDistrictConfig districtConfig = AdrController.CurrentConfig.GetConfigForDistrict(district);
-            Xml.AdrDistrictConfig cityConfig = AdrController.CurrentConfig.GetConfigForDistrict(0);
+            string format = GetRoadNameFormat(segmentID, removePrefix, ref segment, info, ai, out ushort district);
 
-            if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
-            {
-                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile ?? "";
-                ;
-                if ((filenamePrefix == null || !AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0)
-                {
-                    filenamePrefix = cityConfig.RoadConfig?.QualifierFile;
-                }
-
-                if (filenamePrefix != null && AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
-                {
-                    LocaleStruct.RoadPrefixFileIndexer currentPrefixFile = AdrController.LoadedLocalesRoadPrefix[filenamePrefix];
-                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
-                }
-                LogUtils.DoLog("selectedPrefix = {0}", format);
-                if (format == null)
-                {
-                    string key = DefaultPrefix(info, ai);
-                    uint rangeFormat = Locale.Count(key);
-                    format = Locale.Get(key, randomizer.Int32(rangeFormat));
-                }
-            }
-
-            if (format == null)
+            if (format.IsNullOrWhiteSpace())
             {
                 return true;
-            }
-
-            if (removePrefix)
-            {
-                format = Regex.Replace(format, "(?!\\{)(\\w+|\\.)(?!\\})", "");
-                if (format.IsNullOrWhiteSpace())
-                {
-                    return true;
-                }
             }
 
             string genName = "";
@@ -104,7 +68,7 @@ namespace Klyte.Addresses.Overrides
             string direction = "";
             if (format.Contains("{0}"))
             {
-                GetGeneratedRoadName(segment, ai, district, out genName);
+                GetGeneratedRoadName(ref segment, ai, district, out genName);
                 if (genName == null)
                 {
                     return true;
@@ -172,6 +136,67 @@ namespace Klyte.Addresses.Overrides
             return false;
 
         }
+
+        internal static string GetRoadNameFormat(ushort segmentID, bool removePrefix, ref NetSegment segment, NetInfo info, PrefabAI ai, out ushort district)
+        {
+            string format = null;
+            var randomizer = new Randomizer(segment.m_nameSeed);
+            district = (ushort)(DistrictManager.instance.GetDistrict(segment.m_middlePosition) & 0xFF);
+            Xml.AdrDistrictConfig districtConfig = AdrController.CurrentConfig.GetConfigForDistrict(district);
+            Xml.AdrDistrictConfig cityConfig = AdrController.CurrentConfig.GetConfigForDistrict(0);
+
+            if ((info.m_vehicleTypes & VehicleInfo.VehicleType.Car) != VehicleInfo.VehicleType.None)
+            {
+                string filenamePrefix = districtConfig.RoadConfig?.QualifierFile ?? "";
+                ;
+                if ((filenamePrefix == null || !AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix)) && district > 0)
+                {
+                    filenamePrefix = cityConfig.RoadConfig?.QualifierFile;
+                }
+
+                if (filenamePrefix != null && AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
+                {
+                    LocaleStruct.RoadPrefixFileIndexer currentPrefixFile = AdrController.LoadedLocalesRoadPrefix[filenamePrefix];
+                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
+                }
+                LogUtils.DoLog("selectedPrefix = {0}", format);
+                if (format == null)
+                {
+                    string key = DefaultPrefix(info, ai);
+                    uint rangeFormat = Locale.Count(key);
+                    format = Locale.Get(key, randomizer.Int32(rangeFormat));
+                }
+            }
+
+            if (removePrefix)
+            {
+                format = format?.Replace("\\]", "\0") ?? "";
+                if (Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])"))
+                {
+                    format = Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value;
+                }
+                else
+                {
+                    format = Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
+                }
+                format = Regex.Replace(format, @"(?<!\\)(\[|\])", "");
+                format = Regex.Replace(format, @"(?<=\\\\)(\[|\])", "");
+                format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
+                format = Regex.Replace(format, @"\\\\", "\\");
+                format = format.Replace("\0", "]");
+            }
+            else
+            {
+                format = Regex.Replace(format ?? "", @"(?<!\\)(\[|\])", "");
+                format = Regex.Replace(format, @"(?<=\\\\)(\[|\])", "");
+                format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
+                format = Regex.Replace(format, @"\\\\", "\\");
+
+            }
+
+            return format;
+        }
+
         private static string GetDistrictAt(ComparableRoad refer)
         {
             string sourceDistrict;
@@ -200,7 +225,7 @@ namespace Klyte.Addresses.Overrides
             return sourceDistrict;
         }
 
-        private static void GetGeneratedRoadName(NetSegment segment, PrefabAI ai, ushort district, out string genName)
+        private static void GetGeneratedRoadName(ref NetSegment segment, PrefabAI ai, ushort district, out string genName)
         {
             string filename = AdrController.CurrentConfig.GetConfigForDistrict(district).RoadConfig?.NamesFile ?? "";
             if (string.IsNullOrEmpty(filename) || !AdrController.LoadedLocalesRoadName.ContainsKey(filename))

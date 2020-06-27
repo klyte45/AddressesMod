@@ -6,9 +6,10 @@ using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.4.0")]
+[assembly: AssemblyVersion("2.0.5.*")]
 
 namespace Klyte.Addresses
 {
@@ -26,7 +27,7 @@ namespace Klyte.Addresses
 
         public override void DoLog(string fmt, params object[] args) => LogUtils.DoLog(fmt, args);
 
-    
+
         public override void TopSettingsUI(UIHelperExtension helper)
         {
             UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("K45_ADR_GENERAL_INFO"));
@@ -43,13 +44,45 @@ namespace Klyte.Addresses
             UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("K45_ADR_ADDITIONAL_FILES_SOURCE"));
             group7.AddLabel(Locale.Get("K45_ADR_GET_FILES_GITHUB"));
             group7.AddButton(Locale.Get("K45_ADR_GO_TO_GITHUB"), () => Application.OpenURL("https://github.com/klyte45/AddressesFiles"));
+
+
+            group7.AddButton("TST", () => K45DialogControl.ShowModalPromptText(new K45DialogControl.BindProperties
+            {
+                message = "TESTE"
+            }, (x, format) =>
+            {
+                var or = format;
+                format = format.Replace("\\]", "\0");
+                if (Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])"))
+                {
+                    format = Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value;
+                }
+                else
+                {
+                    format = Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
+                }
+                format = Regex.Replace(format, @"(?<!\\)(\[|\])", "");
+                format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
+                format = Regex.Replace(format, @"\\\\", "\\");
+                format = format.Replace("\0", "]");
+
+                var formatFull = Regex.Replace(or, @"(?<!\\)(\[|\])", "");
+                formatFull = Regex.Replace(formatFull, @"(\\)(\[|\])", "$2");
+                formatFull = Regex.Replace(formatFull, @"\\\\", "\\");
+                formatFull = formatFull.Replace("\0", "]");
+                K45DialogControl.ShowModal(new K45DialogControl.BindProperties 
+                {
+                    message = $"\"{or}\"\nPRE: {format}\nFULL: {formatFull}"
+                }, (x) => true);
+                return true;
+            }));
         }
 
         private static void AddFolderButton(string filePath, UIHelperExtension helper, string localeId)
         {
             FileInfo fileInfo = FileUtils.EnsureFolderCreation(filePath);
             helper.AddLabel(Locale.Get(localeId) + ":");
-            var namesFilesButton = ((UIButton) helper.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName)));
+            var namesFilesButton = ((UIButton)helper.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName)));
             namesFilesButton.textColor = Color.yellow;
             KlyteMonoUtils.LimitWidth(namesFilesButton, 710);
             namesFilesButton.text = fileInfo.FullName + Path.DirectorySeparatorChar;
