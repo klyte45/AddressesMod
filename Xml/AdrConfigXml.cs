@@ -132,6 +132,8 @@ namespace Klyte.Addresses.Xml
     [XmlRoot("adrNeighborhoodConfig")]
     public class AdrNeighborhoodConfig
     {
+        private string m_namesFile;
+
         [XmlArray("neighbors")]
         [XmlArrayItem("neighbor")]
         public List<AdrNeighborDetailConfig> Neighbors { get; set; } = new List<AdrNeighborDetailConfig>();
@@ -148,7 +150,13 @@ namespace Klyte.Addresses.Xml
         }
 
         [XmlAttribute("namesFile")]
-        public string NamesFile { get; set; }
+        public string NamesFile
+        {
+            get => m_namesFile; set {
+                m_namesFile = value;
+                AdrShared.TriggerBuildingNameStrategyChanged();
+            }
+        }
     }
 
     public class AdrNeighborDetailConfig

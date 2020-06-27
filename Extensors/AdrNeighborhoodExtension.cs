@@ -1,4 +1,5 @@
 ﻿using ColossalFramework.Math;
+using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Xml;
 using System.Linq;
 
@@ -28,6 +29,7 @@ namespace Klyte.Addresses.Extensors
                     Seed = new Randomizer(new System.Random().Next()).UInt32(0xFFFAFFFF)
                 });
             }
+            AdrShared.TriggerBuildingNameStrategyChanged();
         }
 
         public static Randomizer? GetRandomizerAt(float angle)
@@ -56,6 +58,7 @@ namespace Klyte.Addresses.Extensors
             {
                 NeighborhoodConfig.Neighbors[idx].Seed = value;
             }
+            AdrShared.TriggerBuildingNameStrategyChanged();
         }
 
         public static void SafeCleanEntry(int idx) => NeighborhoodConfig.RemoveNeighborAtIndex(idx);
