@@ -2,6 +2,9 @@
 	- NEW FEATURE: Use brackets [] to select what is the "important part" of a road name in qualifiers file - useful for Write The Signs.
 		<color yellow>EX:</color> <color green>[{0}] Street</color> will make the content of the placeholder {0} to be recognized as main road name in Write The Signs mod.
 	- Minor bugifixing in integration features with Write The Signs
+	- Fixed some entries of Russian Translations
+	- Added Polish translation (thanks to <color yellow>MKuranowski</color>)
+	- Added Chinese translation (thanks to <color yellow>Weikang Fan</color>)
 <color #888888>2.0.4
 	- Activated integration features with Write The Signs
 2.0.3
