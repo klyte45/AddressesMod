@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.5.*")]
+[assembly: AssemblyVersion("2.0.5.10000")]
  
 namespace Klyte.Addresses
 {
@@ -45,36 +45,36 @@ namespace Klyte.Addresses
             group7.AddButton(Locale.Get("K45_ADR_GO_TO_GITHUB"), () => Application.OpenURL("https://github.com/klyte45/AddressesFiles"));
 
 
-            group7.AddButton("TST", () => K45DialogControl.ShowModalPromptText(new K45DialogControl.BindProperties
-            {
-                message = "TESTE"
-            }, (x, format) =>
-            {
-                var or = format;
-                format = format.Replace("\\]", "\0");
-                if (Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])"))
-                {
-                    format = Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value;
-                }
-                else
-                {
-                    format = Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
-                }
-                format = Regex.Replace(format, @"(?<!\\)(\[|\])", "");
-                format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
-                format = Regex.Replace(format, @"\\\\", "\\");
-                format = format.Replace("\0", "]");
+            //group7.AddButton("TST", () => K45DialogControl.ShowModalPromptText(new K45DialogControl.BindProperties
+            //{
+            //    message = "TESTE"
+            //}, (x, format) =>
+            //{
+            //    var or = format;
+            //    format = format.Replace("\\]", "\0");
+            //    if (Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])"))
+            //    {
+            //        format = Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value;
+            //    }
+            //    else
+            //    {
+            //        format = Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
+            //    }
+            //    format = Regex.Replace(format, @"(?<!\\)(\[|\])", "");
+            //    format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
+            //    format = Regex.Replace(format, @"\\\\", "\\");
+            //    format = format.Replace("\0", "]");
 
-                var formatFull = Regex.Replace(or, @"(?<!\\)(\[|\])", "");
-                formatFull = Regex.Replace(formatFull, @"(\\)(\[|\])", "$2");
-                formatFull = Regex.Replace(formatFull, @"\\\\", "\\");
-                formatFull = formatFull.Replace("\0", "]");
-                K45DialogControl.ShowModal(new K45DialogControl.BindProperties 
-                {
-                    message = $"\"{or}\"\nPRE: {format}\nFULL: {formatFull}"
-                }, (k) => true);
-                return true;
-            }));
+            //    var formatFull = Regex.Replace(or, @"(?<!\\)(\[|\])", "");
+            //    formatFull = Regex.Replace(formatFull, @"(\\)(\[|\])", "$2");
+            //    formatFull = Regex.Replace(formatFull, @"\\\\", "\\");
+            //    formatFull = formatFull.Replace("\0", "]");
+            //    K45DialogControl.ShowModal(new K45DialogControl.BindProperties 
+            //    {
+            //        message = $"\"{or}\"\nPRE: {format}\nFULL: {formatFull}"
+            //    }, (k) => true);
+            //    return true;
+            //}));
         }
 
         private static void AddFolderButton(string filePath, UIHelperExtension helper, string localeId)

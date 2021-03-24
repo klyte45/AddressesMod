@@ -5,21 +5,9 @@
 	- Fixed some entries of Russian Translations
 	- Added Polish translation (thanks to <color yellow>MKuranowski</color>)
 	- Added Chinese translation (thanks to <color yellow>Weikang Fan</color>)
-<color #888888>2.0.4
-	- Activated integration features with Write The Signs
-2.0.3
-	- Updated code to 6th Gen of my mods
-	- Now you can leave to main menu from game at any time!
-	- Added russian translation (thanks to <color yellow>9050metro</color>)
 
-	- Added new integrations with the future <k45Symbol K45_CircleIcon,014f71,W>Write the Signs mod 
-	
-	<color yellow>Note: It replaces Dynamic Text Props integrations, so they won't work together anymore...</color>
-
-2.0.1
-	- Fixed the null pointers on searching files in unset configurations
-2.0.0
-	- Removed Klyte Commons' dependency!
-	- New location! Now use the K button to access the mod screen. Double click to move it.
-	- Added new option for building name generation: Cargo Airports
-	- Integration with DTP (soon!)</color>
+<color yellow>r10000 (24/MAR/21)</color>
+	- Fixing some crashes on loading cities
+	- Fixed Write The Signs mod connector bugs
+	- Fixed some errors when loading a city relative to chirper message poster names
+	- Downgrade to C#7.x
