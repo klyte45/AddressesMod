@@ -72,7 +72,7 @@ namespace Klyte.Addresses
                 K45DialogControl.ShowModal(new K45DialogControl.BindProperties 
                 {
                     message = $"\"{or}\"\nPRE: {format}\nFULL: {formatFull}"
-                }, (x) => true);
+                }, (k) => true);
                 return true;
             }));
         }

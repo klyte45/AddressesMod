@@ -225,8 +225,11 @@ namespace Klyte.Addresses
             {
                 return;
             }
-            using var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID));
-            byte[] storage = memoryStream.ToArray();
+            byte[] storage;
+            using (var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID)))
+            {
+                storage = memoryStream.ToArray();
+            }
             Deserialize(System.Text.Encoding.UTF8.GetString(storage));
         }
 
