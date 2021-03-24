@@ -66,7 +66,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("zipcodeFormat")]
         public string ZipcodeFormat
         {
-            get => m_zipcodeFormat; set {
+            get => m_zipcodeFormat; set
+            {
                 m_zipcodeFormat = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -74,7 +75,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("zipcodeCityPrefix")]
         public int ZipcodeCityPrefix
         {
-            get => m_zipcodeCityPrefix; set {
+            get => m_zipcodeCityPrefix; set
+            {
                 m_zipcodeCityPrefix = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -83,7 +85,8 @@ namespace Klyte.Addresses.Xml
         [XmlElement("addressLine1")]
         public string AddressLine1
         {
-            get => m_addressLine1; set {
+            get => m_addressLine1; set
+            {
                 m_addressLine1 = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -91,7 +94,8 @@ namespace Klyte.Addresses.Xml
         [XmlElement("addressLine2")]
         public string AddressLine2
         {
-            get => m_addressLine2; set {
+            get => m_addressLine2; set
+            {
                 m_addressLine2 = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -99,7 +103,8 @@ namespace Klyte.Addresses.Xml
         [XmlElement("addressLine3")]
         public string AddressLine3
         {
-            get => m_addressLine3; set {
+            get => m_addressLine3; set
+            {
                 m_addressLine3 = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -110,7 +115,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("zeroMarkBuildingId")]
         public ushort ZeroMarkBuilding
         {
-            get => m_savedZeroMarkBuilding; set {
+            get => m_savedZeroMarkBuilding; set
+            {
                 if (m_savedZeroMarkBuilding != value)
                 {
                     AdrShared.TriggerZeroMarkerBuildingChange();
@@ -141,18 +147,19 @@ namespace Klyte.Addresses.Xml
         public void AddToNeigborsListAt(int idx, AdrNeighborDetailConfig adrNeighbor)
         {
             Neighbors.Insert(Math.Min(idx, Neighbors.Count), adrNeighbor);
-            GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
+            AdrNeighborConfigTab.instance?.MarkDirty();
         }
         public void RemoveNeighborAtIndex(int idx)
         {
             Neighbors.RemoveAt(idx);
-            GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
+            AdrNeighborConfigTab.instance?.MarkDirty();
         }
 
         [XmlAttribute("namesFile")]
         public string NamesFile
         {
-            get => m_namesFile; set {
+            get => m_namesFile; set
+            {
                 m_namesFile = value;
                 AdrShared.TriggerBuildingNameStrategyChanged();
             }
@@ -165,18 +172,20 @@ namespace Klyte.Addresses.Xml
         public uint Seed
         {
             get => m_seed;
-            set {
+            set
+            {
                 m_seed = value;
-                GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
+                AdrNeighborConfigTab.instance?.MarkDirty();
             }
         }
         [XmlAttribute("azimuth")]
         public ushort Azimuth
         {
             get => m_azimuth;
-            set {
+            set
+            {
                 m_azimuth = value;
-                GameObject.FindObjectOfType<AdrNeighborConfigTab>()?.MarkDirty();
+                AdrNeighborConfigTab.instance?.MarkDirty();
             }
         }
 
@@ -312,7 +321,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("zipcodePrefix")]
         public int? ZipcodePrefix
         {
-            get => m_zipcodePrefix; set {
+            get => m_zipcodePrefix; set
+            {
                 m_zipcodePrefix = value;
                 AdrShared.TriggerPostalCodeChanged();
             }
@@ -342,7 +352,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("namesFile")]
         public string NamesFile
         {
-            get => m_namesFile; set {
+            get => m_namesFile; set
+            {
                 m_namesFile = value;
                 AdrShared.TriggerRoadNamingChange();
                 AdrShared.TriggerDistrictChanged();
@@ -352,7 +363,8 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("qualifierFile")]
         public string QualifierFile
         {
-            get => m_qualifierFile; set {
+            get => m_qualifierFile; set
+            {
                 m_qualifierFile = value;
                 AdrShared.TriggerRoadNamingChange();
                 AdrShared.TriggerDistrictChanged();

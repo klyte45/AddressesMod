@@ -61,7 +61,7 @@ namespace Klyte.Addresses.Utils
         {
             for (int i = 0; i < count; i++)
             {
-                input = input.Replace(((char) ('A' + i)).ToString(), $"{{{i}}}");
+                input = input.Replace(((char)('A' + i)).ToString(), $"{{{i}}}");
             }
         }
 
@@ -84,11 +84,11 @@ namespace Klyte.Addresses.Utils
          */
         public static string FormatPostalCode(Vector3 position, string format = "GCEDF-AJ")
         {
-            format ??= "GCEDF-AJ";
+            format = format ?? "GCEDF-AJ";
             int district = DistrictManager.instance.GetDistrict(position) & 0xff;
             if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
-                int districtPrefix = AdrController.CurrentConfig.GetConfigForDistrict((ushort) district).ZipcodePrefix ?? district;
+                int districtPrefix = AdrController.CurrentConfig.GetConfigForDistrict((ushort)district).ZipcodePrefix ?? district;
                 format = format.Replace("A", (districtPrefix % 100).ToString("00"));
                 format = format.Replace("B", (districtPrefix % 1000).ToString("000"));
             }

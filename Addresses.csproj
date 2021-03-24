@@ -11,10 +11,11 @@
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -77,6 +78,7 @@
     <Compile Include="commons\UI\SpriteNames\LineIconSpriteNames.cs" />
     <Compile Include="commons\UI\TLMAgesChartPanel.cs" />
     <Compile Include="commons\UI\TLMWorkersChartPanel.cs" />
+    <Compile Include="commons\UI\UIPagingBar.cs" />
     <Compile Include="commons\UI\UIRadialChartExtended.cs" />
     <Compile Include="commons\Utils\BuildingUtils.cs" />
     <Compile Include="commons\Utils\DistrictUtils.cs" />
@@ -87,12 +89,14 @@
     <Compile Include="commons\Utils\KlyteResourceLoader.cs" />
     <Compile Include="commons\Utils\LogUtils.cs" />
     <Compile Include="commons\Utils\MapUtils.cs" />
+    <Compile Include="commons\Utils\MeshUtils.cs" />
     <Compile Include="commons\Utils\NumberingUtils.cs" />
     <Compile Include="commons\Utils\PastelConfig.cs" />
     <Compile Include="commons\Utils\PluginUtils.cs" />
-    <Compile Include="commons\Utils\PrefabUtils.cs" />
+    <Compile Include="commons\Utils\PrefabIndexes.cs" />
     <Compile Include="commons\Utils\RandomPastelColorGenerator.cs" />
     <Compile Include="commons\Utils\ReflectionUtils.cs" />
+    <Compile Include="commons\Utils\RenderOverlayUtils.cs" />
     <Compile Include="commons\Utils\RoadSearchUtils.cs" />
     <Compile Include="commons\Utils\SegmentUtils.cs" />
     <Compile Include="commons\Utils\SerializationUtils.cs" />
@@ -131,6 +135,7 @@
     <Compile Include="commons\Utils\UtilitiesClasses\TimeableList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\Tuple.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\VectorsXml.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\XmlDictionary.cs" />
     <Compile Include="commons\Utils\VehicleUtils.cs" />
     <Compile Include="commons\Utils\XmlUtils.cs" />
     <Compile Include="commons\Utils\ZipUtils.cs" />
@@ -270,28 +275,29 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="commons\README.md" />
-    <None Include="commons\UI\i18n\cn.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\cn.properties" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="commons\UI\Images\%25K45_Delete.png" />
-    <Content Include="commons\UI\Images\%25K45_Down.png" />
-    <Content Include="commons\UI\Images\%25K45_Export.png" />
-    <Content Include="commons\UI\Images\%25K45_Import.png" />
-    <Content Include="commons\UI\Images\%25K45_Layers.png" />
-    <Content Include="commons\UI\Images\%25K45_Left.png" />
-    <Content Include="commons\UI\Images\%25K45_Lock.png" />
-    <Content Include="commons\UI\Images\%25K45_Minus.png" />
-    <Content Include="commons\UI\Images\%25K45_MoveCross.png" />
-    <Content Include="commons\UI\Images\%25K45_New.png" />
-    <Content Include="commons\UI\Images\%25K45_Plus.png" />
-    <Content Include="commons\UI\Images\%25K45_QuestionMark.png" />
-    <Content Include="commons\UI\Images\%25K45_Right.png" />
-    <Content Include="commons\UI\Images\%25K45_Settings.png" />
-    <Content Include="commons\UI\Images\%25K45_Steam.png" />
-    <Content Include="commons\UI\Images\%25K45_Unlock.png" />
-    <Content Include="commons\UI\Images\%25K45_Up.png" />
-    <Content Include="commons\UI\Images\%25K45_X.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Delete.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Down.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Dropper.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Export.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Import.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Layers.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Left.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Lock.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Minus.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_MoveCross.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_New.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Plus.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_QuestionMark.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Right.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Settings.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Steam.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Unlock.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_Up.png" />
+    <EmbeddedResource Include="commons\UI\Images\%25K45_X.png" />
     <Content Include="commons\UI\Images\base.psd" />
     <Content Include="commons\UI\Images\sprites.psd" />
   </ItemGroup>

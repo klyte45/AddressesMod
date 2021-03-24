@@ -70,12 +70,7 @@ namespace Klyte.Addresses
             }
         }
 
-        public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
-        public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
-
-        public AdrShared SharedInstance;
-
-        public void Awake()
+        public static void ReloadAllFiles()
         {
             LoadLocalesRoadNames();
             LoadLocalesRoadPrefix();
@@ -85,6 +80,15 @@ namespace Klyte.Addresses
             LoadLocalesCitizenFirstNameMale();
             LoadLocalesCitizenFirstNameFemale();
             LoadLocalesCitizenLastName();
+        }
+
+        public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
+        public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
+
+        public AdrShared SharedInstance;
+
+        public void Awake()
+        {
 
             InitNearLinesOnWorldInfoPanel();
 
@@ -221,8 +225,11 @@ namespace Klyte.Addresses
             {
                 return;
             }
-            using var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID));
-            byte[] storage = memoryStream.ToArray();
+            byte[] storage;
+            using (var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID)))
+            {
+                storage = memoryStream.ToArray();
+            }
             Deserialize(System.Text.Encoding.UTF8.GetString(storage));
         }
 

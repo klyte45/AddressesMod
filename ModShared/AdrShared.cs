@@ -1,4 +1,5 @@
-﻿using ColossalFramework.Math;
+﻿using ColossalFramework;
+using ColossalFramework.Math;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.Utils;
 using System;
@@ -43,7 +44,10 @@ namespace Klyte.Addresses.ModShared
             string result = "";
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
-
+            if (result.IsNullOrWhiteSpace())
+            {
+                return GetStreetFull(idx).Trim();
+            }
             return GetStreetFull(idx).Replace(result, "").Trim();
         }
 
