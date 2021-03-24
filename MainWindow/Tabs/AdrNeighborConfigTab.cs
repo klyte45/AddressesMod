@@ -12,6 +12,7 @@ namespace Klyte.Addresses.UI
 
     internal class AdrNeighborConfigTab : UICustomControl
     {
+        public static AdrNeighborConfigTab instance { get; private set; }
         public UIComponent MainContainer { get; private set; }
 
         private UIHelperExtension m_uiHelperNeighbors;
@@ -24,6 +25,11 @@ namespace Klyte.Addresses.UI
         #region Awake
         public void Awake()
         {
+            if (!(instance is null))
+            {
+                Destroy(instance);
+            }
+            instance = this;
             MainContainer = GetComponent<UIComponent>();
             m_uiHelperNeighbors = new UIHelperExtension(MainContainer);
 

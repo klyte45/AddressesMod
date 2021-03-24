@@ -70,12 +70,7 @@ namespace Klyte.Addresses
             }
         }
 
-        public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
-        public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
-
-        public AdrShared SharedInstance;
-
-        public void Awake()
+        public static void ReloadAllFiles()
         {
             LoadLocalesRoadNames();
             LoadLocalesRoadPrefix();
@@ -85,6 +80,15 @@ namespace Klyte.Addresses
             LoadLocalesCitizenFirstNameMale();
             LoadLocalesCitizenFirstNameFemale();
             LoadLocalesCitizenLastName();
+        }
+
+        public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
+        public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
+
+        public AdrShared SharedInstance;
+
+        public void Awake()
+        {
 
             InitNearLinesOnWorldInfoPanel();
 

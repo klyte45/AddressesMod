@@ -9,17 +9,14 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.5.2")]
+[assembly: AssemblyVersion("2.0.5.*")]
  
 namespace Klyte.Addresses
 {
 
     public class AddressesMod : BasicIUserMod<AddressesMod, AdrController, AdrConfigPanel>
     {
-
         public override string IconName { get; } = "K45_ADRIcon";
-
-
         public override string SimpleName { get; } = "Addresses & Names Mod";
         public override string Description { get; } = "Allow road name generation customization.";
 
@@ -30,6 +27,8 @@ namespace Klyte.Addresses
 
         public override void TopSettingsUI(UIHelperExtension helper)
         {
+            AdrController.ReloadAllFiles();
+
             UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("K45_ADR_GENERAL_INFO"));
             AddFolderButton(RoadPath, group8, "K45_ADR_ROAD_NAME_FILES_PATH_TITLE");
             AddFolderButton(RoadPrefixPath, group8, "K45_ADR_ROAD_PREFIX_NAME_FILES_PATH_TITLE");
