@@ -303,8 +303,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del /Q "S:\Steam\steamapps\workshop\content\255710\1322787091\*"
-del /Q "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ADR\*"
+    <PreBuildEvent>del /Q "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ADR\*"
+del /Q "S:\Steam\steamapps\workshop\content\255710\1322787091\*"
 del /Q "$(ProjectDir)\_requiredDLLs"</PreBuildEvent>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />

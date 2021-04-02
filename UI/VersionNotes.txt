@@ -6,7 +6,7 @@
 	- Added Polish translation (thanks to <color yellow>MKuranowski</color>)
 	- Added Chinese translation (thanks to <color yellow>Weikang Fan</color>)
 
-<color yellow>r10000 (24/MAR/21)</color>
+<color yellow>r10001 (25/MAR/21)</color>
 	- Fixing some crashes on loading cities
 	- Fixed Write The Signs mod connector bugs
 	- Fixed some errors when loading a city relative to chirper message poster names

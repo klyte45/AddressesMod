@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("2.0.5.10000")]
+[assembly: AssemblyVersion("2.0.5.10001")]
  
 namespace Klyte.Addresses
 {
