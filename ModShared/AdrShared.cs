@@ -28,8 +28,10 @@ namespace Klyte.Addresses.ModShared
             string result = "";
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
-
-            return GetStreetFull(idx).Replace(GetStreetQualifier(idx), "").Trim();
+            var qualifier = GetStreetQualifier(idx);
+            return qualifier.IsNullOrWhiteSpace()
+                ? GetStreetFull(idx).Trim()
+                : GetStreetFull(idx).Replace(qualifier, "").Trim();
         }
         public static string GetStreetFull(ushort idx)
         {
@@ -44,34 +46,21 @@ namespace Klyte.Addresses.ModShared
             string result = "";
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
-            if (result.IsNullOrWhiteSpace())
-            {
-                return GetStreetFull(idx).Trim();
-            }
-            return GetStreetFull(idx).Replace(result, "").Trim();
+            return result.IsNullOrWhiteSpace() ? GetStreetFull(idx).Trim() : GetStreetFull(idx).Replace(result, "").Trim();
         }
 
         public static Color GetDistrictColor(ushort idx)
         {
             Color color = AdrController.CurrentConfig.GetConfigForDistrict(idx).DistrictColor;
-            if (color == default)
-            {
-                return AdrController.CurrentConfig.GetConfigForDistrict(0).DistrictColor;
-            }
-            return color;
+            return color == default ? AdrController.CurrentConfig.GetConfigForDistrict(0).DistrictColor : color;
         }
 
         public static Vector2 GetStartPoint()
         {
             ushort buildingZM = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZeroMarkBuilding;
-            if (buildingZM == 0)
-            {
-                return Vector2.zero;
-            }
-            else
-            {
-                return BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
-            }
+            return buildingZM == 0
+                ? Vector2.zero
+                : BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
         }
 
         public static string GetPostalCode(Vector3 position) => AdrUtils.FormatPostalCode(position, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat);
