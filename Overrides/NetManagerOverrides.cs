@@ -17,13 +17,11 @@ namespace Klyte.Addresses.Overrides
 
         #region Mod
 
-#pragma warning disable IDE0051 // Remover membros privados não utilizados
-        private static bool GenerateSegmentName(ushort segmentID, ref string __result)
+        public static bool GenerateSegmentName(ushort segmentID, ref string __result)
         {
             List<ushort> path = new List<ushort>();
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, false);
         }
-#pragma warning restore IDE0051 // Remover membros privados não utilizados
 
         public static bool GetStreetNameForStation(ushort segmentID, ref string __result)
         {
