@@ -28,7 +28,7 @@ namespace Klyte.Addresses.UI
             m_stripMain.tabPages = tabContainer;
             m_stripMain.CreateTabLocalized<AdrDistrictConfigTab>("ToolbarIconDistrict", "K45_ADR_CONFIG_PER_DISTRICT_TAB", "AdrPerDistrict");
             m_stripMain.CreateTabLocalized<AdrNeighborConfigTab>("IconRightArrow", "K45_ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor", false);
-            m_stripMain.CreateTabLocalized<AdrCitizenConfigTab>("IconCitizen", "K45_ADR_CONFIG_CITIZEN_TAB", "AdrCitizen");
+            m_stripMain.CreateTabLocalized<AdrCitizenConfigTab>("IconCitizen", "K45_ADR_CONFIG_CITIZEN_TAB", "AdrCitizen", false);
             m_stripMain.CreateTabLocalized<AdrGlobalConfigTab>("ToolbarIconZoomOutGlobe", "K45_ADR_CONFIG_GLOBAL_TAB", "AdrGlobal");
         }
 
