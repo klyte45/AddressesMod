@@ -147,12 +147,12 @@ namespace Klyte.Addresses.Xml
         public void AddToNeigborsListAt(int idx, AdrNeighborDetailConfig adrNeighbor)
         {
             Neighbors.Insert(Math.Min(idx, Neighbors.Count), adrNeighbor);
-            AdrNeighborConfigTab.instance?.MarkDirty();
+            AdrNeighborConfigTab.Instance?.MarkDirty();
         }
         public void RemoveNeighborAtIndex(int idx)
         {
             Neighbors.RemoveAt(idx);
-            AdrNeighborConfigTab.instance?.MarkDirty();
+            AdrNeighborConfigTab.Instance?.MarkDirty();
         }
 
         [XmlAttribute("namesFile")]
@@ -175,7 +175,7 @@ namespace Klyte.Addresses.Xml
             set
             {
                 m_seed = value;
-                AdrNeighborConfigTab.instance?.MarkDirty();
+                AdrNeighborConfigTab.Instance?.MarkDirty();
             }
         }
         [XmlAttribute("azimuth")]
@@ -185,7 +185,7 @@ namespace Klyte.Addresses.Xml
             set
             {
                 m_azimuth = value;
-                AdrNeighborConfigTab.instance?.MarkDirty();
+                AdrNeighborConfigTab.Instance?.MarkDirty();
             }
         }
 
