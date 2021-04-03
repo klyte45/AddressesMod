@@ -15,7 +15,7 @@ namespace Klyte.Addresses.UI
 
     internal class AdrDistrictConfigTab : UICustomControl
     {
-        public UIScrollablePanel MainContainer { get; private set; }
+        public UIPanel MainContainer { get; private set; }
 
         private UIDropDown m_selectDistrict;
         private Dictionary<string, int> m_cachedDistricts;
@@ -32,7 +32,7 @@ namespace Klyte.Addresses.UI
         {
             isLoading = true;
 
-            MainContainer = GetComponent<UIScrollablePanel>();
+            MainContainer = GetComponent<UIPanel>();
             MainContainer.autoLayout = true;
             MainContainer.autoLayoutDirection = LayoutDirection.Vertical;
             MainContainer.autoLayoutPadding = new RectOffset(0,0, 2,2);

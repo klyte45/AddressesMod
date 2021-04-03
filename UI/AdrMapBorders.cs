@@ -40,7 +40,7 @@ namespace Klyte.Addresses.UI
                 }
             }
 
-            List<int> targetValues = locations360.Select(x => x.First * 100 / 360).ToList();
+            List<float> targetValues = locations360.Select(x => x.First * 100 / 360f).ToList();
             m_bordersInformation.SetValuesStarts(targetValues.ToArray());
         }
 
@@ -48,8 +48,6 @@ namespace Klyte.Addresses.UI
         {
             LogUtils.DoLog("AWAKE AdrMapBordersChart !");
             UIPanel panel = GetComponent<UIPanel>();
-            //panel.width = 370;
-            //panel.height = 70;
             panel.autoLayout = false;
             panel.useCenter = true;
             panel.wrapLayout = false;

@@ -36,7 +36,6 @@ namespace Klyte.Addresses.UI
             MainContainer = GetComponent<UIPanel>();
             MainContainer.autoLayout = true;
             MainContainer.autoLayoutDirection = LayoutDirection.Vertical;
-            MainContainer.autoLayoutPadding = new RectOffset(5, 5, 2, 2);
             MainContainer.clipChildren = true;
 
             m_uiHelperNeighbors = new UIHelperExtension(MainContainer);
