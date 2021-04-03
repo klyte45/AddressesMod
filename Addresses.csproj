@@ -158,7 +158,18 @@
     <Compile Include="UI\AdrAzimuthEditorLineNeighbor .cs" />
     <Compile Include="UI\AdrMapBorders.cs" />
     <Compile Include="Utils\AdrUtils.cs" />
+    <Compile Include="Utils\PostalCodeToken.cs" />
+    <Compile Include="Xml\AdrAddressingConfig.cs" />
+    <Compile Include="Xml\AdrBuildingConfig.cs" />
+    <Compile Include="Xml\AdrCitizenConfig.cs" />
     <Compile Include="Xml\AdrConfigXml.cs" />
+    <Compile Include="Xml\AdrDistrictConfig.cs" />
+    <Compile Include="Xml\AdrGeneralQualifierConfig.cs" />
+    <Compile Include="Xml\AdrGlobalConfig.cs" />
+    <Compile Include="Xml\AdrNeighborDetailConfig.cs" />
+    <Compile Include="Xml\AdrNeighborhoodConfig.cs" />
+    <Compile Include="Xml\AdrRicoNamesGenerationConfig.cs" />
+    <Compile Include="Xml\AdrStationNamesGenerationConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">

@@ -28,8 +28,7 @@ namespace Klyte.Addresses.Xml
             {
                 m_districtConfigs.Add(new AdrDistrictConfig
                 {
-                    Id = districtId,
-                    ZipcodePrefix = districtId % 1000
+                    Id = districtId
                 });
             }
             return m_districtConfigs.Where(x => x.Id == districtId).FirstOrDefault();

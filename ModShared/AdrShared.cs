@@ -63,6 +63,6 @@ namespace Klyte.Addresses.ModShared
                 : BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
         }
 
-        public static string GetPostalCode(Vector3 position) => AdrUtils.FormatPostalCode(position, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat);
+        public static string GetPostalCode(Vector3 position) =>  AdrController.CurrentConfig.GlobalConfig.AddressingConfig.TokenizedPostalCodeFormat.TokenToPostalCode(position);
     }
 }

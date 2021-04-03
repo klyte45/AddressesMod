@@ -49,7 +49,7 @@ namespace Klyte.Addresses.UI
             AddIntField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), out m_prefixPostalCodeCity, m_uiHelperGlobal, OnChangePostalCodePrefixCity, false);
             m_prefixPostalCodeCity.maxLength = 3;
 
-            AddTextField(Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_2"), out m_postalCodeFormat, m_uiHelperGlobal, OnChangePostalCodeFormat, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat);
+            AddTextField(Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_2"), out m_postalCodeFormat, m_uiHelperGlobal, OnChangePostalCodeFormat, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.PostalCodeFormat);
             AddButtonInEditorRow(m_postalCodeFormat, CommonsSpriteNames.K45_QuestionMark, () => K45DialogControl.ShowModal(new K45DialogControl.BindProperties
             {
                 showButton1 = true,
@@ -134,15 +134,14 @@ namespace Klyte.Addresses.UI
         private string GetPostalCodeLegendText()
         {
             var result = new List<string>();
-            var quantityLines = Locale.CountUnchecked("K45_ADR_POSTAL_CODE_FORMAT_LEGEND");
-            for (int i = 0; Locale.Exists("K45_ADR_POSTAL_CODE_FORMAT_LEGEND", i); i++)
+            for (int i = 0; Locale.Exists("K45_ADR_POSTAL_CODE_FORMAT_LEGEND_V3", i); i++)
             {
-                result.Add(Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_LEGEND", i));
+                result.Add(Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_LEGEND_V3", i));
             }
             result.Add("");
-            for (int i = 0; Locale.Exists("K45_ADR_POSTAL_CODE_FORMAT_OBSERVATION", i); i++)
+            for (int i = 0; Locale.Exists("K45_ADR_POSTAL_CODE_FORMAT_OBSERVATION_V3", i); i++)
             {
-                result.Add($"<color yellow>{Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_OBSERVATION", i)}</color>");
+                result.Add($"<color yellow>{Locale.Get("K45_ADR_POSTAL_CODE_FORMAT_OBSERVATION_V3", i)}</color>");
             }
             return string.Join("\n", result.ToArray());
         }
@@ -183,7 +182,7 @@ namespace Klyte.Addresses.UI
             return field;
         }
 
-        private void OnChangePostalCodeFormat(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat = SaveIfNotEmpty(m_postalCodeFormat, val);
+        private void OnChangePostalCodeFormat(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.PostalCodeFormat = SaveIfNotEmpty(m_postalCodeFormat, val);
         private void OnChangeAddressLine1(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine1 = SaveIfNotEmpty(m_addressLine1Format, val);
         private void OnChangeAddressLine2(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine2 = SaveIfNotEmpty(m_addressLine2Format, val);
         private void OnChangeAddressLine3(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine3 = SaveIfNotEmpty(m_addressLine3Format, val);

@@ -35,7 +35,7 @@ namespace Klyte.Addresses.UI
             MainContainer = GetComponent<UIPanel>();
             MainContainer.autoLayout = true;
             MainContainer.autoLayoutDirection = LayoutDirection.Vertical;
-            MainContainer.autoLayoutPadding = new RectOffset(0,0, 2,2);
+            MainContainer.autoLayoutPadding = new RectOffset(0, 0, 2, 2);
 
             m_uiHelperDistrict = new UIHelperExtension(MainContainer);
 
@@ -56,6 +56,7 @@ namespace Klyte.Addresses.UI
 
 
             AddIntField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), out m_prefixPostalCodeDistrict, m_uiHelperDistrict, OnChangePostalCodePrefixDistrict, false);
+            AddButtonInEditorRow(m_prefixPostalCodeDistrict, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Delete, ResetPostalCode, "K45_ADR_RESET_POSTAL_CODE", false, 30);
             m_prefixPostalCodeDistrict.maxLength = 3;
 
             AddColorField(m_uiHelperDistrict, Locale.Get("K45_ADR_DISTRICT_COLOR"), out m_colorDistrict, (y) => OnChangeDistrictColor(y));
@@ -151,8 +152,15 @@ namespace Klyte.Addresses.UI
             {
                 return;
             }
+            m_prefixPostalCodeDistrict.textColor = Color.white;
 
-            GetDistrictConfig().ZipcodePrefix = val;
+            GetDistrictConfig().PostalCodePrefix = (ushort)val;
+        }
+
+        private void ResetPostalCode()
+        {
+            GetDistrictConfig().ResetDistrictCode();
+            UpdateDistrictData();
         }
 
         private void OnChangeDistrictColor(Color c)
@@ -180,6 +188,7 @@ namespace Klyte.Addresses.UI
 
         private void OnDistrictSelect(int x)
         {
+            isLoading = true;
             try
             {
                 m_lastSelectedItem = m_selectDistrict.items[x];
@@ -196,14 +205,23 @@ namespace Klyte.Addresses.UI
                     m_selectDistrict.selectedIndex = -1;
                 }
             }
+            isLoading = false;
             //load district info
             ReloadOptionsRoadPrefix();
             ReloadOptionsRoad();
-            m_prefixPostalCodeDistrict.text = GetDistrictConfig().ZipcodePrefix?.ToString("D3") ?? "";
-            m_colorDistrict.selectedColor = GetDistrictConfig().DistrictColor;
+            UpdateDistrictData();
 
         }
 
+        private void UpdateDistrictData()
+        {
+            isLoading = true;
+            var config = GetDistrictConfig();
+            m_prefixPostalCodeDistrict.text = (config.PostalCodePrefix).ToString("D3");
+            m_prefixPostalCodeDistrict.textColor = config.IsDefaultCode ? Color.yellow : Color.white;
+            m_colorDistrict.selectedColor = config.DistrictColor;
+            isLoading = false;
+        }
 
         private void ReloadDistricts()
         {
