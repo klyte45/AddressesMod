@@ -30,7 +30,7 @@ namespace Klyte.Addresses.Xml
         {
             m_savedDescriptorsSerialized = fromCity?.listVal?.Select(x => { x.m_configurationSource = ConfigurationSource.CITY; return x; }).ToArray() ?? m_savedDescriptorsSerialized.Where(x => x.m_configurationSource == ConfigurationSource.CITY).ToArray();
             var errorList = new List<string>();
-            foreach (string filename in Directory.GetFiles(AddressesMod.HighwayConfigurationFolder, "*.xml"))
+            foreach (string filename in Directory.GetFiles(AddressesMod.HighwayConfigurationFolder, "*.xml").OrderBy(x => !x.EndsWith(AddressesMod.DefaultFileGlobalXml)).ThenBy(x => x))
             {
                 try
                 {
@@ -74,7 +74,7 @@ namespace Klyte.Addresses.Xml
 
         private void LoadDescriptorsFromXml(FileStream stream, string filename)
         {
-            var serializer = new XmlSerializer(typeof(ListWrapper<AdrHighwayParentXml>));            
+            var serializer = new XmlSerializer(typeof(ListWrapper<AdrHighwayParentXml>));
             if (serializer.Deserialize(stream) is ListWrapper<AdrHighwayParentXml> config)
             {
                 var result = new List<AdrHighwayParentXml>();
@@ -93,7 +93,7 @@ namespace Klyte.Addresses.Xml
 
         public string[] FilterBy(string input) =>
          m_indexes
-         .Where((x) =>  (input.IsNullOrWhiteSpace() ? true : LocaleManager.cultureInfo.CompareInfo.IndexOf(x.Key, input, CompareOptions.IgnoreCase) >= 0))
+         .Where((x) => (input.IsNullOrWhiteSpace() ? true : LocaleManager.cultureInfo.CompareInfo.IndexOf(x.Key, input, CompareOptions.IgnoreCase) >= 0))
          .OrderBy((x) => ((int)(3 - m_savedDescriptorsSerialized[x.Value].m_configurationSource)) + x.Key)
          .Select(x => x.Key)
          .ToArray();

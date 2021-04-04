@@ -141,7 +141,7 @@
     <Compile Include="commons\Utils\VehicleUtils.cs" />
     <Compile Include="commons\Utils\XmlUtils.cs" />
     <Compile Include="commons\Utils\ZipUtils.cs" />
-    <Compile Include="Extensors\AdrNeighborhoodExtension.cs" />
+    <Compile Include="Extensions\AdrNeighborhoodExtension.cs" />
     <Compile Include="LocaleStruct\RoadPrefixFileIndexer.cs" />
     <Compile Include="MainWindow\AdrConfigPanel.cs" />
     <Compile Include="MainWindow\Tabs\AdrCitizenConfigTab.cs" />

@@ -1,6 +1,12 @@
-﻿using Klyte.Addresses.ModShared;
+﻿using ColossalFramework.Globalization;
+using Klyte.Addresses.ModShared;
+using Klyte.Addresses.UI;
 using Klyte.Commons.Interfaces;
+using Klyte.Commons.Utils;
+using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
+using static Klyte.Commons.Utils.XmlUtils;
 
 namespace Klyte.Addresses.Xml
 {
@@ -9,9 +15,9 @@ namespace Klyte.Addresses.Xml
         private string m_shortPrefix;
         private string m_fullPrefix;
         private bool m_invertShortConcatenationOrder;
-        private bool m_invertFullConcatenationOrder;
+        private bool m_invertLongConcatenationOrder;
         private bool m_addSpaceBetweenTermsShort;
-        private bool m_addSpaceBetweenTermsFull;
+        private bool m_addSpaceBetweenTermsLong;
 
         [XmlIgnore]
         internal ConfigurationSource m_configurationSource = ConfigurationSource.CITY;
@@ -26,7 +32,7 @@ namespace Klyte.Addresses.Xml
             }
         }
         [XmlAttribute("fullPrefix")]
-        public string FullPrefix
+        public string LongPrefix
         {
             get => m_fullPrefix; set
             {
@@ -44,17 +50,18 @@ namespace Klyte.Addresses.Xml
             }
         }
         [XmlAttribute("invertLong")]
-        public bool InvertFullConcatenationOrder
+        public bool InvertLongConcatenationOrder
         {
-            get => m_invertFullConcatenationOrder; set
+            get => m_invertLongConcatenationOrder; set
             {
-                m_invertFullConcatenationOrder = value;
+                m_invertLongConcatenationOrder = value;
                 AdrShared.TriggerHighwaysChanged();
             }
         }
 
         [XmlAttribute("id")]
         public string SaveName { get; set; }
+        [XmlAttribute("spaceOnShort")]
         public bool AddSpaceBetweenTermsShort
         {
             get => m_addSpaceBetweenTermsShort; set
@@ -63,17 +70,60 @@ namespace Klyte.Addresses.Xml
                 AdrShared.TriggerHighwaysChanged();
             }
         }
-        public bool AddSpaceBetweenTermsFull
+        [XmlAttribute("spaceOnLong")]
+        public bool AddSpaceBetweenTermsLong
         {
-            get => m_addSpaceBetweenTermsFull; set
+            get => m_addSpaceBetweenTermsLong; set
             {
-                m_addSpaceBetweenTermsFull = value;
+                m_addSpaceBetweenTermsLong = value;
                 AdrShared.TriggerHighwaysChanged();
             }
         }
 
-        public string GetShortValue(string id) => InvertShortConcatenationOrder ? $"{id}{(m_addSpaceBetweenTermsShort?" ":"")}{m_shortPrefix}" : $"{m_shortPrefix}{(m_addSpaceBetweenTermsShort ? " " : "")}{id}";
-        public string GetLongValue(string id) => InvertFullConcatenationOrder ? $"{id}{(m_addSpaceBetweenTermsFull ? " " : "")}{m_fullPrefix}" : $"{m_fullPrefix}{(m_addSpaceBetweenTermsFull ? " " : "")}{id}";
+        public string GetShortValue(string id) => InvertShortConcatenationOrder ? $"{id}{(m_addSpaceBetweenTermsShort ? " " : "")}{m_shortPrefix}" : $"{m_shortPrefix}{(m_addSpaceBetweenTermsShort ? " " : "")}{id}";
+        public string GetLongValue(string id) => InvertLongConcatenationOrder ? $"{id}{(m_addSpaceBetweenTermsLong ? " " : "")}{m_fullPrefix}" : $"{m_fullPrefix}{(m_addSpaceBetweenTermsLong ? " " : "")}{id}";
+
+        public void ExportAsGlobal()
+        {
+            FileUtils.EnsureFolderCreation(AddressesMod.HighwayConfigurationFolder);
+
+            ListWrapper<AdrHighwayParentXml> currentFile = File.Exists(AddressesMod.HighwayConfigurationDefaultGlobalFile)
+                ? DefaultXmlDeserialize<ListWrapper<AdrHighwayParentXml>>(File.ReadAllText(AddressesMod.HighwayConfigurationDefaultGlobalFile), (x, y) => currentFile = new ListWrapper<AdrHighwayParentXml>())
+                : new ListWrapper<AdrHighwayParentXml>();
+
+            var targetLayoutName = SaveName;
+            var exportableLayouts = new ListWrapper<AdrHighwayParentXml>
+            {
+                listVal = currentFile.listVal
+                .Where(x => x.SaveName != targetLayoutName)
+                .Union(new AdrHighwayParentXml[] { CloneViaXml(this) }.Select(x => { x.SaveName = targetLayoutName; return x; }))
+                .ToList()
+            };
+            File.WriteAllText(AddressesMod.HighwayConfigurationDefaultGlobalFile, DefaultXmlSerialize(exportableLayouts));
+
+            AdrHighwayParentEditorTab.Instance.OnRefresh();
+
+            K45DialogControl.ShowModal(
+              new K45DialogControl.BindProperties
+              {
+                  title = AddressesMod.Instance.SimpleName,
+                  message = string.Format(Locale.Get("K45_ADR_SAVESUCCESSFULLAT"), AddressesMod.HighwayConfigurationDefaultGlobalFile),
+                  showButton1 = true,
+                  textButton1 = Locale.Get("K45_CMNS_GOTO_FILELOC"),
+                  showButton2 = true,
+                  textButton2 = Locale.Get("EXCEPTION_OK"),
+              }
+           , (x) =>
+           {
+               if (x == 1)
+               {
+                   ColossalFramework.Utils.OpenInFileBrowser(AddressesMod.HighwayConfigurationDefaultGlobalFile);
+                   return false;
+               }
+               return true;
+           });
+
+        }
     }
 }
 
