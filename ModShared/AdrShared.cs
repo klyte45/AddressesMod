@@ -16,12 +16,14 @@ namespace Klyte.Addresses.ModShared
         public event Action EventDistrictChanged;
         public event Action EventBuildingNameStrategyChanged;
         public event Action EventPostalCodeChanged;
+        public event Action EventHighwaysChanged;
 
         internal static void TriggerPostalCodeChanged() => Instance?.EventPostalCodeChanged?.Invoke();
         internal static void TriggerZeroMarkerBuildingChange() => Instance?.EventZeroMarkerBuildingChange?.Invoke();
         internal static void TriggerRoadNamingChange() => Instance?.EventRoadNamingChange?.Invoke();
         internal static void TriggerDistrictChanged() => Instance?.EventDistrictChanged?.Invoke();
         internal static void TriggerBuildingNameStrategyChanged() => Instance?.EventBuildingNameStrategyChanged?.Invoke();
+        internal static void TriggerHighwaysChanged() => Instance?.EventHighwaysChanged?.Invoke();
 
         public static string GetStreetSuffix(ushort idx)
         {

@@ -207,7 +207,6 @@ namespace Klyte.Addresses
 
         internal static AdrConfigXml CurrentConfig => AdrConfigXml.Instance;
 
-
     }
 
     internal delegate Dictionary<string, string[]> ReturnerDictionary();

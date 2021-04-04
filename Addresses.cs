@@ -38,6 +38,7 @@ namespace Klyte.Addresses
             AddFolderButton(CitizenFirstNameMascPath, group8, "K45_ADR_CITIZEN_FIRST_NAME_MASC_FILES_PATH_TITLE");
             AddFolderButton(CitizenFirstNameFemPath, group8, "K45_ADR_CITIZEN_FIRST_NAME_FEM_FILES_PATH_TITLE");
             AddFolderButton(CitizenLastNamePath, group8, "K45_ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
+            AddFolderButton(HighwayConfigurationFolder, group8, "K45_ADR_HIGHWAY_CONFIGS_FILES_PATH_TITLE");
 
 
             UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("K45_ADR_ADDITIONAL_FILES_SOURCE"));
@@ -98,6 +99,7 @@ namespace Klyte.Addresses
         public const string CITIZEN_FIRST_NAME_MASC_SUBFOLDER_NAME = "CitizenFirstNameMale";
         public const string CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME = "CitizenFirstNameFemale";
         public const string CITIZEN_LAST_NAME_SUBFOLDER_NAME = "CitizenLastName";
+        public const string HIGHWAY_PREFABS_SUBFOLDER_NAME = "HighwayConfigurations";
 
         public static string RoadPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
         public static string RoadPrefixPath => FOLDER_NAME + Path.DirectorySeparatorChar + ROADPREFIX_SUBFOLDER_NAME;
@@ -107,6 +109,7 @@ namespace Klyte.Addresses
         public static string CitizenFirstNameMascPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_MASC_SUBFOLDER_NAME;
         public static string CitizenFirstNameFemPath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME;
         public static string CitizenLastNamePath => FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_LAST_NAME_SUBFOLDER_NAME;
+        public static string HighwayConfigurationFolder => FOLDER_NAME + Path.DirectorySeparatorChar + HIGHWAY_PREFABS_SUBFOLDER_NAME;
 
     }
 
