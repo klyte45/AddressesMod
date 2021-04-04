@@ -1,4 +1,5 @@
-﻿using Klyte.Addresses.UI;
+﻿using ColossalFramework;
+using Klyte.Addresses.UI;
 using System.Xml.Serialization;
 
 namespace Klyte.Addresses.Xml
@@ -25,9 +26,20 @@ namespace Klyte.Addresses.Xml
                 AdrNeighborConfigTab.Instance?.MarkDirty();
             }
         }
-
+        [XmlAttribute("fixedName")]
+        public string FixedName
+        {
+            get => m_fixedName;
+            set
+            {
+                m_fixedName = value.IsNullOrWhiteSpace() ? null : value.Trim();
+                AdrNeighborConfigTab.Instance?.MarkDirty();
+            }
+        }
         [XmlIgnore]
         private uint m_seed;
+        [XmlIgnore]
+        private string m_fixedName;
         [XmlIgnore]
         private ushort m_azimuth;
     }

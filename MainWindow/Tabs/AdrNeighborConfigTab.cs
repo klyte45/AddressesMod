@@ -75,7 +75,6 @@ namespace Klyte.Addresses.UI
             m_neighborEntryListPanel.height = parentContainer.height;
             m_neighborEntryListPanel.autoLayout = true;
             m_neighborEntryListPanel.autoLayoutDirection = LayoutDirection.Vertical;
-            m_neighborEntryListPanel.tooltipLocaleID = "K45_ADR_AZIMUTH_EDITOR_TITLE";
 
 
             KlyteMonoUtils.CreateUIElement(out UIPanel titleItem, m_neighborEntryListPanel.transform, "NeighborhoodContainer");
@@ -136,6 +135,7 @@ namespace Klyte.Addresses.UI
                     AdrAzimuthEditorLineNeighbor line = newEntry.gameObject.AddComponent<AdrAzimuthEditorLineNeighbor>();
                     line.SetLegendInfo(GetColorForNumber(i), i + 1);
                     line.OnValueChange += ValidateAngleStr;
+                    line.OnFixedNameChange += SetFixedName;
                     m_borderCities.Add(line);
                 }
             }
@@ -149,6 +149,11 @@ namespace Klyte.Addresses.UI
         private void ValidateAngleStr(int idx, uint val)
         {
             SaveAzimuthConfig(idx, (ushort)val);
+            ReordenateFields();
+        }
+        private void SetFixedName(int idx, string val)
+        {
+            AdrNeighborhoodExtension.SetFixedName(idx, val);
             ReordenateFields();
         }
 
@@ -192,7 +197,7 @@ namespace Klyte.Addresses.UI
                     }
 
                     float angle = (start + end) / 2f;
-                    updateInfo[i].Fourth.SetCardinalAngle(angle);
+                    updateInfo[i].Fourth.SetData();
                 }
                 m_borderChart.SetValues(updateInfo.Select(x => Tuple.New(x.Second, x.Third)).ToList());
             }

@@ -31,20 +31,47 @@ namespace Klyte.Addresses.Extensors
             }
             AdrShared.TriggerBuildingNameStrategyChanged();
         }
-
-        public static Randomizer? GetRandomizerAt(float angle)
+        public static void SetFixedName(int idx, string value)
         {
+            if (idx < NeighborhoodConfig.Neighbors.Count)
+            {
+                NeighborhoodConfig.Neighbors[idx].FixedName = value;
+            }
+            else
+            {
+                NeighborhoodConfig.AddToNeigborsListAt(idx, new AdrNeighborDetailConfig
+                {
+                    Azimuth = 0,
+                    Seed = new Randomizer(new System.Random().Next()).UInt32(0xFFFAFFFF),
+                    FixedName = value
+                });
+            }
+            AdrShared.TriggerBuildingNameStrategyChanged();
+        }
+        public static string GetFixedName(int idx) => NeighborhoodConfig.Neighbors.ElementAtOrDefault(idx)?.FixedName;
+
+        public static void GetNeighborParams(float angle, out Randomizer? randomizer, out string fixedName)
+        {
+            randomizer = null;
+            fixedName = null;
             if (NeighborhoodConfig.Neighbors.Count == 0)
             {
-                return null;
+                return;
             }
 
             AdrNeighborDetailConfig[] sortedArray = NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth).ToArray();
-            if (angle < sortedArray[0].Azimuth)
+            AdrNeighborDetailConfig item =
+                NeighborhoodConfig.Neighbors.Count == 1 ? sortedArray[0]
+                : angle < sortedArray[0].Azimuth ? sortedArray[sortedArray.Length - 1] :
+                NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth).Where(x => x.Azimuth <= angle).LastOrDefault();
+            if (item.FixedName != null)
             {
-                return new Randomizer(sortedArray[sortedArray.Length - 1].Seed);
+                fixedName = item.FixedName;
             }
-            return new Randomizer(NeighborhoodConfig.Neighbors.OrderBy(x => x.Azimuth).Where(x => x.Azimuth < angle).LastOrDefault()?.Seed ?? 0);
+            else
+            {
+                randomizer = new Randomizer(item.Seed);
+            }
 
         }
         #endregion
@@ -57,6 +84,7 @@ namespace Klyte.Addresses.Extensors
             if (idx < NeighborhoodConfig.Neighbors.Count)
             {
                 NeighborhoodConfig.Neighbors[idx].Seed = value;
+                NeighborhoodConfig.Neighbors[idx].FixedName = null;
             }
             AdrShared.TriggerBuildingNameStrategyChanged();
         }
