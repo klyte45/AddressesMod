@@ -1,7 +1,7 @@
 using ColossalFramework.Math;
 using ColossalFramework.UI;
 using ICities;
-using Klyte.Addresses.Extensors;
+using Klyte.Addresses.Extensions;
 using Klyte.Addresses.Overrides;
 using Klyte.Commons.UI;
 using Klyte.Commons.UI.SpriteNames;

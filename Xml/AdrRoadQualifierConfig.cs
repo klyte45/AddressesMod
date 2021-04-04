@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Klyte.Addresses.Xml
 {
-    public class AdrGeneralQualifierConfig
+    public class AdrRoadQualifierConfig
     {
         private string m_namesFile;
         private string m_qualifierFile;
@@ -15,7 +15,6 @@ namespace Klyte.Addresses.Xml
             {
                 m_namesFile = value;
                 AdrShared.TriggerRoadNamingChange();
-                AdrShared.TriggerDistrictChanged();
             }
         }
 
@@ -26,7 +25,6 @@ namespace Klyte.Addresses.Xml
             {
                 m_qualifierFile = value;
                 AdrShared.TriggerRoadNamingChange();
-                AdrShared.TriggerDistrictChanged();
             }
         }
     }

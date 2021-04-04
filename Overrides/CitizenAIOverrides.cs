@@ -1,6 +1,6 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Commons.Extensors;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Reflection;
 using UnityEngine;

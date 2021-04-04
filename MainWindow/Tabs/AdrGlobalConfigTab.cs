@@ -1,9 +1,10 @@
-﻿using ColossalFramework.Globalization;
+﻿using ColossalFramework;
+using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using ICities;
 using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Xml;
-using Klyte.Commons.Extensors;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
 using System;
@@ -29,7 +30,7 @@ namespace Klyte.Addresses.UI
         private UIHelperExtension m_uiHelperGlobal;
         private UIDropDown m_districtPrefixGenFile;
         private UIDropDown m_districtNameGenFile;
-
+        private bool isLoading;
 
         #region Awake
         public void Awake()
@@ -43,8 +44,7 @@ namespace Klyte.Addresses.UI
 
             CreateGroupFileSelect("K45_ADR_DISTRICT_GEN_PREFIX_FILE", OnChangeSelectedDistrictPrefix, ReloadDistrictPrefixesFiles, out m_districtPrefixGenFile);
             CreateGroupFileSelect("K45_ADR_DISTRICT_GEN_NAME_FILE", OnChangeSelectedDistrictName, ReloadDistrictNamesFiles, out m_districtNameGenFile);
-            ReloadDistrictPrefixesFiles();
-            ReloadDistrictNamesFiles();
+            isLoading = true;
 
             AddIntField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), out m_prefixPostalCodeCity, m_uiHelperGlobal, OnChangePostalCodePrefixCity, false);
             m_prefixPostalCodeCity.maxLength = 3;
@@ -111,7 +111,7 @@ namespace Klyte.Addresses.UI
             AddLabel(Locale.Get("K45_ADR_BUILDING_CARGO"), buildingTogglePanelHelper, out lbl, out _);
             lbl.padding.top = 5;
             lbl.padding.bottom = 5;
-            KlyteMonoUtils.LimitWidthAndBox(lbl, 220, out  panel);
+            KlyteMonoUtils.LimitWidthAndBox(lbl, 220, out panel);
             panel.maximumSize = new Vector2(230, 0);
             panel.minimumSize = new Vector2(230, 0);
             AddBuildingCheckbox("SubBarPublicTransportShip", "K45_ADR_ENABLE_CUSTOM_NAMING_CARGO_SHIP", x => getGenConfig().ShipCargo = x, () => getGenConfig().ShipCargo);
@@ -129,6 +129,9 @@ namespace Klyte.Addresses.UI
             AddBuildingCheckbox("SubBarDistrictSpecializationIndustrial", "K45_ADR_ENABLE_ADDRESS_NAMING_IND", x => getRicoGenConfig().Industry = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE, () => getRicoGenConfig().Industry == GenerationMethod.ADDRESS);
             AddBuildingCheckbox("SubBarDistrictSpecializationCommercial", "K45_ADR_ENABLE_ADDRESS_NAMING_COM", x => getRicoGenConfig().Commerce = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE, () => getRicoGenConfig().Commerce == GenerationMethod.ADDRESS);
             AddBuildingCheckbox("SubBarDistrictSpecializationOffice", "K45_ADR_ENABLE_ADDRESS_NAMING_OFF", x => getRicoGenConfig().Office = x ? GenerationMethod.ADDRESS : GenerationMethod.NONE, () => getRicoGenConfig().Office == GenerationMethod.ADDRESS);
+            isLoading = false;
+            ReloadDistrictPrefixesFiles();
+            ReloadDistrictNamesFiles();
         }
 
         private string GetPostalCodeLegendText()
@@ -158,37 +161,69 @@ namespace Klyte.Addresses.UI
         #endregion
         private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, Action onReload, out UIDropDown dropDown)
         {
+            isLoading = true;
             AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperGlobal, new string[0], onChanged);
             AddButtonInEditorRow(dropDown, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, onReload, "K45_ADR_ROAD_NAME_FILES_RELOAD");
+            isLoading = false;
             onReload.Invoke();
         }
 
 
-        private void OnChangePostalCodePrefixCity(int val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeCityPrefix = val;
 
         private string SaveIfNotEmpty(UITextField input, string val)
         {
-            string field;
-            val = val?.Trim();
-            if (val?.Length == 0)
-            {
-                field = null;
-            }
-            else
-            {
-                field = val;
-            }
-            input.text = field;
+            string field = val.IsNullOrWhiteSpace() ? null : val;
+            input.text = field ?? "";
             return field;
         }
+        private void OnChangePostalCodePrefixCity(int val)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeCityPrefix = val;
+        }
 
-        private void OnChangePostalCodeFormat(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.PostalCodeFormat = SaveIfNotEmpty(m_postalCodeFormat, val);
-        private void OnChangeAddressLine1(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine1 = SaveIfNotEmpty(m_addressLine1Format, val);
-        private void OnChangeAddressLine2(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine2 = SaveIfNotEmpty(m_addressLine2Format, val);
-        private void OnChangeAddressLine3(string val) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine3 = SaveIfNotEmpty(m_addressLine3Format, val);
+        private void OnChangePostalCodeFormat(string val)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.AddressingConfig.PostalCodeFormat = SaveIfNotEmpty(m_postalCodeFormat, val);
+        }
+
+        private void OnChangeAddressLine1(string val)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine1 = SaveIfNotEmpty(m_addressLine1Format, val);
+        }
+
+        private void OnChangeAddressLine2(string val)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine2 = SaveIfNotEmpty(m_addressLine2Format, val);
+        }
+
+        private void OnChangeAddressLine3(string val)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.AddressingConfig.AddressLine3 = SaveIfNotEmpty(m_addressLine3Format, val);
+        }
 
         private void ReloadFiles(Action reloadAction, string selectedOption, List<string> referenceList, UIDropDown ddRef, string optionZeroText)
         {
+            isLoading = true;
             reloadAction();
             referenceList.Insert(0, optionZeroText);
             ddRef.items = referenceList.ToArray();
@@ -201,6 +236,7 @@ namespace Klyte.Addresses.UI
                 ddRef.selectedIndex = 0;
             }
             DistrictManager.instance.NamesModified();
+            isLoading = false;
         }
         private void ReloadDistrictPrefixesFiles() => ReloadFiles(
             AdrController.LoadLocalesDistrictPrefix,
@@ -221,11 +257,19 @@ namespace Klyte.Addresses.UI
 
         private void OnChangeSelectedDistrictPrefix(int idx)
         {
+            if (isLoading)
+            {
+                return;
+            }
             AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.QualifierFile = (idx > 0 ? m_districtPrefixGenFile.selectedValue : null);
             DistrictManager.instance.NamesModified();
         }
         private void OnChangeSelectedDistrictName(int idx)
         {
+            if (isLoading)
+            {
+                return;
+            }
             AdrController.CurrentConfig.GlobalConfig.AddressingConfig.DistrictsConfig.NamesFile = (idx > 0 ? m_districtNameGenFile.selectedValue : null);
             DistrictManager.instance.NamesModified();
         }

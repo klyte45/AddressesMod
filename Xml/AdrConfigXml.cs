@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Klyte.Commons.Interfaces;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 
 namespace Klyte.Addresses.Xml
 {
     [XmlRoot("adrConfig")]
-    public class AdrConfigXml
+    public class AdrConfigXml : DataExtensionBase<AdrConfigXml>
     {
         [XmlElement("global")]
         public AdrGlobalConfig GlobalConfig { get; set; } = new AdrGlobalConfig();
@@ -18,6 +19,9 @@ namespace Klyte.Addresses.Xml
 
             set => m_districtConfigs = value;
         }
+
+        [XmlIgnore]
+        public override string SaveId => "K45_ADR_MAIN";      
 
         [XmlIgnore]
         private List<AdrDistrictConfig> m_districtConfigs = new List<AdrDistrictConfig>();

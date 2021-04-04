@@ -63,7 +63,7 @@ namespace Klyte.Addresses.Xml
             }
         }
         [XmlElement("districts")]
-        public AdrGeneralQualifierConfig DistrictsConfig { get; set; } = new AdrGeneralQualifierConfig();
+        public AdrDistrictQualifierConfig DistrictsConfig { get; set; } = new AdrDistrictQualifierConfig();
 
         [XmlAttribute("zeroMarkBuildingId")]
         public ushort ZeroMarkBuilding

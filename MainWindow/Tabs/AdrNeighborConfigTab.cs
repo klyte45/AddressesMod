@@ -1,7 +1,7 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Addresses.Extensors;
-using Klyte.Commons.Extensors;
+using Klyte.Addresses.Extensions;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace Klyte.Addresses.UI
         #region Awake
         public void Awake()
         {
+            m_isLoading = true;
             if (!(Instance is null))
             {
                 Destroy(Instance);
@@ -88,12 +89,13 @@ namespace Klyte.Addresses.UI
             listContainer.height = m_neighborEntryListPanel.height - 35;
 
             KlyteMonoUtils.CreateScrollPanel(listContainer, out m_neighborsList, out _, listContainer.width - 17.5f, listContainer.height);
-
+            m_isLoading = false;
             ReloadOptionsFilesNeighbor();
         }
         #endregion
 
         private bool m_isDirty = false;
+        private bool m_isLoading = false;
 
         public void MarkDirty() => m_isDirty = true;
 
@@ -108,6 +110,7 @@ namespace Klyte.Addresses.UI
 
         private void RebuildList()
         {
+            m_isLoading = true;
             AdrAzimuthEditorLineNeighbor[] currentLines = m_neighborsList?.GetComponentsInChildren<AdrAzimuthEditorLineNeighbor>();
             if (currentLines is null)
             {
@@ -143,16 +146,26 @@ namespace Klyte.Addresses.UI
             {
                 GameObject.Destroy(currentLines[i].gameObject);
             }
+            m_isLoading = false;
             ReordenateFields();
         }
 
         private void ValidateAngleStr(int idx, uint val)
         {
+            if (m_isLoading)
+            {
+                return;
+            }
             SaveAzimuthConfig(idx, (ushort)val);
             ReordenateFields();
         }
         private void SetFixedName(int idx, string val)
         {
+            if (m_isLoading)
+            {
+                return;
+            }
+
             AdrNeighborhoodExtension.SetFixedName(idx, val);
             ReordenateFields();
         }
@@ -227,12 +240,17 @@ namespace Klyte.Addresses.UI
 
         private void OnChangeSelectedNeighborFile(int idx)
         {
+            if (m_isLoading)
+            {
+                return;
+            }
             AdrController.CurrentConfig.GlobalConfig.NeighborhoodConfig.NamesFile = idx > 0 ? m_neighborFileSelect.items[idx] : null;
-
             RebuildList();
         }
         private void ReloadOptionsFilesNeighbor()
         {
+            m_isLoading = true;
+
             AdrController.LoadLocalesNeighborName();
             List<string> items = AdrController.LoadedLocalesNeighborName.Keys.ToList();
             items.Insert(0, Locale.Get("K45_ADR_DEFAULT_CITIES_REGIONAL_NAMES"));
@@ -246,6 +264,7 @@ namespace Klyte.Addresses.UI
             {
                 m_neighborFileSelect.selectedIndex = 0;
             }
+            m_isLoading = false;
             RebuildList();
         }
     }

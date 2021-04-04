@@ -4,7 +4,7 @@ using Klyte.Addresses.Xml;
 using System.Linq;
 
 
-namespace Klyte.Addresses.Extensors
+namespace Klyte.Addresses.Extensions
 {
 
     internal static class AdrNeighborhoodExtension

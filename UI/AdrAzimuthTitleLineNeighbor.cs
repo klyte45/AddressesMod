@@ -1,6 +1,6 @@
 using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using Klyte.Addresses.Extensors;
+using Klyte.Addresses.Extensions;
 using Klyte.Commons.UI;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;

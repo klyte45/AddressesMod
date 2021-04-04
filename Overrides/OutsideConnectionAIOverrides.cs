@@ -1,8 +1,8 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Addresses.Extensors;
-using Klyte.Commons.Extensors;
+using Klyte.Addresses.Extensions;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Reflection;
 using UnityEngine;

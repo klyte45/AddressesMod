@@ -1,6 +1,5 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
-using ICities;
 using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Overrides;
@@ -18,7 +17,7 @@ using UnityEngine;
 
 namespace Klyte.Addresses
 {
-    public class AdrController : BaseController<AddressesMod, AdrController>, ISerializableDataExtension
+    public class AdrController : BaseController<AddressesMod, AdrController>
     {
 
 
@@ -206,73 +205,9 @@ namespace Klyte.Addresses
         }
 
 
-        internal static AdrConfigXml CurrentConfig { get; private set; } = new AdrConfigXml();
-
-        #region Serialization
-        protected const string ID = "K45_ADR_MAIN";
-        public IManagers Managers => SerializableDataManager?.managers;
-
-        public ISerializableData SerializableDataManager { get; private set; }
-
-        public void OnCreated(ISerializableData serializableData) => SerializableDataManager = serializableData;
-        public void OnLoadData()
-        {
-            if (ID == null || Singleton<ToolManager>.instance.m_properties.m_mode != ItemClass.Availability.Game)
-            {
-                return;
-            }
-            if (!SerializableDataManager.EnumerateData().Contains(ID))
-            {
-                return;
-            }
-            byte[] storage;
-            using (var memoryStream = new MemoryStream(SerializableDataManager.LoadData(ID)))
-            {
-                storage = memoryStream.ToArray();
-            }
-            Deserialize(System.Text.Encoding.UTF8.GetString(storage));
-        }
-
-        public void OnSaveData()
-        {
-            if (ID == null || Singleton<ToolManager>.instance.m_properties.m_mode != ItemClass.Availability.Game)
-            {
-                return;
-            }
-
-            string serialData = Serialize();
-            LogUtils.DoLog($"serialData: {serialData ?? "<NULL>"}");
-            if (serialData == null)
-            {
-                return;
-            }
-
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(serialData);
-            SerializableDataManager.SaveData(ID, data);
-        }
+        internal static AdrConfigXml CurrentConfig => AdrConfigXml.Instance;
 
 
-        public void Deserialize(string data)
-        {
-            LogUtils.DoLog($"{GetType()} STR: \"{data}\"");
-            if (data.IsNullOrWhiteSpace())
-            {
-                return;
-            }
-            try
-            {
-                CurrentConfig = XmlUtils.DefaultXmlDeserialize<AdrConfigXml>(data);
-            }
-            catch (Exception e)
-            {
-                LogUtils.DoErrorLog($"Error deserializing: {e.Message}\n{e.StackTrace}");
-            }
-        }
-
-        public string Serialize() => XmlUtils.DefaultXmlSerialize(CurrentConfig, false);
-
-        public void OnReleased() { }
-        #endregion
     }
 
     internal delegate Dictionary<string, string[]> ReturnerDictionary();

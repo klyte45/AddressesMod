@@ -14,7 +14,7 @@ namespace Klyte.Addresses.Xml
         public ushort Id { get; set; }
 
         [XmlElement("roads")]
-        public AdrGeneralQualifierConfig RoadConfig { get; set; } = new AdrGeneralQualifierConfig();
+        public AdrRoadQualifierConfig RoadConfig { get; set; } = new AdrRoadQualifierConfig();
 
         [XmlIgnore]
         public ushort PostalCodePrefix
