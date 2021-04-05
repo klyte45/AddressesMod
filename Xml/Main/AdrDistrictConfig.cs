@@ -40,12 +40,12 @@ namespace Klyte.Addresses.Xml
 
         [XmlIgnore]
         public bool IsDefaultCode => m_postalCodePrefix == null;
+        private ushort? m_postalCodePrefix;
 
         [XmlIgnore]
         public Color DistrictColor { get => m_cachedColor; set => SetDistrictColor(value); }
         [XmlIgnore]
         private Color m_cachedColor;
-        private ushort? m_postalCodePrefix;
 
         [XmlAttribute("color")]
         public string DistrictColorStr { get => m_cachedColor == default ? null : ColorExtensions.ToRGB(DistrictColor); set => SetDistrictColor(value.IsNullOrWhiteSpace() ? default : (Color)ColorExtensions.FromRGB(value)); }

@@ -149,6 +149,7 @@
     <Compile Include="MainWindow\Tabs\AdrNeighborConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrDistrictConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrHighwayParentEditorTab.cs" />
+    <Compile Include="MainWindow\Tabs\AdrHighwaySeedNameDataTab.cs" />
     <Compile Include="ModShared\AdrShared.cs" />
     <Compile Include="Overrides\CitizenAIOverrides.cs" />
     <Compile Include="Overrides\DistrictManagerOverrides.cs" />
@@ -157,11 +158,13 @@
     <Compile Include="Overrides\OutsideConnectionAIOverrides.cs" />
     <Compile Include="Overrides\NetManagerOverrides.cs" />
     <Compile Include="AdrController.cs" />
+    <Compile Include="Tools\RoadSegmentTool.cs" />
     <Compile Include="UI\AdrAzimuthTitleLineNeighbor.cs" />
     <Compile Include="UI\AdrAzimuthEditorLineNeighbor .cs" />
     <Compile Include="UI\AdrMapBorders.cs" />
     <Compile Include="Utils\AdrUtils.cs" />
     <Compile Include="Utils\PostalCodeToken.cs" />
+    <Compile Include="Xml\Highways\AdrNameSeedDataXml.cs" />
     <Compile Include="Xml\Highways\AdrHighwayParentLibDataXml.cs" />
     <Compile Include="Xml\Highways\AdrHighwayParentData.cs" />
     <Compile Include="Xml\ConfigurationSource.cs" />
@@ -317,6 +320,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="commons\UI\Images\%25K45_PaintBucket.png" />
     <Content Include="commons\UI\Images\base.psd" />
     <Content Include="commons\UI\Images\sprites.psd" />
   </ItemGroup>

@@ -3,6 +3,7 @@ using ColossalFramework.UI;
 using Klyte.Addresses.LocaleStruct;
 using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Overrides;
+using Klyte.Addresses.Tools;
 using Klyte.Addresses.Utils;
 using Klyte.Addresses.Xml;
 using Klyte.Commons.Interfaces;
@@ -88,6 +89,10 @@ namespace Klyte.Addresses
 
         public void Awake()
         {
+            if (FindObjectOfType<RoadSegmentTool>() is null)
+            {
+                ToolsModifierControl.toolController.gameObject.AddComponent<RoadSegmentTool>();
+            }
 
             InitNearLinesOnWorldInfoPanel();
 

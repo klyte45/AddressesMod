@@ -17,6 +17,7 @@ namespace Klyte.Addresses.ModShared
         public event Action EventBuildingNameStrategyChanged;
         public event Action EventPostalCodeChanged;
         public event Action EventHighwaysChanged;
+        public event Action<ushort> EventHighwaySeedChanged;
 
         internal static void TriggerPostalCodeChanged() => Instance?.EventPostalCodeChanged?.Invoke();
         internal static void TriggerZeroMarkerBuildingChange() => Instance?.EventZeroMarkerBuildingChange?.Invoke();
@@ -24,6 +25,7 @@ namespace Klyte.Addresses.ModShared
         internal static void TriggerDistrictChanged() => Instance?.EventDistrictChanged?.Invoke();
         internal static void TriggerBuildingNameStrategyChanged() => Instance?.EventBuildingNameStrategyChanged?.Invoke();
         internal static void TriggerHighwaysChanged() => Instance?.EventHighwaysChanged?.Invoke();
+        internal static void TriggerHighwaySeedChanged(ushort seed) => Instance?.EventHighwaySeedChanged?.Invoke(seed);
 
         public static string GetStreetSuffix(ushort idx)
         {

@@ -98,6 +98,7 @@ namespace Klyte.Addresses.Xml
          .Select(x => x.Key)
          .ToArray();
 
+        public override void LoadDefaults() => ReloadGlobalConfigurations();
     }
 }
 

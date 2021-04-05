@@ -1,6 +1,11 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
+using ColossalFramework.UI;
+using Klyte.Addresses.Tools;
+using Klyte.Addresses.UI;
+using Klyte.Addresses.Xml;
+using Klyte.Commons;
 using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
@@ -314,11 +319,37 @@ namespace Klyte.Addresses.Overrides
             return text;
         }
 
+        public static void AfterEndOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+            if (AdrHighwaySeedNameDataTab.Instance?.component?.isVisible == true)
+            {
+                if (AdrHighwaySeedNameDataTab.Instance.CurrentSeedId != 0
+                && AdrNameSeedDataXml.Instance.CurrentSavegameSeeds.TryGetValue(AdrHighwaySeedNameDataTab.Instance.CurrentSeedId, out HashSet<ushort> segmentsSelected))
+                {
+                    var targetColor = new Color32(22, (byte)(127 + ((UIView.GetAView().framesRendered * 2) & 0x7f)), 22, 255);
+                    foreach (var id in segmentsSelected)
+                    {
+                        RenderOverlayUtils.RenderNetSegmentOverlay(cameraInfo, AdrHighwaySeedNameDataTab.Instance.CurrentSourceSegmentId == id ? Color.yellow : (Color)targetColor, id);
+                    }
+                }
+
+                if (ToolsModifierControl.toolController.CurrentTool is RoadSegmentTool rst
+                    && rst.CurrentHoverSegment > 0
+                    && NetManager.instance.m_segments.m_buffer[rst.CurrentHoverSegment].m_nameSeed != AdrHighwaySeedNameDataTab.Instance.CurrentSeedId
+                    && AdrNameSeedDataXml.Instance.CurrentSavegameSeeds.TryGetValue(NetManager.instance.m_segments.m_buffer[rst.CurrentHoverSegment].m_nameSeed, out HashSet<ushort> segmentsSelected2))
+                {
+                    var targetColor = new Color(rst.singleSelectMode ? 0 : 1, 1, 0, 1);
+                    foreach (var id in segmentsSelected2)
+                    {
+                        RenderOverlayUtils.RenderNetSegmentOverlay(cameraInfo, targetColor, id);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Hooking
-        public static readonly MethodInfo GenerateSegmentNameMethod = typeof(NetManager).GetMethod("GenerateSegmentName", RedirectorUtils.allFlags);
-
         public Redirector RedirectorInstance { get; } = new Redirector();
 
         public void Awake()
@@ -327,7 +358,8 @@ namespace Klyte.Addresses.Overrides
             #region RoadBaseAI Hooks
             MethodInfo preRename = typeof(NetManagerOverrides).GetMethod("GenerateSegmentName", RedirectorUtils.allFlags);
 
-            RedirectorInstance.AddRedirect(GenerateSegmentNameMethod, preRename);
+            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("GenerateSegmentName", RedirectorUtils.allFlags), preRename);
+            RedirectorInstance.AddRedirect(typeof(NetManager).GetMethod("IRenderableManager.EndOverlay", RedirectorUtils.allFlags), null, typeof(NetManagerOverrides).GetMethod("AfterEndOverlay", RedirectorUtils.allFlags));
             #endregion
         }
 
