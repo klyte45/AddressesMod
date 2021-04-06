@@ -32,6 +32,7 @@ namespace Klyte.Addresses.UI
         private UILabel m_scopeInfo;
         #endregion
         #region Bottom bar panels
+        private UITextField m_dettachedPrefix;
         private UITextField m_shortPrefix;
         private UITextField m_fullPrefix;
         private UICheckBox m_shortAddSpace;
@@ -85,6 +86,7 @@ namespace Klyte.Addresses.UI
 
             var editAreaHelper = new UIHelperExtension(m_editArea);
 
+            AddTextField(Locale.Get("K45_ADR_HW_DETTACHEDPREFIX"), out m_dettachedPrefix, out UILabel dettachedLbl, editAreaHelper, OnEditDettachedPrefix);
             AddTextField(Locale.Get("K45_ADR_HW_SHORTPREFIX"), out m_shortPrefix, out UILabel shortLbl, editAreaHelper, OnEditShortPrefix);
             AddCheckboxLocale("K45_ADR_HW_SHORTINVERT", out m_shortInvert, editAreaHelper, OnSetInvertConcatenateShort);
             AddCheckboxLocale("K45_ADR_HW_SHORTADDSPACE", out m_shortAddSpace, editAreaHelper, OnSetSpaceShort);
@@ -104,11 +106,14 @@ namespace Klyte.Addresses.UI
             exampleTitle.processMarkup = true;
             shortLbl.processMarkup = true;
             longLbl.processMarkup = true;
+            dettachedLbl.processMarkup = true;
 
             OnConfigSelectionChange("", -1, new string[0]);
         }
 
         private void OnEditShortPrefix(string x) { EditingInstance.ShortPrefix = x; ReloadExamples(); }
+
+        private void OnEditDettachedPrefix(string x) { EditingInstance.DettachedPrefix = x; ReloadExamples(); }
 
         private void OnEditLongPrefix(string x) { EditingInstance.LongPrefix = x; ReloadExamples(); }
 
@@ -263,6 +268,7 @@ namespace Klyte.Addresses.UI
                 m_fullAddSpace.isChecked = EditingInstance.AddSpaceBetweenTermsLong;
                 m_fullInvert.isChecked = EditingInstance.InvertLongConcatenationOrder;
                 m_shortInvert.isChecked = EditingInstance.InvertShortConcatenationOrder;
+                m_dettachedPrefix.text = EditingInstance.DettachedPrefix ?? "";
                 ReloadExamples();
             }
             else

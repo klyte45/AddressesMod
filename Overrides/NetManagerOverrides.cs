@@ -34,6 +34,36 @@ namespace Klyte.Addresses.Overrides
             return GenerateSegmentNameInternal(segmentID, ref __result, ref path, true);
         }
 
+        private class NameVariablesContainer
+        {
+            public string genName = "";
+            public string sourceRoad = "";
+            public string targetRoad = "";
+            public string sourceKm = "";
+            public string sourceKmWithDecimal = "";
+            public string sourceDistrict = "";
+            public string targetDistrict = "";
+            public string direction = "";
+            public string longCodeHw = "";
+            public string forcedNameHw = "";
+            public string shortCodeHw = "";
+
+            public string[] ToArray() => new string[]
+                {
+                    genName,
+                    sourceRoad,
+                    targetRoad,
+                    sourceKm ,
+                    sourceKmWithDecimal,
+                    sourceDistrict ,
+                    targetDistrict,
+                    direction,
+                    longCodeHw,
+                    forcedNameHw,
+                    shortCodeHw
+                };
+        }
+
         public static bool GenerateSegmentNameInternal(ushort segmentID, ref string __result, ref List<ushort> usedQueue, bool removePrefix)
         {
             LogUtils.DoLog($"[START {segmentID}]" + __result);
@@ -51,7 +81,7 @@ namespace Klyte.Addresses.Overrides
                     return false;
                 }
             }
-            NetSegment segment = NetManager.instance.m_segments.m_buffer[segmentID];
+            ref NetSegment segment = ref NetManager.instance.m_segments.m_buffer[segmentID];
             NetInfo info = segment.Info;
             PrefabAI ai = info.GetAI();
             string format = GetRoadNameFormat(segmentID, removePrefix, ref segment, info, ai, out ushort district);
@@ -61,37 +91,53 @@ namespace Klyte.Addresses.Overrides
                 return true;
             }
 
-            string genName = "";
-            string sourceRoad = "";
-            string targetRoad = "";
-            string sourceKm = "";
-            string sourceKmWithDecimal = "";
-            string sourceDistrict = "";
-            string targetDistrict = "";
-            string direction = "";
+            var variables = new NameVariablesContainer();
+
+            if (format.Contains("{8}") || format.Contains("{9}") || format.Contains("{10}"))
+            {
+                var seed = segment.m_nameSeed;
+                if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+                {
+                    if (!(seedConf.HighwayParent is null))
+                    {
+                        if (format.Contains("{8}"))
+                        {
+                            variables.longCodeHw = seedConf.HighwayParent.GetLongValue(seedConf.HighwayIdentifier);
+                        }
+                        if (format.Contains("{10}"))
+                        {
+                            variables.shortCodeHw = seedConf.HighwayParent.GetShortValue(seedConf.HighwayIdentifier);
+                        }
+                    }
+                    if (format.Contains("{9}"))
+                    {
+                        variables.forcedNameHw = seedConf.ForcedName;
+                    }
+                }
+            }
+
             if (format.Contains("{0}"))
             {
-                GetGeneratedRoadName(ref segment, ai, district, out genName);
-                if (genName == null)
+                GetGeneratedRoadName(ref segment, ai, district, out variables.genName);
+                if (variables.genName == null)
                 {
                     return true;
                 }
             }
-            ushort sourceSeg = 0;
-            ushort targetSeg = 0;
+
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
                 SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef, out _);
 
-                sourceSeg = startRef.segmentReference;
-                targetSeg = endRef.segmentReference;
+                ushort sourceSeg = startRef.segmentReference;
+                ushort targetSeg = endRef.segmentReference;
 
                 if (format.Contains("{1}"))
                 {
                     if (!usedQueue.Contains(sourceSeg))
                     {
                         usedQueue.Add(sourceSeg);
-                        GenerateSegmentNameInternal(sourceSeg, ref sourceRoad, ref usedQueue, false);
+                        GenerateSegmentNameInternal(sourceSeg, ref variables.sourceRoad, ref usedQueue, false);
                     }
                 }
                 if (format.Contains("{2}"))
@@ -99,20 +145,29 @@ namespace Klyte.Addresses.Overrides
                     if (!usedQueue.Contains(targetSeg))
                     {
                         usedQueue.Add(targetSeg);
-                        GenerateSegmentNameInternal(targetSeg, ref targetRoad, ref usedQueue, false);
+                        GenerateSegmentNameInternal(targetSeg, ref variables.targetRoad, ref usedQueue, false);
                     }
                 }
                 if (format.Contains("{3}") || format.Contains("{4}"))
                 {
-                    float km = GetNumberAt(startRef.segmentReference, NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference) / 1000f;
-                    sourceKm = km.ToString("0");
-                    sourceKmWithDecimal = km.ToString("0.0");
+                    var seed = NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_nameSeed;
+                    var invertStart = false;
+                    var offsetMeters = 0;
+                    if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+                    {
+                        invertStart = seedConf.InvertMileageStart;
+                        offsetMeters = (int)seedConf.MileageOffset;
+                    }
+
+                    float km = GetDistanceFromStart(startRef.segmentReference, NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference, invertStart, offsetMeters) / 1000f;
+                    variables.sourceKm = km.ToString("0");
+                    variables.sourceKmWithDecimal = km.ToString("0.0");
                 }
                 if (format.Contains("{7}"))//direction
                 {
                     int cardinalDirection = SegmentUtils.GetCardinalDirection(startRef, endRef);
 
-                    direction = Locale.Get("K45_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
+                    variables.direction = Locale.Get("K45_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
                 }
             }
             if (format.Contains("{5}") || format.Contains("{6}"))
@@ -120,20 +175,20 @@ namespace Klyte.Addresses.Overrides
                 GetSegmentRoadEdges(segmentID, false, false, false, out ComparableRoad startRef, out ComparableRoad endRef, out _);
                 if (format.Contains("{5}"))//source district
                 {
-                    sourceDistrict = GetDistrictAt(startRef);
+                    variables.sourceDistrict = GetDistrictAt(startRef);
                 }
                 if (format.Contains("{6}"))//target district
                 {
-                    targetDistrict = GetDistrictAt(endRef);
+                    variables.targetDistrict = GetDistrictAt(endRef);
                 }
             }
             if (AddressesMod.DebugMode)
             {
-                __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, genName, sourceSeg, targetSeg, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
+                __result = $"[{segmentID}] " + StringUtils.SafeFormat(format, variables.ToArray())?.Trim();
             }
             else
             {
-                __result = StringUtils.SafeFormat(format, genName, sourceRoad, targetRoad, sourceKm, sourceKmWithDecimal, sourceDistrict, targetDistrict, direction)?.Trim();
+                __result = StringUtils.SafeFormat(format, variables.ToArray())?.Trim();
             }
             LogUtils.DoLog($"[END {segmentID}]" + __result);
             return false;
@@ -160,7 +215,14 @@ namespace Klyte.Addresses.Overrides
                 if (filenamePrefix != null && AdrController.LoadedLocalesRoadPrefix.ContainsKey(filenamePrefix))
                 {
                     LocaleStruct.RoadPrefixFileIndexer currentPrefixFile = AdrController.LoadedLocalesRoadPrefix[filenamePrefix];
-                    format = currentPrefixFile.GetPrefix(ai, info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0, info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2, (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount), randomizer, segmentID);
+                    format = currentPrefixFile.GetPrefix(
+                        ai,
+                        info.m_forwardVehicleLaneCount == 0 || info.m_backwardVehicleLaneCount == 0,
+                        info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount, info.m_halfWidth * 2,
+                        (byte)(info.m_forwardVehicleLaneCount + info.m_backwardVehicleLaneCount),
+                        randomizer,
+                        segmentID,
+                        segment.m_nameSeed);
                 }
                 LogUtils.DoLog("selectedPrefix = {0}", format);
                 if (format == null)
@@ -174,14 +236,9 @@ namespace Klyte.Addresses.Overrides
             if (removePrefix)
             {
                 format = format?.Replace("\\]", "\0") ?? "";
-                if (Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])"))
-                {
-                    format = Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value;
-                }
-                else
-                {
-                    format = Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
-                }
+                format = Regex.IsMatch(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")
+                    ? Regex.Matches(format, @"(?<=\[)(?<!\\\[).+?(?<!\\\])(?=\])")[0].Groups[0].Value
+                    : Regex.Replace(format ?? "", "(?!\\{)(\\w+|\\.)(?!\\})", "");
                 format = Regex.Replace(format, @"(?<!\\)(\[|\])", "");
                 format = Regex.Replace(format, @"(?<=\\\\)(\[|\])", "");
                 format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
@@ -194,7 +251,6 @@ namespace Klyte.Addresses.Overrides
                 format = Regex.Replace(format, @"(?<=\\\\)(\[|\])", "");
                 format = Regex.Replace(format, @"(\\)(\[|\])", "$2");
                 format = Regex.Replace(format, @"\\\\", "\\");
-
             }
 
             return format;

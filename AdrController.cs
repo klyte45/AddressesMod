@@ -85,7 +85,7 @@ namespace Klyte.Addresses
         public void OpenAdrPanel() => AddressesMod.Instance.OpenPanelAtModTab();
         public void CloseAdrPanel() => AddressesMod.Instance.ClosePanel();
 
-        public AdrShared SharedInstance;
+        public AdrShared SharedInstance { get; private set; }
 
         public void Awake()
         {
@@ -99,6 +99,8 @@ namespace Klyte.Addresses
             BuildingManagerOverrides.EventBuidlingReleased += RemoveZeroMarker;
 
             SharedInstance = gameObject.AddComponent<AdrShared>();
+
+            SharedInstance.EventHighwaysChanged += AdrNameSeedDataXml.Instance.EraseParentCaches;
         }
 
         private void RemoveZeroMarker(ushort building)

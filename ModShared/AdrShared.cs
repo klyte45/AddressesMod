@@ -2,6 +2,8 @@
 using ColossalFramework.Math;
 using Klyte.Addresses.Overrides;
 using Klyte.Addresses.Utils;
+using Klyte.Addresses.Xml;
+using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,8 +26,17 @@ namespace Klyte.Addresses.ModShared
         internal static void TriggerRoadNamingChange() => Instance?.EventRoadNamingChange?.Invoke();
         internal static void TriggerDistrictChanged() => Instance?.EventDistrictChanged?.Invoke();
         internal static void TriggerBuildingNameStrategyChanged() => Instance?.EventBuildingNameStrategyChanged?.Invoke();
-        internal static void TriggerHighwaysChanged() => Instance?.EventHighwaysChanged?.Invoke();
-        internal static void TriggerHighwaySeedChanged(ushort seed) => Instance?.EventHighwaySeedChanged?.Invoke(seed);
+        internal static void TriggerHighwaysChanged()
+        {
+            SegmentUtils.UpdateSegmentNamesView();
+            Instance?.EventHighwaysChanged?.Invoke();
+        }
+
+        internal static void TriggerHighwaySeedChanged(ushort seed)
+        {
+            SegmentUtils.UpdateSegmentNamesView();
+            Instance?.EventHighwaySeedChanged?.Invoke(seed);
+        }
 
         public static string GetStreetSuffix(ushort idx)
         {
@@ -37,6 +48,45 @@ namespace Klyte.Addresses.ModShared
                 ? GetStreetFull(idx).Trim()
                 : GetStreetFull(idx).Replace(qualifier, "").Trim();
         }
+
+        public static void GetMileageSeedConfig(ushort seedId, out bool invertStart, out int offsetMeters)
+        {
+            invertStart = false;
+            offsetMeters = 0;
+            if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seedId, out AdrNameSeedConfig seedConf))
+            {
+                invertStart = seedConf.InvertMileageStart;
+                offsetMeters = (int)seedConf.MileageOffset;
+            }
+        }
+        public static void GetSeedHighwayParameters(ushort seedId, out string detachedStr, out string hwIdentifier, out string shortCode, out string longCode, out Color hwColor)
+        {
+            detachedStr = null;
+            shortCode = null;
+            longCode = null;
+            hwIdentifier = null;
+            hwColor = default;
+            if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seedId, out AdrNameSeedConfig seedConf))
+            {
+                if (!(seedConf.HighwayParent is null))
+                {
+                    GetHighwayTypeData(out detachedStr, out shortCode, out longCode, seedConf);
+                }
+                hwIdentifier = seedConf.HighwayIdentifier;
+                hwColor = seedConf.HighwayColor;
+            }
+        }
+        public static string GetHighwayTypeDetachedString(string itemName) => AdrHighwayParentLibDataXml.Instance.Get(itemName)?.DettachedPrefix;
+
+        private static void GetHighwayTypeData(out string detachedStr, out string shortCode, out string longCode, AdrNameSeedConfig seedConf)
+        {
+            detachedStr = seedConf.HighwayParent.DettachedPrefix;
+            shortCode = seedConf.HighwayParent.GetShortValue(seedConf.HighwayIdentifier);
+            longCode = seedConf.HighwayParent.GetLongValue(seedConf.HighwayIdentifier);
+        }
+
+        public static string[] ListAllHighwayTypes(string textFilter) => AdrHighwayParentLibDataXml.Instance.FilterBy(textFilter);
+
         public static string GetStreetFull(ushort idx)
         {
             string result = "";
@@ -67,6 +117,6 @@ namespace Klyte.Addresses.ModShared
                 : BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_flags == Building.Flags.None ? Vector2.zero : VectorUtils.XZ(BuildingManager.instance.m_buildings.m_buffer[buildingZM].m_position);
         }
 
-        public static string GetPostalCode(Vector3 position) =>  AdrController.CurrentConfig.GlobalConfig.AddressingConfig.TokenizedPostalCodeFormat.TokenToPostalCode(position);
+        public static string GetPostalCode(Vector3 position) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.TokenizedPostalCodeFormat.TokenToPostalCode(position);
     }
 }

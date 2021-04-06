@@ -1,4 +1,6 @@
-﻿using ColossalFramework.Math;
+﻿using ColossalFramework;
+using ColossalFramework.Math;
+using Klyte.Addresses.Xml;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +31,7 @@ namespace Klyte.Addresses.LocaleStruct
             return result;
         }
 
-        public string GetPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand, ushort segmentId)
+        public string GetPrefix(PrefabAI ai, bool isOneWay, bool isSymmetric, float width, byte lanes, Randomizer rand, ushort segmentId, ushort seedId)
         {
             Highway highway = Highway.ANY;
             RoadType type = RoadType.NONE;
@@ -62,6 +64,9 @@ namespace Klyte.Addresses.LocaleStruct
             OneWay wayVal = isOneWay ? OneWay.TRUE : OneWay.FALSE;
             Symmetry symVal = isSymmetric ? Symmetry.TRUE : Symmetry.FALSE;
             LinkingType linking = LinkingType.NO_LINKING;
+            SeedConfiguration seedConfiguration = 
+                (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seedId, out AdrNameSeedConfig seedConf) && !(seedConf.HighwayParent is null) ? SeedConfiguration.HAS_HIGHWAY_TYPE : SeedConfiguration.NO_HIGHWAY_TYPE)
+                | ((seedConf?.ForcedName).IsNullOrWhiteSpace()? SeedConfiguration.NO_FORCED_NAME : SeedConfiguration.HAS_FORCED_NAME);
             bool hasStart = true;
             bool hasEnd = true;
             if (wayVal == OneWay.TRUE && lanes <= 2)
@@ -93,41 +98,43 @@ namespace Klyte.Addresses.LocaleStruct
             }
 
             List<RoadPrefixFileItem> filterResult = m_prefixes.Where(x =>
-                (x.roadType & type) != 0
-                && (x.oneWay & wayVal) != 0
-                && (x.symmetry & symVal) != 0
-                && (x.highway & highway) != 0
-                && (wayVal == OneWay.FALSE || ((x.linking & linking) != 0))
+                (x.roadType & type) == type
+                && (x.oneWay & wayVal) == wayVal
+                && (x.symmetry & symVal) == symVal
+                && (x.highway & highway) == highway
+                && (wayVal == OneWay.FALSE || ((x.linking & linking) == linking))
                 && (hasStart || !x.requireSource)
                 && (hasEnd || !x.requireTarget)
                 && x.minWidth <= width + 0.99f
                 && width + 0.99f < x.maxWidth
                 && x.minLanes <= lanes
                 && lanes < x.maxLanes
+                && (x.seedConfig & seedConfiguration) == seedConfiguration
             ).ToList();
             if (filterResult.Count == 0 && linking != LinkingType.NO_LINKING)
             {
                 filterResult = m_prefixes.Where(x =>
-                   (x.roadType & type) != 0
-                   && (x.oneWay & wayVal) != 0
-                   && (x.symmetry & symVal) != 0
-                   && (x.highway & highway) != 0
-                   && (wayVal == OneWay.FALSE || ((x.linking & LinkingType.NO_LINKING) != 0))
+                   (x.roadType & type) == type
+                   && (x.oneWay & wayVal) == wayVal
+                   && (x.symmetry & symVal) == symVal
+                   && (x.highway & highway) == highway
+                   && (wayVal == OneWay.FALSE || ((x.linking & LinkingType.NO_LINKING) == LinkingType.NO_LINKING))
                    && (hasStart || !x.requireSource)
                    && (hasEnd || !x.requireTarget)
                    && x.minWidth <= width + 0.99f
                    && width + 0.99f < x.maxWidth
                    && x.minLanes <= lanes
                    && lanes < x.maxLanes
+                   && (x.seedConfig & seedConfiguration) == seedConfiguration
                ).ToList();
             }
-            LogUtils.DoLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} = {filterResult?.Count}");
+            LogUtils.DoLog($"Results for: {type} O:{wayVal} S:{symVal} H:{highway} W:{width} L:{lanes} Lk:{linking} Hs:{hasStart} He:{hasEnd} Sc:{seedConfiguration} = {filterResult?.Count}");
             if (filterResult?.Count == 0)
             {
                 return null;
             }
 
-            return filterResult[rand.Int32((uint) (filterResult.Count))].name;
+            return filterResult[rand.Int32((uint)(filterResult.Count))].name;
         }
 
 
@@ -276,6 +283,31 @@ namespace Klyte.Addresses.LocaleStruct
                         item.maxLanes = ++minLanes;
                     }
                 }
+                if (kv[0].Contains("p") || kv[1].Contains("{8}") || kv[1].Contains("{10}"))
+                {
+                    item.seedConfig = SeedConfiguration.HAS_HIGHWAY_TYPE;
+                }
+                else if (kv[0].Contains("P"))
+                {
+                    item.seedConfig = SeedConfiguration.NO_HIGHWAY_TYPE;
+                }
+                else
+                {
+                    item.seedConfig = SeedConfiguration.ANY_HIGHWAY_TYPE;
+                }
+
+                if (kv[0].Contains("n") || kv[1].Contains("{9}"))
+                {
+                    item.seedConfig |= SeedConfiguration.HAS_FORCED_NAME;
+                }
+                else if (kv[0].Contains("N"))
+                {
+                    item.seedConfig |= SeedConfiguration.NO_FORCED_NAME;
+                }
+                else
+                {
+                    item.seedConfig |= SeedConfiguration.ANY_FORCED_NAME;
+                }
 
                 return item;
             }
@@ -289,6 +321,7 @@ namespace Klyte.Addresses.LocaleStruct
             public RoadType roadType = RoadType.ANY;
             public Highway highway = Highway.ANY;
             public LinkingType linking = LinkingType.ANY;
+            public SeedConfiguration seedConfig = SeedConfiguration.ANY;
             public bool requireSource = false;
             public bool requireTarget = false;
             public string name;
@@ -323,6 +356,18 @@ namespace Klyte.Addresses.LocaleStruct
             TUNNEL = 4,
             DAM = 8,
             ANY = GROUND | BRIDGE | TUNNEL | DAM
+        }
+
+        private enum SeedConfiguration : byte
+        {
+            NONE = 0,
+            HAS_HIGHWAY_TYPE = 1,
+            NO_HIGHWAY_TYPE = 2,
+            ANY_HIGHWAY_TYPE = 3,
+            HAS_FORCED_NAME = 4,
+            NO_FORCED_NAME = 8,
+            ANY_FORCED_NAME = 12,
+            ANY = ANY_HIGHWAY_TYPE | ANY_FORCED_NAME
         }
 
         private enum LinkingType : byte

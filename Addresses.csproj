@@ -164,6 +164,7 @@
     <Compile Include="UI\AdrMapBorders.cs" />
     <Compile Include="Utils\AdrUtils.cs" />
     <Compile Include="Utils\PostalCodeToken.cs" />
+    <Compile Include="Xml\Highways\AdrNameSeedConfig.cs" />
     <Compile Include="Xml\Highways\AdrNameSeedDataXml.cs" />
     <Compile Include="Xml\Highways\AdrHighwayParentLibDataXml.cs" />
     <Compile Include="Xml\Highways\AdrHighwayParentData.cs" />

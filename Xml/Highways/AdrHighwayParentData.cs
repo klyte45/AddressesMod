@@ -12,6 +12,7 @@ namespace Klyte.Addresses.Xml
 {
     public class AdrHighwayParentXml : ILibable
     {
+        private string m_dettachedPrefix;
         private string m_shortPrefix;
         private string m_fullPrefix;
         private bool m_invertShortConcatenationOrder;
@@ -22,6 +23,15 @@ namespace Klyte.Addresses.Xml
         [XmlIgnore]
         internal ConfigurationSource m_configurationSource = ConfigurationSource.CITY;
 
+        [XmlAttribute("dettachedPrefix")]
+        public string DettachedPrefix
+        {
+            get => m_dettachedPrefix; set
+            {
+                m_dettachedPrefix = value;
+                AdrShared.TriggerHighwaysChanged();
+            }
+        }
         [XmlAttribute("shortPrefix")]
         public string ShortPrefix
         {

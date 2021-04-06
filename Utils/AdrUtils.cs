@@ -1,5 +1,5 @@
-﻿using Klyte.Commons.Utils;
-using System;
+﻿using Klyte.Addresses.Xml;
+using Klyte.Commons.Utils;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -27,7 +27,21 @@ namespace Klyte.Addresses.Utils
 
             if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
-                if (!SegmentUtils.GetAddressStreetAndNumber(sidewalk, midPosBuilding, out b, out a))
+                SegmentUtils.GetNearestSegment(sidewalk, out Vector3 targetPosition, out float targetLength, out ushort targetSegmentId);
+                if (targetSegmentId == 0)
+                {
+                    return;
+                }
+                var seed = NetManager.instance.m_segments.m_buffer[targetSegmentId].m_nameSeed;
+                var invertStart = false;
+                var offsetMeters = 0;
+                if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+                {
+                    invertStart = seedConf.InvertMileageStart;
+                    offsetMeters = (int)seedConf.MileageOffset;
+                }
+
+                if (!SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, invertStart, offsetMeters, out b, out a))
                 {
                     return;
                 }

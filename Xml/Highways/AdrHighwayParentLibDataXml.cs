@@ -22,13 +22,13 @@ namespace Klyte.Addresses.Xml
         [XmlElement("descriptorsData")]
         public override ListWrapper<AdrHighwayParentXml> SavedDescriptorsSerialized
         {
-            get => new ListWrapper<AdrHighwayParentXml>() { listVal = m_savedDescriptorsSerialized.Where(x => x.m_configurationSource == ConfigurationSource.CITY).ToList() };
+            get => new ListWrapper<AdrHighwayParentXml>() { listVal = m_savedDescriptorsSerialized.Where(x => x.Value.m_configurationSource == ConfigurationSource.CITY).Select(x => x.Value).ToList() };
             set => ReloadGlobalConfigurations(value);
         }
         public void ReloadGlobalConfigurations() => ReloadGlobalConfigurations(null);
         private void ReloadGlobalConfigurations(ListWrapper<AdrHighwayParentXml> fromCity)
         {
-            m_savedDescriptorsSerialized = fromCity?.listVal?.Select(x => { x.m_configurationSource = ConfigurationSource.CITY; return x; }).ToArray() ?? m_savedDescriptorsSerialized.Where(x => x.m_configurationSource == ConfigurationSource.CITY).ToArray();
+            m_savedDescriptorsSerialized = fromCity?.listVal?.Select(x => { x.m_configurationSource = ConfigurationSource.CITY; return x; }).ToDictionary(x => x.SaveName, x => x) ?? m_savedDescriptorsSerialized.Where(x => x.Value.m_configurationSource == ConfigurationSource.CITY).ToDictionary(x => x.Key, x => x.Value);
             var errorList = new List<string>();
             foreach (string filename in Directory.GetFiles(AddressesMod.HighwayConfigurationFolder, "*.xml").OrderBy(x => !x.EndsWith(AddressesMod.DefaultFileGlobalXml)).ThenBy(x => x))
             {
@@ -63,12 +63,6 @@ namespace Klyte.Addresses.Xml
 
                 }, (x) => true);
             }
-
-            m_savedDescriptorsSerialized = m_savedDescriptorsSerialized
-                .GroupBy(p => p.SaveName)
-                .Select(g => g.OrderBy(x => -1 * (int)x.m_configurationSource).First())
-                .ToArray();
-            UpdateIndex();
         }
 
 
@@ -83,7 +77,10 @@ namespace Klyte.Addresses.Xml
                     item.m_configurationSource = ConfigurationSource.GLOBAL;
                     result.Add(item);
                 }
-                m_savedDescriptorsSerialized = m_savedDescriptorsSerialized.Union(result).ToArray();
+                m_savedDescriptorsSerialized = m_savedDescriptorsSerialized.Select(x => x.Value).Union(result)
+                .GroupBy(p => p.SaveName)
+                .Select(g => g.OrderBy(x => -1 * (int)x.m_configurationSource).First())
+                .ToDictionary(x => x.SaveName, x => x); 
             }
             else
             {
@@ -92,9 +89,9 @@ namespace Klyte.Addresses.Xml
         }
 
         public string[] FilterBy(string input) =>
-         m_indexes
+         m_savedDescriptorsSerialized
          .Where((x) => (input.IsNullOrWhiteSpace() ? true : LocaleManager.cultureInfo.CompareInfo.IndexOf(x.Key, input, CompareOptions.IgnoreCase) >= 0))
-         .OrderBy((x) => ((int)(3 - m_savedDescriptorsSerialized[x.Value].m_configurationSource)) + x.Key)
+         .OrderBy((x) => ((int)(3 - x.Value.m_configurationSource)) + x.Key)
          .Select(x => x.Key)
          .ToArray();
 

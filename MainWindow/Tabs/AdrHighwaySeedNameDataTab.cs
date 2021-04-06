@@ -85,6 +85,7 @@ namespace Klyte.Addresses.UI
             AddIntField(Locale.Get("K45_ADR_HIGHWAYITEM_MILEAGEOFFSET"), out m_hwMileageOffset, m_editingHelper, OnSetMileageOffset, false);
             AddCheckboxLocale("K45_ADR_HIGHWAYITEM_INVERTMILEAGE", out m_hwInvertMileage, m_editingHelper, OnSetMileageInvert);
             AddColorField(m_editingHelper, Locale.Get("K45_ADR_HIGHWAYITEM_COLOR"), out m_hwColor, OnSetHwColor);
+            m_hwMileageOffset.width = 120;
 
 
             MainContainer.eventVisibilityChanged += (x, y) =>
@@ -98,7 +99,7 @@ namespace Klyte.Addresses.UI
                 {
                     if (ToolsModifierControl.toolController.CurrentTool is RoadSegmentTool)
                     {
-                        ToolsModifierControl.toolController.CurrentTool = null;
+                        ToolsModifierControl.SetTool<DefaultTool>();
                     }
                     OnSegmentSet(0);
                 }
@@ -241,7 +242,7 @@ namespace Klyte.Addresses.UI
             {
                 if (!AdrNameSeedDataXml.Instance.NameSeedConfigs.ContainsKey(CurrentSeedId))
                 {
-                    AdrNameSeedDataXml.Instance.NameSeedConfigs[CurrentSeedId] = new AdrNameSeedConfig();
+                    _ = AdrNameSeedDataXml.Instance.NameSeedConfigs + new AdrNameSeedConfig { Id = CurrentSeedId };
                 }
                 CurrentEditingInstance = AdrNameSeedDataXml.Instance.NameSeedConfigs[CurrentSeedId];
                 m_hwType.text = CurrentEditingInstance.HighwayParentName ?? "";
