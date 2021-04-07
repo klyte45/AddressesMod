@@ -70,7 +70,7 @@ namespace Klyte.Addresses.UI
         {
             m_selectDistrict.selectedIndex = -1;
             m_selectDistrict.selectedIndex = 0;
-            AdrShared.Instance.EventDistrictChanged += () => dirty = true;
+            AdrFacade.Instance.EventDistrictChanged += () => dirty = true;
         }
         #endregion
         private bool dirty;

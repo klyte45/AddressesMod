@@ -25,7 +25,7 @@ namespace Klyte.Addresses.Overrides
                 if (AdrController.LoadedLocalesCitizenFirstNameMasc.ContainsKey(filenameFirst))
                 {
                     int arrLen = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst].Length;
-                    name = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst][randomizer.Int32((uint) arrLen)];
+                    name = AdrController.LoadedLocalesCitizenFirstNameMasc[filenameFirst][randomizer.Int32((uint)arrLen)];
 
                 }
                 else
@@ -41,7 +41,7 @@ namespace Klyte.Addresses.Overrides
                 if (AdrController.LoadedLocalesCitizenFirstNameFem.ContainsKey(filenameFirst))
                 {
                     int arrLen = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst].Length;
-                    name = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst][randomizer.Int32((uint) arrLen)];
+                    name = AdrController.LoadedLocalesCitizenFirstNameFem[filenameFirst][randomizer.Int32((uint)arrLen)];
 
                 }
                 else
@@ -55,7 +55,7 @@ namespace Klyte.Addresses.Overrides
             if (AdrController.LoadedLocalesCitizenLastName.ContainsKey(filenameLast))
             {
                 int arrLen = AdrController.LoadedLocalesCitizenLastName[filenameLast].Length;
-                surname = AdrController.LoadedLocalesCitizenLastName[filenameLast][randomizer2.Int32((uint) arrLen)];
+                surname = AdrController.LoadedLocalesCitizenLastName[filenameLast][randomizer2.Int32((uint)arrLen)];
             }
             else
             {

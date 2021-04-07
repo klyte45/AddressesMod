@@ -38,7 +38,7 @@ namespace Klyte.Addresses.Xml
             {
                 highwayParentName = value;
                 cachedParent = null;
-                AdrShared.TriggerHighwaySeedChanged((ushort)Id);
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
 
@@ -48,7 +48,7 @@ namespace Klyte.Addresses.Xml
             get => highwayIdentifier; set
             {
                 highwayIdentifier = value;
-                AdrShared.TriggerHighwaySeedChanged((ushort)Id);
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Klyte.Addresses.Xml
             get => forcedName; set
             {
                 forcedName = value;
-                AdrShared.TriggerHighwaySeedChanged((ushort)Id);
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Klyte.Addresses.Xml
             get => mileageOffset; set
             {
                 mileageOffset = value;
-                AdrShared.TriggerHighwaySeedChanged((ushort)Id);
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Klyte.Addresses.Xml
             get => invertMileageStart; set
             {
                 invertMileageStart = value;
-                AdrShared.TriggerHighwaySeedChanged((ushort)Id);
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
 
@@ -107,7 +107,7 @@ namespace Klyte.Addresses.Xml
         private void SetHighwayColor(Color c)
         {
             m_cachedHighwayColor = c;
-            AdrShared.TriggerHighwaySeedChanged(id);
+            AdrFacade.TriggerHighwaySeedChanged(id);
         }
     }
 }

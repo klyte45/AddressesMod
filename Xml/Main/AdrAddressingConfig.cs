@@ -22,7 +22,7 @@ namespace Klyte.Addresses.Xml
             get => TokenizedPostalCodeFormat.AsPostalCodeString(); set
             {
                 TokenizedPostalCodeFormat = value.TokenizeAsPostalCode();
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
         [XmlAttribute("zipcodeCityPrefix")]
@@ -31,7 +31,7 @@ namespace Klyte.Addresses.Xml
             get => m_zipcodeCityPrefix; set
             {
                 m_zipcodeCityPrefix = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
 
@@ -41,7 +41,7 @@ namespace Klyte.Addresses.Xml
             get => m_addressLine1; set
             {
                 m_addressLine1 = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
         [XmlElement("addressLine2")]
@@ -50,7 +50,7 @@ namespace Klyte.Addresses.Xml
             get => m_addressLine2; set
             {
                 m_addressLine2 = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
         [XmlElement("addressLine3")]
@@ -59,7 +59,7 @@ namespace Klyte.Addresses.Xml
             get => m_addressLine3; set
             {
                 m_addressLine3 = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
         [XmlElement("districts")]
@@ -72,7 +72,7 @@ namespace Klyte.Addresses.Xml
             {
                 if (m_savedZeroMarkBuilding != value)
                 {
-                    AdrShared.TriggerZeroMarkerBuildingChange();
+                    AdrFacade.TriggerZeroMarkerBuildingChange();
                 }
                 m_savedZeroMarkBuilding = value;
             }

@@ -29,7 +29,7 @@ namespace Klyte.Addresses.Xml
             get => m_dettachedPrefix; set
             {
                 m_dettachedPrefix = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
         [XmlAttribute("shortPrefix")]
@@ -38,7 +38,7 @@ namespace Klyte.Addresses.Xml
             get => m_shortPrefix; set
             {
                 m_shortPrefix = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
         [XmlAttribute("fullPrefix")]
@@ -47,7 +47,7 @@ namespace Klyte.Addresses.Xml
             get => m_fullPrefix; set
             {
                 m_fullPrefix = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
         [XmlAttribute("invertShort")]
@@ -56,7 +56,7 @@ namespace Klyte.Addresses.Xml
             get => m_invertShortConcatenationOrder; set
             {
                 m_invertShortConcatenationOrder = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
         [XmlAttribute("invertLong")]
@@ -65,7 +65,7 @@ namespace Klyte.Addresses.Xml
             get => m_invertLongConcatenationOrder; set
             {
                 m_invertLongConcatenationOrder = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
 
@@ -77,7 +77,7 @@ namespace Klyte.Addresses.Xml
             get => m_addSpaceBetweenTermsShort; set
             {
                 m_addSpaceBetweenTermsShort = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
         [XmlAttribute("spaceOnLong")]
@@ -86,7 +86,7 @@ namespace Klyte.Addresses.Xml
             get => m_addSpaceBetweenTermsLong; set
             {
                 m_addSpaceBetweenTermsLong = value;
-                AdrShared.TriggerHighwaysChanged();
+                AdrFacade.TriggerHighwaysChanged();
             }
         }
 

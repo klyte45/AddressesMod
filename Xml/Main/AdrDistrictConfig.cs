@@ -22,7 +22,7 @@ namespace Klyte.Addresses.Xml
             get => m_postalCodePrefix ?? (byte)(Id == 0 ? 0 : 128 - Id); set
             {
                 m_postalCodePrefix = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
             }
         }
 
@@ -33,7 +33,7 @@ namespace Klyte.Addresses.Xml
             get => m_postalCodePrefix; set
             {
                 m_postalCodePrefix = value;
-                AdrShared.TriggerPostalCodeChanged();
+                AdrFacade.TriggerPostalCodeChanged();
 
             }
         }
@@ -53,13 +53,13 @@ namespace Klyte.Addresses.Xml
         private void SetDistrictColor(Color c)
         {
             m_cachedColor = c;
-            AdrShared.TriggerDistrictChanged();
+            AdrFacade.TriggerDistrictChanged();
         }
         public void ResetDistrictCode()
         {
             m_postalCodePrefix = null;
-            AdrShared.TriggerDistrictChanged();
-            AdrShared.TriggerPostalCodeChanged();
+            AdrFacade.TriggerDistrictChanged();
+            AdrFacade.TriggerPostalCodeChanged();
         }
     }
 }

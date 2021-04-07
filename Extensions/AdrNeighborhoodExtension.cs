@@ -29,7 +29,7 @@ namespace Klyte.Addresses.Extensions
                     Seed = new Randomizer(new System.Random().Next()).UInt32(0xFFFAFFFF)
                 });
             }
-            AdrShared.TriggerBuildingNameStrategyChanged();
+            AdrFacade.TriggerBuildingNameStrategyChanged();
         }
         public static void SetFixedName(int idx, string value)
         {
@@ -46,7 +46,7 @@ namespace Klyte.Addresses.Extensions
                     FixedName = value
                 });
             }
-            AdrShared.TriggerBuildingNameStrategyChanged();
+            AdrFacade.TriggerBuildingNameStrategyChanged();
         }
         public static string GetFixedName(int idx) => NeighborhoodConfig.Neighbors.ElementAtOrDefault(idx)?.FixedName;
 
@@ -86,7 +86,7 @@ namespace Klyte.Addresses.Extensions
                 NeighborhoodConfig.Neighbors[idx].Seed = value;
                 NeighborhoodConfig.Neighbors[idx].FixedName = null;
             }
-            AdrShared.TriggerBuildingNameStrategyChanged();
+            AdrFacade.TriggerBuildingNameStrategyChanged();
         }
 
         public static void SafeCleanEntry(int idx) => NeighborhoodConfig.RemoveNeighborAtIndex(idx);

@@ -180,8 +180,8 @@ namespace Klyte.Addresses.UI
             yield return RecursiveSetSeed(segmentId, oldSeed, newSeed, NetManager.instance.m_segments.m_buffer[segmentId].m_endNode, false, true);
             AdrNameSeedDataXml.Instance.EraseSeedCache();
             SegmentUtils.UpdateSegmentNamesView();
-            AdrShared.TriggerHighwaySeedChanged(oldSeed);
-            AdrShared.TriggerHighwaySeedChanged(newSeed);
+            AdrFacade.TriggerHighwaySeedChanged(oldSeed);
+            AdrFacade.TriggerHighwaySeedChanged(newSeed);
         }
 
         private IEnumerator SetSeedInterCrossings(ushort segmentId, ushort oldSeed, ushort newSeed)
@@ -190,8 +190,8 @@ namespace Klyte.Addresses.UI
             yield return RecursiveSetSeed(segmentId, oldSeed, newSeed, NetManager.instance.m_segments.m_buffer[segmentId].m_endNode, true, true);
             AdrNameSeedDataXml.Instance.EraseSeedCache();
             SegmentUtils.UpdateSegmentNamesView();
-            AdrShared.TriggerHighwaySeedChanged(oldSeed);
-            AdrShared.TriggerHighwaySeedChanged(newSeed);
+            AdrFacade.TriggerHighwaySeedChanged(oldSeed);
+            AdrFacade.TriggerHighwaySeedChanged(newSeed);
         }
         private IEnumerator RecursiveSetSeed(ushort segmentId, ushort oldSeed, ushort newSeed, ushort srcNode, bool requireOnly2Segments, bool forceScan = false)
         {
