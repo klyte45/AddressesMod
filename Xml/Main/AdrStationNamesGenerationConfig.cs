@@ -8,6 +8,10 @@ namespace Klyte.Addresses.Xml
     {
         [XmlAttribute("trainPassenger")]
         public bool TrainsPassenger { get; set; }
+        [XmlAttribute("bus")]
+        public bool Bus { get; set; }
+        [XmlAttribute("intercityBus")]
+        public bool IntercityBus { get; set; }
 
         [XmlAttribute("trainCargo")]
         public bool TrainsCargo { get; set; }
@@ -39,6 +43,15 @@ namespace Klyte.Addresses.Xml
         [XmlAttribute("blimp")]
         public bool Blimp { get; set; }
 
+        [XmlAttribute("trolleybus")]
+        public bool Trolleybus { get; set; }
+
+        [XmlAttribute("tram")]
+        public bool Tram { get; set; }
+
+        [XmlAttribute("helicopter")]
+        public bool Helicopter { get; set; }
+
         public bool IsRenameEnabled(TransportType transport, VehicleType vehicle, BuildingAI buildingAI)
         {
             switch (transport)
@@ -51,7 +64,7 @@ namespace Klyte.Addresses.Xml
                         case VehicleType.Plane:
                             return buildingAI is CargoStationAI ? AirplaneCargo : AirplanePassenger;
                     }
-                    break;
+                    return false;
                 case TransportInfo.TransportType.CableCar:
                     return CableCar;
                 case TransportInfo.TransportType.Metro:
@@ -66,12 +79,34 @@ namespace Klyte.Addresses.Xml
                         case VehicleType.Ship:
                             return buildingAI is CargoStationAI ? ShipCargo : ShipPassenger;
                     }
-                    break;
+                    return false;
                 case TransportInfo.TransportType.Train:
                     return buildingAI is CargoStationAI ? TrainsCargo : TrainsPassenger;
+                case TransportInfo.TransportType.Tram:
+                    return buildingAI is TransportStationAI && Tram;
+                case TransportInfo.TransportType.Bus:
+                    if (buildingAI is TransportStationAI tsai2)
+                    {
+                        var isUrban = (tsai2.m_info.m_class.m_level == ItemClass.Level.Level1);
+                        if (isUrban && Bus)
+                        {
+                            return true;
+                        }
+                        var isIntermunicipal = (tsai2.m_info.m_class.m_level == ItemClass.Level.Level3);
+                        if (isIntermunicipal && IntercityBus)
+                        {
+                            return true;
+                        }
 
+                    }
+                    return false;
+                case TransportInfo.TransportType.Trolleybus:
+                    return buildingAI is TransportStationAI && Trolleybus;
+                case TransportInfo.TransportType.Helicopter:
+                    return buildingAI is TransportStationAI && Helicopter;
+                default:
+                    return false;
             }
-            return false;
         }
 
     }
