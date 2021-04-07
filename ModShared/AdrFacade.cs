@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace Klyte.Addresses.ModShared
 {
-    public class AdrShared : MonoBehaviour
+    public class AdrFacade : MonoBehaviour
     {
-        public static AdrShared Instance => AddressesMod.Controller?.SharedInstance;
+        public static AdrFacade Instance => AddressesMod.Controller?.FacadeInstance;
         public event Action EventZeroMarkerBuildingChange;
         public event Action EventRoadNamingChange;
         public event Action EventDistrictChanged;
@@ -37,6 +37,8 @@ namespace Klyte.Addresses.ModShared
             SegmentUtils.UpdateSegmentNamesView();
             Instance?.EventHighwaySeedChanged?.Invoke(seed);
         }
+
+        public static bool GetStreetAndNumber(Vector3 sidewalk, Vector3 midPosBuilding, out string streetName, out int number) => AdrUtils.GetStreetAndNumber(sidewalk, midPosBuilding, out streetName, out number);
 
         public static string GetStreetSuffix(ushort idx)
         {

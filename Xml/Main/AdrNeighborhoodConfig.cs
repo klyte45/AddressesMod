@@ -32,7 +32,7 @@ namespace Klyte.Addresses.Xml
             get => m_namesFile; set
             {
                 m_namesFile = value;
-                AdrShared.TriggerBuildingNameStrategyChanged();
+                AdrFacade.TriggerBuildingNameStrategyChanged();
             }
         }
     }

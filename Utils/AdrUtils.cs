@@ -27,21 +27,7 @@ namespace Klyte.Addresses.Utils
 
             if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
-                SegmentUtils.GetNearestSegment(sidewalk, out Vector3 targetPosition, out float targetLength, out ushort targetSegmentId);
-                if (targetSegmentId == 0)
-                {
-                    return;
-                }
-                var seed = NetManager.instance.m_segments.m_buffer[targetSegmentId].m_nameSeed;
-                var invertStart = false;
-                var offsetMeters = 0;
-                if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
-                {
-                    invertStart = seedConf.InvertMileageStart;
-                    offsetMeters = (int)seedConf.MileageOffset;
-                }
-
-                if (!SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, invertStart, offsetMeters, out b, out a))
+                if (!GetStreetAndNumber(sidewalk, midPosBuilding, out a, out b))
                 {
                     return;
                 }
@@ -69,6 +55,27 @@ namespace Klyte.Addresses.Utils
             ParseToFormatableString(ref format, 5);
 
             addressLines = string.Format(format, a, b, c, d, e).Split("≠".ToCharArray());
+        }
+
+        internal static bool GetStreetAndNumber(Vector3 sidewalk, Vector3 midPosBuilding, out string streetName, out int number)
+        {
+            SegmentUtils.GetNearestSegment(sidewalk, out Vector3 targetPosition, out float targetLength, out ushort targetSegmentId);
+            if (targetSegmentId == 0)
+            {
+                streetName = string.Empty;
+                number = 0;
+                return false;
+            }
+            var seed = NetManager.instance.m_segments.m_buffer[targetSegmentId].m_nameSeed;
+            var invertStart = false;
+            var offsetMeters = 0;
+            if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+            {
+                invertStart = seedConf.InvertMileageStart;
+                offsetMeters = (int)seedConf.MileageOffset;
+            }
+
+            return SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, invertStart, offsetMeters, out number, out streetName);
         }
 
         private static void ParseToFormatableString(ref string input, byte count)

@@ -150,7 +150,7 @@
     <Compile Include="MainWindow\Tabs\AdrDistrictConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrHighwayParentEditorTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrHighwaySeedNameDataTab.cs" />
-    <Compile Include="ModShared\AdrShared.cs" />
+    <Compile Include="ModShared\AdrFacade.cs" />
     <Compile Include="Overrides\CitizenAIOverrides.cs" />
     <Compile Include="Overrides\DistrictManagerOverrides.cs" />
     <Compile Include="Overrides\BuildingManagerOverrides.cs" />

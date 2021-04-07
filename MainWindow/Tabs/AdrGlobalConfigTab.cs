@@ -90,7 +90,7 @@ namespace Klyte.Addresses.UI
 
             var buildingTogglePanelHelper = new UIHelperExtension(buildingTogglePanel);
 
-            void AddBuildingCheckbox(string icon, string locale, Action<bool> onChange, Func<bool> getCurrentVal) => AddIconCheckbox(icon, locale, out _, buildingTogglePanelHelper, (x) => { onChange(x); AdrShared.TriggerBuildingNameStrategyChanged(); }, new Vector2(45, 30), getCurrentVal());
+            void AddBuildingCheckbox(string icon, string locale, Action<bool> onChange, Func<bool> getCurrentVal) => AddIconCheckbox(icon, locale, out _, buildingTogglePanelHelper, (x) => { onChange(x); AdrFacade.TriggerBuildingNameStrategyChanged(); }, new Vector2(45, 30), getCurrentVal());
 
             AddLabel(Locale.Get("K45_ADR_BUILDING_PASSENGERS"), buildingTogglePanelHelper, out UILabel lbl, out _);
             lbl.padding.top = 5;

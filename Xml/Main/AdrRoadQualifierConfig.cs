@@ -14,7 +14,7 @@ namespace Klyte.Addresses.Xml
             get => m_namesFile; set
             {
                 m_namesFile = value;
-                AdrShared.TriggerRoadNamingChange();
+                AdrFacade.TriggerRoadNamingChange();
             }
         }
 
@@ -24,7 +24,7 @@ namespace Klyte.Addresses.Xml
             get => m_qualifierFile; set
             {
                 m_qualifierFile = value;
-                AdrShared.TriggerRoadNamingChange();
+                AdrFacade.TriggerRoadNamingChange();
             }
         }
     }
