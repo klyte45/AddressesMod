@@ -152,6 +152,7 @@
     <Compile Include="MainWindow\Tabs\AdrHighwaySeedNameDataTab.cs" />
     <Compile Include="ModShared\AdrFacade.cs" />
     <Compile Include="Overrides\CitizenAIOverrides.cs" />
+    <Compile Include="Overrides\CSLMapViewModOverrides.cs" />
     <Compile Include="Overrides\DistrictManagerOverrides.cs" />
     <Compile Include="Overrides\BuildingManagerOverrides.cs" />
     <Compile Include="Overrides\InstanceManagerOverrides.cs" />

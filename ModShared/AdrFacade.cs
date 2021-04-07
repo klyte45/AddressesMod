@@ -89,25 +89,25 @@ namespace Klyte.Addresses.ModShared
 
         public static string[] ListAllHighwayTypes(string textFilter) => AdrHighwayParentLibDataXml.Instance.FilterBy(textFilter);
 
-        public static string GetStreetFull(ushort idx)
+        public static string GetStreetFull(ushort segmentId)
         {
             string result = "";
             var usedQueue = new List<ushort>();
-            NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, false);
+            NetManagerOverrides.GenerateSegmentNameInternal(segmentId, ref result, ref usedQueue, false);
 
             return result;
         }
-        public static string GetStreetQualifier(ushort idx)
+        public static string GetStreetQualifier(ushort segmentId)
         {
             string result = "";
             var usedQueue = new List<ushort>();
-            NetManagerOverrides.GenerateSegmentNameInternal(idx, ref result, ref usedQueue, true);
-            return result.IsNullOrWhiteSpace() ? GetStreetFull(idx).Trim() : GetStreetFull(idx).Replace(result, "").Trim();
+            NetManagerOverrides.GenerateSegmentNameInternal(segmentId, ref result, ref usedQueue, true);
+            return result.IsNullOrWhiteSpace() ? GetStreetFull(segmentId).Trim() : GetStreetFull(segmentId).Replace(result, "").Trim();
         }
 
-        public static Color GetDistrictColor(ushort idx)
+        public static Color GetDistrictColor(ushort districtId)
         {
-            Color color = AdrController.CurrentConfig.GetConfigForDistrict(idx).DistrictColor;
+            Color color = AdrController.CurrentConfig.GetConfigForDistrict(districtId).DistrictColor;
             return color == default ? AdrController.CurrentConfig.GetConfigForDistrict(0).DistrictColor : color;
         }
 
@@ -120,5 +120,14 @@ namespace Klyte.Addresses.ModShared
         }
 
         public static string GetPostalCode(Vector3 position) => AdrController.CurrentConfig.GlobalConfig.AddressingConfig.TokenizedPostalCodeFormat.TokenToPostalCode(position);
+
+        public static bool IsAutonameAvailable(ref Building building)
+        {
+            if (building.Info.m_buildingAI is TransportStationAI tsai)
+            {
+                return AdrConfigXml.Instance.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(tsai.m_transportInfo.m_transportType, tsai.m_transportInfo.m_vehicleType, tsai);
+            }
+            return false;
+        }
     }
 }
