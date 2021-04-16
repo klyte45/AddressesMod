@@ -1,10 +1,12 @@
-using ColossalFramework.Globalization;
 using ColossalFramework.Math;
 using ColossalFramework.UI;
 using ICities;
-using Klyte.Addresses.Extensors;
+using Klyte.Addresses.Extensions;
 using Klyte.Addresses.Overrides;
+using Klyte.Commons.UI;
+using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
+using System;
 using UnityEngine;
 
 namespace Klyte.Addresses.UI
@@ -15,12 +17,12 @@ namespace Klyte.Addresses.UI
         private UILabel m_cityId;
         private UITextField m_azimuthInput;
         private UILabel m_direction;
-        private UILabel m_generatedName;
-        private UIButton m_regenerateName;
+        private UITextField m_generatedName;
         private UIButton m_die;
         public event OnButtonClicked OnDie;
         public event OnButtonClicked OnRegenerate;
         public event OnAzimuthChange OnValueChange;
+        public event Action<int, string> OnFixedNameChange;
         private int m_id;
 
         public void SetLegendInfo(Color c, int id)
@@ -34,11 +36,17 @@ namespace Klyte.Addresses.UI
             m_die.isVisible = m_id > 0;
         }
 
-        public void SetCardinalAngle(float angle)
+        public void SetData()
         {
+            var angle = AdrNeighborhoodExtension.GetAzimuth(m_id);
+            var cityNameFixed = AdrNeighborhoodExtension.GetFixedName(m_id);
+
             m_direction.text = CardinalPoint.GetCardinalPoint16(angle);
-            m_generatedName.text = OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out bool canTrust);
-            if (!canTrust)
+            bool canTrust = true;
+            var name = cityNameFixed ?? OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out canTrust);
+            m_generatedName.text = name;
+            m_generatedName.tooltip = name;
+            if (cityNameFixed == null && !canTrust)
             {
                 m_generatedName.text = "?????";
             }
@@ -50,8 +58,8 @@ namespace Klyte.Addresses.UI
 
         public void Awake()
         {
-            m_container = transform.gameObject.AddComponent<UIPanel>();
-            m_container.width = transform.parent.gameObject.GetComponent<UIComponent>().width;
+            m_container = GetComponent<UIPanel>();
+            m_container.width = m_container.parent.width;
             m_container.height = 30;
             m_container.autoLayout = true;
             m_container.autoLayoutDirection = LayoutDirection.Horizontal;
@@ -78,8 +86,10 @@ namespace Klyte.Addresses.UI
             m_azimuthInput.textScale = 1.6f;
             m_azimuthInput.maxLength = 3;
             m_azimuthInput.numericalOnly = true;
+            m_azimuthInput.allowNegative = true;
             m_azimuthInput.text = "0";
             m_azimuthInput.eventTextChanged += SendText;
+            m_azimuthInput.eventMouseWheel += DefaultEditorUILib.RollInteger;
 
             KlyteMonoUtils.CreateUIElement(out m_direction, m_container.transform, "Direction");
             m_direction.autoSize = false;
@@ -89,60 +99,42 @@ namespace Klyte.Addresses.UI
             m_direction.textAlignment = UIHorizontalAlignment.Center;
             m_direction.padding = new RectOffset(3, 3, 5, 3);
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel nameContainer, m_container.transform, "GenNameContainer");
-            nameContainer.autoSize = false;
-            nameContainer.width = 150;
-            nameContainer.height = 30;
-            nameContainer.autoLayout = true;
-            nameContainer.autoLayoutDirection = LayoutDirection.Horizontal;
-
-            KlyteMonoUtils.CreateUIElement(out m_generatedName, nameContainer.transform, "GenName");
+            KlyteMonoUtils.CreateUIElement(out m_generatedName, m_container.transform, "GenName");
+            KlyteMonoUtils.UiTextFieldDefaults(m_generatedName);
             m_generatedName.autoSize = true;
             m_generatedName.height = 30;
             m_generatedName.textScale = 1.125f;
             m_generatedName.padding = new RectOffset(3, 3, 5, 3);
             m_generatedName.text = "???";
-            m_generatedName.textAlignment = UIHorizontalAlignment.Center;
-            m_generatedName.minimumSize = new Vector2(150, 0);
-            KlyteMonoUtils.LimitWidth(m_generatedName, 150);
+            m_generatedName.horizontalAlignment = UIHorizontalAlignment.Center;
+            m_generatedName.width = m_container.width - 235;
+            m_generatedName.eventTextSubmitted += SetFixedName;
+            m_generatedName.submitOnFocusLost = true;
 
-            KlyteMonoUtils.CreateUIElement(out m_regenerateName, m_container.transform, "RegenName");
-            m_regenerateName.textScale = 1f;
-            m_regenerateName.width = 30;
-            m_regenerateName.height = 30;
-            m_regenerateName.tooltip = Locale.Get("K45_ADR_REGENERATE_NAME");
-            KlyteMonoUtils.InitButton(m_regenerateName, true, "ButtonMenu");
-            m_regenerateName.isVisible = true;
-            m_regenerateName.text = "R";
-            m_regenerateName.eventClick += (component, eventParam) =>
-            {
-                AdrNeighborhoodExtension.SetSeed(m_id, new Randomizer(new System.Random().Next()).UInt32(0xFEFFFFFF));
-                OnRegenerate?.Invoke();
-            };
 
-            KlyteMonoUtils.CreateUIElement(out m_die, m_container.transform, "Delete");
-            m_die.textScale = 1f;
-            m_die.width = 30;
-            m_die.height = 30;
-            m_die.tooltip = Locale.Get("K45_ADR_DELETE_STOP_NEIGHBOR");
-            KlyteMonoUtils.InitButton(m_die, true, "ButtonMenu");
-            m_die.isVisible = true;
-            m_die.text = "X";
-            m_die.eventClick += (component, eventParam) =>
+            m_die = DefaultEditorUILib.AddButtonInEditorRow(m_generatedName, CommonsSpriteNames.K45_X, () =>
             {
                 AdrNeighborhoodExtension.SafeCleanEntry(m_id);
                 OnDie?.Invoke();
-            };
+            }, "K45_ADR_DELETE_STOP_NEIGHBOR", false, 30);
+
+            DefaultEditorUILib.AddButtonInEditorRow(m_generatedName, CommonsSpriteNames.K45_Reload, () =>
+            {
+                AdrNeighborhoodExtension.SetSeed(m_id, new Randomizer(new System.Random().Next()).UInt32(0xFEFFFFFF));
+                OnRegenerate?.Invoke();
+            }, "K45_ADR_REGENERATE_NAME", false, 30);
 
         }
 
         private void SendText(UIComponent x, string y)
         {
-            if (uint.TryParse(y, out uint angle))
+            if (int.TryParse(y, out int angle))
             {
-                OnValueChange?.Invoke(m_id, angle);
+                OnValueChange?.Invoke(m_id, (uint)(((angle + 360) % 360) + 360) % 360);
             }
         }
+
+        private void SetFixedName(UIComponent x, string y) => OnFixedNameChange?.Invoke(m_id, y);
     }
 
     internal delegate void OnAzimuthChange(int idx, uint val);

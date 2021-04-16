@@ -1,8 +1,8 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
 using ColossalFramework.Math;
-using Klyte.Addresses.Extensors;
-using Klyte.Commons.Extensors;
+using Klyte.Addresses.Extensions;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Reflection;
 using UnityEngine;
@@ -31,23 +31,23 @@ namespace Klyte.Addresses.Overrides
 
         private static bool GetNameBasedInAngle(OutsideConnectionAI __instance, out string __result, ref InstanceID caller, float angle, out bool canTrust)
         {
-            Randomizer? randomizer = AdrNeighborhoodExtension.GetRandomizerAt(angle);
+            AdrNeighborhoodExtension.GetNeighborParams(angle, out Randomizer? randomizer, out string fixedName);
             if (randomizer == null)
             {
-                __result = OriginalGenerateName(__instance, caller);
-                canTrust = false;
+                __result = fixedName ?? OriginalGenerateName(__instance, caller);
+                canTrust = fixedName != null;
                 return false;
             }
             var fileName = AdrController.CurrentConfig.GlobalConfig.NeighborhoodConfig.NamesFile ?? "";
             if (fileName == null || !AdrController.LoadedLocalesNeighborName.ContainsKey(fileName))
             {
-                caller.Index = (uint) randomizer.GetValueOrDefault().seed;
+                caller.Index = (uint)randomizer.GetValueOrDefault().seed;
                 __result = OriginalGenerateName(__instance, caller);
                 canTrust = true;
                 return false;
             }
             var file = AdrController.LoadedLocalesNeighborName[fileName];
-            __result = file[randomizer.GetValueOrDefault().Int32((uint) file.Length)];
+            __result = file[randomizer.GetValueOrDefault().Int32((uint)file.Length)];
             canTrust = true;
             return false;
         }
@@ -76,7 +76,7 @@ namespace Klyte.Addresses.Overrides
             if (num != 0)
             {
                 var randomizer = new Randomizer(caller.Index);
-                num = randomizer.Int32((uint) num);
+                num = randomizer.Int32((uint)num);
                 string text = null;
                 if (text == null && __instance.m_useCloseNames)
                 {

@@ -1,13 +1,16 @@
-﻿<color #AA44FF>ADRv2.0.5</color>
-	- NEW FEATURE: Use brackets [] to select what is the "important part" of a road name in qualifiers file - useful for Write The Signs.
-		<color yellow>EX:</color> <color green>[{0}] Street</color> will make the content of the placeholder {0} to be recognized as main road name in Write The Signs mod.
-	- Minor bugifixing in integration features with Write The Signs
-	- Fixed some entries of Russian Translations
-	- Added Polish translation (thanks to <color yellow>MKuranowski</color>)
-	- Added Chinese translation (thanks to <color yellow>Weikang Fan</color>)
-
-<color yellow>r10001 (25/MAR/21)</color>
-	- Fixing some crashes on loading cities
-	- Fixed Write The Signs mod connector bugs
-	- Fixed some errors when loading a city relative to chirper message poster names
-	- Downgrade to C#7.x
+﻿<extended><color #44aa44>ADRv3</color>
+	- New UI, following most recent layout pattern (Klyte Mods Gen 6).
+	- <color yellow>New highway type register</color>: Categorize your roads with short identifiers (A-1, BR-030, SP-31, Interstate 4, etc).
+	- New integration with <color yellow>CSL Map View mod</color>, allowing to export all roads generated names and building with auto generated names.
+	- <color yellow>New Neighbor Cities editor:</color>
+		- Bigger city map showing the limits.
+		- Now is possible to setup a custom name directly in the neighbor names list.
+	-<color yellow>New postal code generator system:</color>
+		- Changed the letters and their meanings (check help button there).
+		- Now supports escaping using backslash or double quotes.
+		- Added support to get the road seed name (which defines the name of the road).
+	- New feature allowing to generate new seeds for roads and use replace a seed in all adjacent segments to another one.
+	- Added Sunset Harbor public transport modals stations autonaming support.
+	- New facade methods to be used by other modders in their mods (used by Write the Signs & Transport Lines Manager, at least).
+	- Fixed: Sometimes the autoname for building algorithm cannot find the road the building is placed to name it.
+	- Fixed: Acute angle (<90°) crossing roads with same seed are not causing to invert road direction on naming.

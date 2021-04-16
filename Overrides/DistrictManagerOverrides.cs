@@ -1,7 +1,7 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.Math;
 using Klyte.Addresses.ModShared;
-using Klyte.Commons.Extensors;
+using Klyte.Commons.Extensions;
 using Klyte.Commons.Utils;
 using System.Reflection;
 using UnityEngine;
@@ -63,7 +63,7 @@ namespace Klyte.Addresses.Overrides
             RedirectorInstance.AddRedirect(GetNameMethod, preRename);
 
 
-            MethodInfo posChange = typeof(AdrShared).GetMethod("TriggerDistrictChanged", RedirectorUtils.allFlags);
+            MethodInfo posChange = typeof(AdrFacade).GetMethod("TriggerDistrictChanged", RedirectorUtils.allFlags);
 
             RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("SetDistrictName", RedirectorUtils.allFlags), null, posChange);
             RedirectorInstance.AddRedirect(typeof(DistrictManager).GetMethod("AreaModified", RedirectorUtils.allFlags), null, posChange);

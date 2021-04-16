@@ -1,58 +1,61 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using ICities;
-using Klyte.Commons.Extensors;
-using Klyte.Commons.Utils;
+using Klyte.Commons.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using static Klyte.Commons.UI.DefaultEditorUILib;
 
 namespace Klyte.Addresses.UI
 {
 
     internal class AdrCitizenConfigTab : UICustomControl
     {
-        public UIComponent MainContainer { get; private set; }
+        public UIPanel MainContainer { get; private set; }
 
         private UIDropDown m_maleFiles;
         private UIDropDown m_femaleFiles;
         private UIDropDown m_lastNameFiles;
 
         private UIHelperExtension m_uiHelperDistrict;
-        private float DefaultWidth { get; } = 420;
 
+        private bool isLoading;
         #region Awake
         public void Awake()
         {
-            MainContainer = GetComponent<UIComponent>();
+            isLoading = true;
+            MainContainer = GetComponent<UIPanel>();
+
+            MainContainer.autoLayout = true;
+            MainContainer.autoLayoutDirection = LayoutDirection.Vertical;
+            MainContainer.autoLayoutPadding = new RectOffset(0, 0, 2, 2);
 
             m_uiHelperDistrict = new UIHelperExtension(MainContainer);
 
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).autoLayoutDirection = LayoutDirection.Horizontal;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).wrapLayout = true;
-            ((UIScrollablePanel) m_uiHelperDistrict.Self).width = DefaultWidth;
+            isLoading = false;
 
             CreateGroupFileSelect("K45_ADR_CITIZEN_MALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameMasc, ReloadMaleNameFiles, out m_maleFiles);
             CreateGroupFileSelect("K45_ADR_CITIZEN_FEMALE_FIRST_NAME_FILE", OnChangeSelectedCitizenFirstNameFem, ReloadFemaleNameFiles, out m_femaleFiles);
             CreateGroupFileSelect("K45_ADR_CITIZEN_LAST_NAME_FILE", OnChangeSelectedCitizenLastName, ReloadLastNameFiles, out m_lastNameFiles);
-
         }
 
 
-        private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, OnButtonClicked onReload, out UIDropDown dropDown)
+        private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, Action onReload, out UIDropDown dropDown)
         {
-            dropDown = m_uiHelperDistrict.AddDropdownLocalized(i18n, new string[0], -1, onChanged);
-            dropDown.width = DefaultWidth;
-            m_uiHelperDistrict.AddSpace(1);
-            KlyteMonoUtils.LimitWidth((UIButton) m_uiHelperDistrict.AddButton(Locale.Get(i18n + "S_RELOAD"), onReload), 380);
-            m_uiHelperDistrict.AddSpace(20);
+            isLoading = true;
+            AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperDistrict, new string[0], onChanged);
+            AddButtonInEditorRow(dropDown, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, onReload, "K45_ADR_ROAD_NAME_FILES_RELOAD");
             onReload.Invoke();
+            isLoading = false;
         }
 
         #endregion
 
         private void ReloadFiles(Action reloadAction, string selectedOption, List<string> referenceList, UIDropDown ddRef, string optionZeroText)
         {
+            isLoading = true;
             reloadAction();
             referenceList.Insert(0, optionZeroText);
             ddRef.items = referenceList.ToArray();
@@ -65,6 +68,7 @@ namespace Klyte.Addresses.UI
                 ddRef.selectedIndex = 0;
             }
             DistrictManager.instance.NamesModified();
+            isLoading = false;
         }
         private void ReloadMaleNameFiles() => ReloadFiles(
             AdrController.LoadLocalesCitizenFirstNameMale,
@@ -90,11 +94,33 @@ namespace Klyte.Addresses.UI
             );
 
 
-        private void OnChangeSelectedCitizenFirstNameMasc(int idx) => AdrController.CurrentConfig.GlobalConfig.CitizenConfig.MaleNamesFile = (idx > 0 ? m_maleFiles.selectedValue : null);
-        private void OnChangeSelectedCitizenFirstNameFem(int idx) => AdrController.CurrentConfig.GlobalConfig.CitizenConfig.FemaleNamesFile = (idx > 0 ? m_femaleFiles.selectedValue : null);
-        private void OnChangeSelectedCitizenLastName(int idx) => AdrController.CurrentConfig.GlobalConfig.CitizenConfig.SurnamesFile = (idx > 0 ? m_lastNameFiles.selectedValue : null);
+        private void OnChangeSelectedCitizenFirstNameMasc(int idx)
+        {
+            if (isLoading)
+            {
+                return;
+            }
 
+            AdrController.CurrentConfig.GlobalConfig.CitizenConfig.MaleNamesFile = (idx > 0 ? m_maleFiles.selectedValue : null);
+        }
 
+        private void OnChangeSelectedCitizenFirstNameFem(int idx)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.CitizenConfig.FemaleNamesFile = (idx > 0 ? m_femaleFiles.selectedValue : null);
+        }
+
+        private void OnChangeSelectedCitizenLastName(int idx)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+            AdrController.CurrentConfig.GlobalConfig.CitizenConfig.SurnamesFile = (idx > 0 ? m_lastNameFiles.selectedValue : null);
+        }
     }
 
 

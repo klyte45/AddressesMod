@@ -1,5 +1,5 @@
-﻿using Klyte.Commons.Utils;
-using System;
+﻿using Klyte.Addresses.Xml;
+using Klyte.Commons.Utils;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -27,7 +27,7 @@ namespace Klyte.Addresses.Utils
 
             if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
             {
-                if (!SegmentUtils.GetAddressStreetAndNumber(sidewalk, midPosBuilding, out b, out a))
+                if (!GetStreetAndNumber(sidewalk, midPosBuilding, out a, out b))
                 {
                     return;
                 }
@@ -50,11 +50,32 @@ namespace Klyte.Addresses.Utils
 
             if (format.Contains("E"))
             {
-                e = FormatPostalCode(sidewalk, AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeFormat);
+                e = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.TokenizedPostalCodeFormat.TokenToPostalCode(sidewalk);
             }
             ParseToFormatableString(ref format, 5);
 
             addressLines = string.Format(format, a, b, c, d, e).Split("≠".ToCharArray());
+        }
+
+        internal static bool GetStreetAndNumber(Vector3 sidewalk, Vector3 midPosBuilding, out string streetName, out int number)
+        {
+            SegmentUtils.GetNearestSegment(sidewalk, out Vector3 targetPosition, out float targetLength, out ushort targetSegmentId);
+            if (targetSegmentId == 0)
+            {
+                streetName = string.Empty;
+                number = 0;
+                return false;
+            }
+            var seed = NetManager.instance.m_segments.m_buffer[targetSegmentId].m_nameSeed;
+            var invertStart = false;
+            var offsetMeters = 0;
+            if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+            {
+                invertStart = seedConf.InvertMileageStart;
+                offsetMeters = (int)seedConf.MileageOffset;
+            }
+
+            return SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, invertStart, offsetMeters, out number, out streetName);
         }
 
         private static void ParseToFormatableString(ref string input, byte count)
@@ -63,59 +84,6 @@ namespace Klyte.Addresses.Utils
             {
                 input = input.Replace(((char)('A' + i)).ToString(), $"{{{i}}}");
             }
-        }
-
-
-
-        /* Format:
-         * 
-         * A = District code (2 digits) - 00 for none
-         * B = District code (3 digits) - 000 for none
-         * C = X map area (0-8)
-         * D = Y map area (0-8)
-         * E = Decimal X division in map area (0-9)
-         * F = Decimal Y division in map area (0-9)
-         * G = City fixed number (1 digit)
-         * H = City fixed number (2 digits)
-         * I = City fixed number (3 digits) 
-         * J = Last digit of segmentId
-         * K = Last 2 digits of segmentId
-         * L = Last 3 digits of segmentId
-         */
-        public static string FormatPostalCode(Vector3 position, string format = "GCEDF-AJ")
-        {
-            format = format ?? "GCEDF-AJ";
-            int district = DistrictManager.instance.GetDistrict(position) & 0xff;
-            if (format.ToCharArray().Intersect("AB".ToCharArray()).Count() > 0)
-            {
-                int districtPrefix = AdrController.CurrentConfig.GetConfigForDistrict((ushort)district).ZipcodePrefix ?? district;
-                format = format.Replace("A", (districtPrefix % 100).ToString("00"));
-                format = format.Replace("B", (districtPrefix % 1000).ToString("000"));
-            }
-            if (format.ToCharArray().Intersect("CDEF".ToCharArray()).Count() > 0)
-            {
-                Vector2 tilePos = MapUtils.GetMapTile(position);
-                format = format.Replace("C", Math.Floor(tilePos.x).ToString("0"));
-                format = format.Replace("D", Math.Floor(tilePos.y).ToString("0"));
-                format = format.Replace("E", Math.Floor(tilePos.x % 1 * 10).ToString("0"));
-                format = format.Replace("F", Math.Floor(tilePos.y % 1 * 10).ToString("0"));
-            }
-            if (format.ToCharArray().Intersect("GHI".ToCharArray()).Count() > 0)
-            {
-                int cityPrefix = AdrController.CurrentConfig.GlobalConfig.AddressingConfig.ZipcodeCityPrefix;
-                format = format.Replace("G", (cityPrefix % 10).ToString("0"));
-                format = format.Replace("H", (cityPrefix % 100).ToString("00"));
-                format = format.Replace("I", (cityPrefix % 1000).ToString("000"));
-            }
-            if (format.ToCharArray().Intersect("JKL".ToCharArray()).Count() > 0)
-            {
-                SegmentUtils.GetNearestSegment(position, out _, out _, out ushort targetSegmentId);
-                format = format.Replace("J", (targetSegmentId % 10).ToString("0"));
-                format = format.Replace("K", (targetSegmentId % 100).ToString("00"));
-                format = format.Replace("L", (targetSegmentId % 1000).ToString("000"));
-            }
-
-            return format;
         }
         #endregion
     }

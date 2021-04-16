@@ -1,4 +1,5 @@
 using ColossalFramework.UI;
+using Klyte.Commons.UI.Sprites;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +7,10 @@ using UnityEngine;
 
 namespace Klyte.Addresses.UI
 {
-    public class AdrMapBordersChart : MonoBehaviour
+    public class AdrMapBordersChart : UICustomControl
     {
         private UIPanel m_container;
-        private UISprite m_cityMap;
+        private UITextureSprite m_cityMap;
         private UIRadialChartExtended m_bordersInformation;
 
         public void SetValues(List<Tuple<int, Color>> locations360)
@@ -39,44 +40,67 @@ namespace Klyte.Addresses.UI
                 }
             }
 
-            List<int> targetValues = locations360.Select(x => x.First * 100 / 360).ToList();
+            List<float> targetValues = locations360.Select(x => x.First * 100 / 360f).ToList();
             m_bordersInformation.SetValuesStarts(targetValues.ToArray());
         }
 
         public void Awake()
         {
             LogUtils.DoLog("AWAKE AdrMapBordersChart !");
-            UIPanel panel = transform.gameObject.AddComponent<UIPanel>();
-            panel.width = 370;
-            panel.height = 70;
+            UIPanel panel = GetComponent<UIPanel>();
             panel.autoLayout = false;
             panel.useCenter = true;
             panel.wrapLayout = false;
             panel.tooltipLocaleID = "K45_ADR_CITY_NEIGHBORHOOD";
 
             KlyteMonoUtils.CreateUIElement(out m_container, transform, "NeighborhoodContainer");
-            m_container.relativePosition = new Vector3((panel.width / 2f) - 35, 0);
-            m_container.width = 70;
-            m_container.height = 70;
+            m_container.relativePosition = new Vector3((panel.width / 2f) - 190, (panel.height / 2f) - 190);
+            m_container.width = 380;
+            m_container.height = 380;
             m_container.autoLayout = false;
             m_container.useCenter = true;
             m_container.wrapLayout = false;
             m_container.tooltipLocaleID = "K45_ADR_CITY_NEIGHBORHOOD";
 
             KlyteMonoUtils.CreateUIElement(out m_bordersInformation, m_container.transform, "Neighbors");
-            m_bordersInformation.spriteName = "EmptySprite";
+            m_bordersInformation.spriteName = LineIconSpriteNames.K45_SquareIcon.ToString();
             m_bordersInformation.relativePosition = new Vector3(0, 0);
-            m_bordersInformation.width = 70;
-            m_bordersInformation.height = 70;
+            m_bordersInformation.width = 380;
+            m_bordersInformation.height = 380;
 
             KlyteMonoUtils.CreateUIElement(out m_cityMap, m_bordersInformation.transform, "City");
-            m_cityMap.spriteName = "EmptySprite";
-            m_cityMap.relativePosition = new Vector3(5, 5);
+
+            m_cityMap.relativePosition = new Vector3(20, 20);
             m_cityMap.color = Color.gray;
-            m_cityMap.width = 60;
-            m_cityMap.height = 60;
+            m_cityMap.width = 340;
+            m_cityMap.height = 340;
             m_cityMap.tooltipLocaleID = "K45_ADR_CITY_AREA";
+            m_cityMap.eventVisibilityChanged += (x, y) =>
+            {
+                if (y)
+                {
+                    ProcessResourceTexture();
+                }
+            };
         }
+
+        private void ProcessResourceTexture()
+        {
+            var reference = NaturalResourceManager.instance.m_resourceTexture;
+            Texture2D result = new Texture2D(reference.width, reference.height);
+            result.SetPixels(reference.GetPixels().Select(x =>
+                    x.b > 0.55f ? WATER
+                            : x.b < 0.45f ? FOREST
+                            : x.g > 0.55f ? SAND
+                            : GROUND).ToArray());
+            result.Apply();
+            m_cityMap.texture = result;
+        }
+
+        private static readonly Color SAND = ColorExtensions.FromRGB("FAF3BE");
+        private static readonly Color WATER = ColorExtensions.FromRGB("456aa1");
+        private static readonly Color FOREST = ColorExtensions.FromRGB("1e5451");
+        private static readonly Color GROUND = ColorExtensions.FromRGB("86cf74");
     }
 
 }
