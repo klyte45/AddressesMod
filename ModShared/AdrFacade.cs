@@ -34,6 +34,11 @@ namespace Klyte.Addresses.ModShared
 
         internal static void TriggerHighwaySeedChanged(ushort seed)
         {
+            if (seed == 0)
+            {
+                return;
+            }
+
             SegmentUtils.UpdateSegmentNamesView();
             Instance?.EventHighwaySeedChanged?.Invoke(seed);
         }
@@ -61,30 +66,47 @@ namespace Klyte.Addresses.ModShared
                 offsetMeters = (int)seedConf.MileageOffset;
             }
         }
-        public static void GetSeedHighwayParameters(ushort seedId, out string detachedStr, out string hwIdentifier, out string shortCode, out string longCode, out Color hwColor)
+        public static bool GetHighwayTypeParameters(string layoutName, out string detachedStr, out string shortCode, out string longCode)
+        {
+            var cachedParent = AdrHighwayParentLibDataXml.Instance.Get(layoutName);
+            if (cachedParent is null)
+            {
+                shortCode = null;
+                longCode = null;
+                detachedStr = null;
+                return false;
+            }
+            GetHighwayTypeData(out detachedStr, out shortCode, out longCode, cachedParent, "XXX");
+            return true;
+        }
+        public static bool GetSeedHighwayParameters(ushort seedId, out string layoutName, out string detachedStr, out string hwIdentifier, out string shortCode, out string longCode, out Color hwColor)
         {
             detachedStr = null;
             shortCode = null;
             longCode = null;
             hwIdentifier = null;
+            layoutName = null;
             hwColor = default;
             if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seedId, out AdrNameSeedConfig seedConf))
             {
                 if (!(seedConf.HighwayParent is null))
                 {
-                    GetHighwayTypeData(out detachedStr, out shortCode, out longCode, seedConf);
+                    GetHighwayTypeData(out detachedStr, out shortCode, out longCode, seedConf.HighwayParent, seedConf.HighwayIdentifier);
                 }
+                layoutName = seedConf.HighwayParentName;
                 hwIdentifier = seedConf.HighwayIdentifier;
                 hwColor = seedConf.HighwayColor;
+                return true;
             }
+            return false;
         }
         public static string GetHighwayTypeDetachedString(string itemName) => AdrHighwayParentLibDataXml.Instance.Get(itemName)?.DettachedPrefix;
 
-        private static void GetHighwayTypeData(out string detachedStr, out string shortCode, out string longCode, AdrNameSeedConfig seedConf)
+        private static void GetHighwayTypeData(out string detachedStr, out string shortCode, out string longCode, AdrHighwayParentXml parentConf, string identifier)
         {
-            detachedStr = seedConf.HighwayParent.DettachedPrefix;
-            shortCode = seedConf.HighwayParent.GetShortValue(seedConf.HighwayIdentifier);
-            longCode = seedConf.HighwayParent.GetLongValue(seedConf.HighwayIdentifier);
+            detachedStr = parentConf.DettachedPrefix;
+            shortCode = parentConf.GetShortValue(identifier);
+            longCode = parentConf.GetLongValue(identifier);
         }
 
         public static string[] ListAllHighwayTypes(string textFilter) => AdrHighwayParentLibDataXml.Instance.FilterBy(textFilter);
