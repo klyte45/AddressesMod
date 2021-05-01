@@ -21,10 +21,13 @@ namespace Klyte.Addresses.Overrides
                 MethodInfo transpileMethodBuilding = typeof(CSLMapViewModOverrides).GetMethod("ExportBuildingTranspile", RedirectorUtils.allFlags);
                 MethodInfo ExportSegments = Type.GetType("CSLMod.CSLMapView.Modding.Exporter.MapInfoExporter, CSLMapViewMod")?.GetMethod("ExportSegments", RedirectorUtils.allFlags);
                 MethodInfo ExportBuilding = Type.GetType("CSLMod.CSLMapView.Modding.Exporter.MapInfoExporter, CSLMapViewMod")?.GetMethod("ExportBuilding", RedirectorUtils.allFlags);
-                LogUtils.DoLog($"Overriding GetName ({ExportSegments} => {transpileMethod})");
-                AddRedirect(ExportSegments, null, null, transpileMethod);
-                LogUtils.DoLog($"Overriding GetName ({ExportBuilding} => {transpileMethodBuilding})");
-                AddRedirect(ExportBuilding, null, null, transpileMethodBuilding);
+                if (ExportSegments != null && ExportBuilding != null)
+                {
+                    LogUtils.DoLog($"Overriding GetName ({ExportSegments} => {transpileMethod})");
+                    AddRedirect(ExportSegments, null, null, transpileMethod);
+                    LogUtils.DoLog($"Overriding GetName ({ExportBuilding} => {transpileMethodBuilding})");
+                    AddRedirect(ExportBuilding, null, null, transpileMethodBuilding);
+                }
             }
             catch (Exception e)
             {

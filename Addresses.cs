@@ -9,8 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("3.0.0.1" +
-    "")]
+[assembly: AssemblyVersion("3.0.0.4")]
  
 namespace Klyte.Addresses
 {
@@ -28,7 +27,6 @@ namespace Klyte.Addresses
 
         public override void TopSettingsUI(UIHelperExtension helper)
         {
-            AdrController.ReloadAllFiles();
 
             UIHelperExtension group8 = helper.AddGroupExtended(Locale.Get("K45_ADR_GENERAL_INFO"));
             AddFolderButton(RoadPath, group8, "K45_ADR_ROAD_NAME_FILES_PATH_TITLE");
@@ -41,6 +39,7 @@ namespace Klyte.Addresses
             AddFolderButton(CitizenLastNamePath, group8, "K45_ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
             AddFolderButton(HighwayConfigurationFolder, group8, "K45_ADR_HIGHWAY_CONFIGS_FILES_PATH_TITLE");
 
+            AdrController.ReloadAllFiles();
 
             UIHelperExtension group7 = helper.AddGroupExtended(Locale.Get("K45_ADR_ADDITIONAL_FILES_SOURCE"));
             group7.AddLabel(Locale.Get("K45_ADR_GET_FILES_GITHUB"));
