@@ -14,5 +14,6 @@
 	- New facade methods to be used by other modders in their mods (used by Write the Signs & Transport Lines Manager, at least).
 	- Fixed: Sometimes the autoname for building algorithm cannot find the road the building is placed to name it.
 	- Fixed: Acute angle (<90°) crossing roads with same seed are not causing to invert road direction on naming.
-
+	
 <color yellow>r2:</color> Fixed error being thrown on fresh install due to configurations files folders haven't been created yet.
+<color yellow>r4 (02/MAY/21):</color> Fixed exception when CSL Map View isn't found.
