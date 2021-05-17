@@ -10,7 +10,7 @@ namespace Klyte.Addresses.Xml
     public class AdrAddressingConfig
     {
         [XmlAttribute("zipcodeFormat")]
-        [Obsolete("Legacy < 3.0")]
+        [Obsolete("Legacy < 3.0",true)]
         public string Old_zipCodeFormat
         {
             get => null; set => PostalCodeFormat = ConvertFromV2ToV3PostalCode(value);

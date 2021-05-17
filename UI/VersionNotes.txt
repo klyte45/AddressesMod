@@ -17,3 +17,4 @@
 	
 <color yellow>r2:</color> Fixed error being thrown on fresh install due to configurations files folders haven't been created yet.
 <color yellow>r4 (02/MAY/21):</color> Fixed exception when CSL Map View isn't found.
+<color yellow>r6 (17/MAY/21):</color> Fixing garbled text issues when loading the city.
