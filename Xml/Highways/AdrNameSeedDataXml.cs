@@ -41,9 +41,10 @@ namespace Klyte.Addresses.Xml
 
         public void EnsureValidSeedsOnly()
         {
-            foreach (var item in m_nameSeedConfigs.Where(x => !CurrentSavegameSeeds.ContainsKey((ushort)x.Key)))
+            var values = m_nameSeedConfigs.Where(x => !CurrentSavegameSeeds.ContainsKey((ushort)x.Key)).Select(x => x.Value).ToArray();
+            foreach (var item in values)
             {
-                _ = m_nameSeedConfigs - item.Value;
+                _ = m_nameSeedConfigs - item;
             }
         }
 
