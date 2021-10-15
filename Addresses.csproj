@@ -65,7 +65,6 @@
     <Compile Include="commons\Libraries\BasicLib.cs" />
     <Compile Include="commons\Libraries\LibBaseData.cs" />
     <Compile Include="commons\Libraries\LibBaseFile.cs" />
-    <Compile Include="commons\Redirectors\UIDynamicFontRendererRedirector.cs" />
     <Compile Include="commons\Redirectors\UIDynamicPanelsRedirector.cs" />
     <Compile Include="commons\Redirectors\UIViewRedirector.cs" />
     <Compile Include="commons\Redirectors\UIWorkshopAssetRedirector.cs" />
@@ -142,15 +141,19 @@
     <Compile Include="commons\Utils\XmlUtils.cs" />
     <Compile Include="commons\Utils\ZipUtils.cs" />
     <Compile Include="Extensions\AdrNeighborhoodExtension.cs" />
+    <Compile Include="LocaleStruct\FootballTeamData.cs" />
     <Compile Include="LocaleStruct\RoadPrefixFileIndexer.cs" />
     <Compile Include="MainWindow\AdrConfigPanel.cs" />
+    <Compile Include="MainWindow\Tabs\AdrFootballConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrCitizenConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrGlobalConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrNeighborConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrDistrictConfigTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrHighwayParentEditorTab.cs" />
     <Compile Include="MainWindow\Tabs\AdrHighwaySeedNameDataTab.cs" />
+    <Compile Include="MainWindow\Tabs\StadiumListItem.cs" />
     <Compile Include="ModShared\AdrFacade.cs" />
+    <Compile Include="Overrides\FootballOverrides.cs" />
     <Compile Include="Overrides\CitizenAIOverrides.cs" />
     <Compile Include="Overrides\CSLMapViewModOverrides.cs" />
     <Compile Include="Overrides\DistrictManagerOverrides.cs" />
@@ -176,6 +179,7 @@
     <Compile Include="Xml\Main\AdrConfigXml.cs" />
     <Compile Include="Xml\Main\AdrDistrictConfig.cs" />
     <Compile Include="Xml\Main\AdrDistrictQualifierConfig.cs" />
+    <Compile Include="Xml\Main\AdrFootballConfig.cs" />
     <Compile Include="Xml\Main\AdrRoadQualifierConfig.cs" />
     <Compile Include="Xml\Main\AdrGlobalConfig.cs" />
     <Compile Include="Xml\Main\AdrNeighborDetailConfig.cs" />
@@ -319,6 +323,7 @@
   <ItemGroup>
     <None Include="commons\LICENSE" />
     <None Include="commons\README.md" />
+    <EmbeddedResource Include="commons\UI\i18n\ja.properties" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

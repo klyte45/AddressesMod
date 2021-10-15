@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Globalization;
+using ICities;
 using Klyte.Commons;
 using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
@@ -95,7 +96,7 @@ namespace Klyte.Addresses.Xml
          .Select(x => x.Key)
          .ToArray();
 
-        public override void LoadDefaults() => ReloadGlobalConfigurations();
+        public override void LoadDefaults(ISerializableData serializableData) => ReloadGlobalConfigurations();
     }
 }
 

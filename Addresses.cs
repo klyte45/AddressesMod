@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-[assembly: AssemblyVersion("3.0.0.6")]
+[assembly: AssemblyVersion("3.1.0.*")]
  
 namespace Klyte.Addresses
 {
@@ -38,6 +38,7 @@ namespace Klyte.Addresses
             AddFolderButton(CitizenFirstNameFemPath, group8, "K45_ADR_CITIZEN_FIRST_NAME_FEM_FILES_PATH_TITLE");
             AddFolderButton(CitizenLastNamePath, group8, "K45_ADR_CITIZEN_LAST_NAME_FILES_PATH_TITLE");
             AddFolderButton(HighwayConfigurationFolder, group8, "K45_ADR_HIGHWAY_CONFIGS_FILES_PATH_TITLE");
+            AddFolderButton(FootballTeamDataFolder, group8, "K45_ADR_FOOTBALL_TEAMNAMES_FILES_PATH_TITLE");
 
             AdrController.ReloadAllFiles();
 
@@ -84,7 +85,7 @@ namespace Klyte.Addresses
             helper.AddLabel(Locale.Get(localeId) + ":");
             var namesFilesButton = ((UIButton)helper.AddButton("/", () => ColossalFramework.Utils.OpenInFileBrowser(fileInfo.FullName)));
             namesFilesButton.textColor = Color.yellow;
-            KlyteMonoUtils.LimitWidth(namesFilesButton, 710);
+            KlyteMonoUtils.LimitWidthAndBox(namesFilesButton, 710);
             namesFilesButton.text = fileInfo.FullName + Path.DirectorySeparatorChar;
         }
 
@@ -100,6 +101,7 @@ namespace Klyte.Addresses
         public const string CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME = "CitizenFirstNameFemale";
         public const string CITIZEN_LAST_NAME_SUBFOLDER_NAME = "CitizenLastName";
         public const string HIGHWAY_PREFABS_SUBFOLDER_NAME = "HighwayConfigurations";
+        public const string FOOTBALL_TEAM_DATA = "FootballTeams";
 
         public static string RoadPath { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + ROAD_SUBFOLDER_NAME;
         public static string RoadPrefixPath { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + ROADPREFIX_SUBFOLDER_NAME;
@@ -110,6 +112,7 @@ namespace Klyte.Addresses
         public static string CitizenFirstNameFemPath { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_FIRST_NAME_FEM_SUBFOLDER_NAME;
         public static string CitizenLastNamePath { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + CITIZEN_LAST_NAME_SUBFOLDER_NAME;
         public static string HighwayConfigurationFolder { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + HIGHWAY_PREFABS_SUBFOLDER_NAME;
+        public static string FootballTeamDataFolder { get; } = FOLDER_NAME + Path.DirectorySeparatorChar + FOOTBALL_TEAM_DATA;
 
 
         public static string DefaultFileGlobalXml { get; } = "__DEFAULT.xml";

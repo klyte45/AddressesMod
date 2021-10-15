@@ -16,6 +16,9 @@ namespace Klyte.Addresses.Xml
 
         [XmlElement("citizen")]
         public AdrCitizenConfig CitizenConfig { get; set; } = new AdrCitizenConfig();
+
+        [XmlElement("football")]
+        public AdrFootballConfig FootballConfig { get; set; } = new AdrFootballConfig();
     }
 }
 

@@ -41,10 +41,10 @@ namespace Klyte.Addresses.UI
             MainContainer.autoLayoutDirection = LayoutDirection.Vertical;
             MainContainer.autoLayoutPadding = new RectOffset(0, 0, 2, 2);
             m_uiHelperGlobal = new UIHelperExtension(MainContainer);
+            isLoading = true;
 
             CreateGroupFileSelect("K45_ADR_DISTRICT_GEN_PREFIX_FILE", OnChangeSelectedDistrictPrefix, ReloadDistrictPrefixesFiles, out m_districtPrefixGenFile);
             CreateGroupFileSelect("K45_ADR_DISTRICT_GEN_NAME_FILE", OnChangeSelectedDistrictName, ReloadDistrictNamesFiles, out m_districtNameGenFile);
-            isLoading = true;
 
             AddIntField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), out m_prefixPostalCodeCity, m_uiHelperGlobal, OnChangePostalCodePrefixCity, false);
             m_prefixPostalCodeCity.maxLength = 3;
