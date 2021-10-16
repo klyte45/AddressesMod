@@ -1,4 +1,5 @@
-﻿using Klyte.Commons.Interfaces;
+﻿using ICities;
+using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace Klyte.Addresses.Xml
                 x.Value.CleanCacheParent();
             }
         }
-        public override void LoadDefaults() => base.LoadDefaults();
+        public override void LoadDefaults(ISerializableData serializableData) => base.LoadDefaults(serializableData);
     }
 }
 

@@ -31,6 +31,7 @@ namespace Klyte.Addresses.UI
             m_stripMain.CreateTabLocalized<AdrHighwaySeedNameDataTab>("IconAdjustRoad", "K45_ADR_HIGHWAYNAMESEED_TAB", "AdrHwNameSeed", false);
             m_stripMain.CreateTabLocalized<AdrNeighborConfigTab>("IconRightArrow", "K45_ADR_CONFIG_NEIGHBOR_TAB", "AdrNeighbor", false);
             m_stripMain.CreateTabLocalized<AdrCitizenConfigTab>("IconCitizen", "K45_ADR_CONFIG_CITIZEN_TAB", "AdrCitizen", false);
+            m_stripMain.CreateTabLocalized<AdrFootballConfigTab>("IconPolicySubsidizedYouthHovered", "K45_ADR_CONFIG_FOOTBALL_TAB", "AdrFootball", false);
             m_stripMain.CreateTabLocalized<AdrGlobalConfigTab>("ToolbarIconZoomOutGlobe", "K45_ADR_CONFIG_GLOBAL_TAB", "AdrGlobal", false);
         }
 
@@ -38,6 +39,7 @@ namespace Klyte.Addresses.UI
 
 
         public void SetActiveTab(int idx) => m_stripMain.selectedIndex = idx;
+        public void SetActiveTab(string idx) => m_stripMain.selectedIndex = m_stripMain.tabs.Where(x => x.name == idx).FirstOrDefault()?.zOrder ?? -1;
 
         public void Start()
         {

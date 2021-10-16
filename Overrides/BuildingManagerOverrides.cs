@@ -16,24 +16,29 @@ namespace Klyte.Addresses.Overrides
 #pragma warning disable IDE0051 // Remover membros privados não utilizados
         private static bool GetNameStation(ref string __result, ushort buildingID)
         {
-            LogUtils.DoLog($"START {buildingID}");
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is TransportStationAI || BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is CargoStationAI)
-            {
+            var info = BuildingManager.instance.m_buildings.m_buffer[buildingID].Info;
 
-                if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is TransportStationAI transportStationAI)
+            if (info.GetAI() is TransportStationAI transportStationAI)
+            {
+                if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(transportStationAI.m_transportInfo.m_transportType, transportStationAI.m_transportInfo.m_vehicleType, transportStationAI))
                 {
-                    if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(transportStationAI.m_transportInfo.m_transportType, transportStationAI.m_transportInfo.m_vehicleType, transportStationAI))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-                if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.GetAI() is CargoStationAI cargoStationAI)
+            }
+            else
+            if (info.GetAI() is CargoStationAI cargoStationAI)
+            {
+                if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(cargoStationAI.m_transportInfo.m_transportType, cargoStationAI.m_transportInfo.m_vehicleType, cargoStationAI))
                 {
-                    if (!AdrController.CurrentConfig.GlobalConfig.BuildingConfig.StationsNameGenerationConfig.IsRenameEnabled(cargoStationAI.m_transportInfo.m_transportType, cargoStationAI.m_transportInfo.m_vehicleType, cargoStationAI))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
+            }
+            else
+            {
+                return true;
+            }
+            if (info.m_placementMode == BuildingInfo.PlacementMode.Roadside)
+            {
                 Vector3 sidewalk = BuildingManager.instance.m_buildings.m_buffer[buildingID].CalculateSidewalkPosition();
                 SegmentUtils.GetNearestSegment(sidewalk, out _, out _, out ushort targetSegmentId);
                 List<ushort> crossingSegmentList = SegmentUtils.GetCrossingPath(targetSegmentId);
@@ -77,35 +82,58 @@ namespace Klyte.Addresses.Overrides
                     }
                 }
             }
+            else
+            {
+                var parkId = DistrictManager.instance.GetPark(BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position);
+                if (parkId != 0)
+                {
+                    __result = DistrictManager.instance.GetParkName(parkId);
+                    if (__result != string.Empty)
+                    {
+                        InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        return false;
+                    }
+                }
+                var districtId = DistrictManager.instance.GetDistrict(BuildingManager.instance.m_buildings.m_buffer[buildingID].m_position);
+                if (districtId != 0)
+                {
+                    __result = DistrictManager.instance.GetDistrictName(districtId);
+                    if (__result != string.Empty)
+                    {
+                        InstanceManagerOverrides.CallBuildRenamedEvent(buildingID);
+                        return false;
+                    }
+                }
+            }
             return true;
-
 
         }
 
         private static bool GetNameRico(ref string __result, ushort buildingID)
         {
-            if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is ResidentialBuildingAI)
+            var info = BuildingManager.instance.m_buildings.m_buffer[buildingID].Info;
+            if (info.m_buildingAI is ResidentialBuildingAI)
             {
                 if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Residence == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
                 {
                     return true;
                 }
             }
-            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is IndustrialBuildingAI)
+            else if (info.m_buildingAI is IndustrialBuildingAI)
             {
                 if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Industry == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
                 {
                     return true;
                 }
             }
-            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is CommercialBuildingAI)
+            else if (info.m_buildingAI is CommercialBuildingAI)
             {
                 if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Commerce == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
                 {
                     return true;
                 }
             }
-            else if (BuildingManager.instance.m_buildings.m_buffer[buildingID].Info.m_buildingAI is OfficeBuildingAI)
+            else if (info.m_buildingAI is OfficeBuildingAI)
             {
                 if (AdrController.CurrentConfig.GlobalConfig.BuildingConfig.RicoNamesGenerationConfig.Office == Xml.AdrRicoNamesGenerationConfig.GenerationMethod.NONE)
                 {

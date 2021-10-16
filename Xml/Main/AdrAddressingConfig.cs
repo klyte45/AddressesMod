@@ -85,7 +85,7 @@ namespace Klyte.Addresses.Xml
         [XmlIgnore]
         public PostalCodeTokenContainer[] TokenizedPostalCodeFormat { get; private set; } = DEFAULT_POSTAL_CODE_FORMAT.TokenizeAsPostalCode();
 
-        private string m_addressLine1 = "A, B";
+        private string m_addressLine1 = "B A";
         private string m_addressLine2 = "[D - ]C";
         private string m_addressLine3 = "E";
         private int m_zipcodeCityPrefix;

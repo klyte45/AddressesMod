@@ -1,20 +1,5 @@
-﻿<extended><color #44aa44>ADRv3</color>
-	- New UI, following most recent layout pattern (Klyte Mods Gen 6).
-	- <color yellow>New highway type register</color>: Categorize your roads with short identifiers (A-1, BR-030, SP-31, Interstate 4, etc).
-	- New integration with <color yellow>CSL Map View mod</color>, allowing to export all roads generated names and building with auto generated names.
-	- <color yellow>New Neighbor Cities editor:</color>
-		- Bigger city map showing the limits.
-		- Now is possible to setup a custom name directly in the neighbor names list.
-	-<color yellow>New postal code generator system:</color>
-		- Changed the letters and their meanings (check help button there).
-		- Now supports escaping using backslash or double quotes.
-		- Added support to get the road seed name (which defines the name of the road).
-	- New feature allowing to generate new seeds for roads and use replace a seed in all adjacent segments to another one.
-	- Added Sunset Harbor public transport modals stations autonaming support.
-	- New facade methods to be used by other modders in their mods (used by Write the Signs & Transport Lines Manager, at least).
-	- Fixed: Sometimes the autoname for building algorithm cannot find the road the building is placed to name it.
-	- Fixed: Acute angle (<90°) crossing roads with same seed are not causing to invert road direction on naming.
-	
-<color yellow>r2:</color> Fixed error being thrown on fresh install due to configurations files folders haven't been created yet.
-<color yellow>r4 (02/MAY/21):</color> Fixed exception when CSL Map View isn't found.
-<color yellow>r6 (17/MAY/21):</color> Fixing garbled text issues when loading the city.
+﻿ADRv3.1
+	- Added support to Match Day DLC: Customize opponents names and color and local team names.
+	- Fixed auto naming buildings not placed roadside - will try to get Park/Campus/Industry area first, then district name as fallback
+	- Fixed address information location to be included inside the main popup, when possible - if not will be added at top-right of the window
+	- Normatized the default pattern for the steet number addressing as "B A" (Number Street; Ex: <color yellow>36 Key St</color>)
