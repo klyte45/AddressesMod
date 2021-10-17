@@ -31,7 +31,16 @@ namespace Klyte.Addresses.UI
             CreateTitleLabel(out UILabel m_direction, "Direction", Locale.Get("K45_ADR_DIRECTION_TITLE"), 60);
             CreateTitleLabel(out UILabel m_generatedName, "GenName", Locale.Get("K45_ADR_GEN_NAME_TITLE"), m_container.width - 247.5f);
 
-            DefaultEditorUILib.AddButtonInEditorRow(m_generatedName, CommonsSpriteNames.K45_Plus, () => AdrNeighborhoodExtension.SetAzimuth(99, 0), "K45_ADR_ADD_REG_CITY", false, 30);
+            KlyteMonoUtils.CreateUIElement(out UIButton add, m_container.transform, "RegenName");
+            add.textScale = 1f;
+            add.width = 25;
+            add.height = 25;
+            add.tooltip = Locale.Get("K45_TLM_ADD_ENTRY");
+            KlyteMonoUtils.InitButton(add, true, "OptionBase");
+            add.isVisible = true;
+            add.foregroundSpriteMode = UIForegroundSpriteMode.Scale;
+            add.normalFgSprite = KlyteResourceLoader.GetDefaultSpriteNameFor(CommonsSpriteNames.K45_Plus);
+            add.eventClick += (component, eventParam) => AdrNeighborhoodExtension.SetAzimuth(999, 0);
         }
 
         private void CreateTitleLabel(out UILabel label, string name, string text, float width)

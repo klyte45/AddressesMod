@@ -3,3 +3,5 @@
 	- Fixed auto naming buildings not placed roadside - will try to get Park/Campus/Industry area first, then district name as fallback
 	- Fixed address information location to be included inside the main popup, when possible - if not will be added at top-right of the window
 	- Normatized the default pattern for the steet number addressing as "B A" (Number Street; Ex: <color yellow>36 Key St</color>)
+
+<color yellow>Patch r1 (17/OCT/21)</color>: Fixed plus button not being showed at neighbors editor</color>
