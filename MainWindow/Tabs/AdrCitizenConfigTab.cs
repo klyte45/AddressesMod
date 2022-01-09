@@ -2,6 +2,7 @@
 using ColossalFramework.UI;
 using ICities;
 using Klyte.Commons.Extensions;
+using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace Klyte.Addresses.UI
         private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, Action onReload, out UIDropDown dropDown)
         {
             isLoading = true;
-            AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperDistrict, new string[0], onChanged);
+            AddEmptyDropdown(Locale.Get(i18n), out dropDown, m_uiHelperDistrict, onChanged);
             AddButtonInEditorRow(dropDown, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, onReload, "K45_ADR_ROAD_NAME_FILES_RELOAD");
             onReload.Invoke();
             isLoading = false;

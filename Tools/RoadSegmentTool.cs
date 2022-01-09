@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Klyte.Addresses.Tools
 {
 
-    public class RoadSegmentTool : BasicNetTool<RoadSegmentTool>
+    public class RoadSegmentTool : BaseNetTool<RoadSegmentTool>
     {
         public event Action<ushort> OnSelectSegment;
         protected static new Color m_hoverColor = new Color32(22, byte.MaxValue, 22, byte.MaxValue);

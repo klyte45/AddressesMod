@@ -29,7 +29,7 @@
   <PropertyGroup>
     <AssemblyName>KlyteAddresses</AssemblyName>
   </PropertyGroup>
-    <ItemGroup>
+  <ItemGroup>
     <Compile Include="commons\**\*.cs" />
     <EmbeddedResource Include="commons\UI\i18n\*.properties" />
     <EmbeddedResource Include="commons\UI\Images\*.png" />
@@ -39,7 +39,7 @@
     <EmbeddedResource Include="UI\Images\*.txt" />
     <EmbeddedResource Include="UI\VersionNotes.txt" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <Compile Include="Extensions\**\*.cs" />
     <Compile Include="LocaleStruct\**\*.cs" />
     <Compile Include="MainWindow\**\*.cs" />
@@ -96,11 +96,19 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lib.Harmony">
       <Version>1.2.0.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnifiedUILib">
+      <HintPath>S:\Steam\steamapps\workshop\content\255710\2255219025\UnifiedUILib.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Aliases>UUI</Aliases>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

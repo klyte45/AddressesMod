@@ -6,11 +6,14 @@ using Klyte.Addresses.ModShared;
 using Klyte.Addresses.Tools;
 using Klyte.Addresses.Xml;
 using Klyte.Commons.Extensions;
+using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using static Klyte.Commons.UI.DefaultEditorUILib;
+using static Klyte.Commons.Utils.SegmentUtils;
 
 namespace Klyte.Addresses.UI
 {
@@ -44,7 +47,8 @@ namespace Klyte.Addresses.UI
         private UITextField m_hwName;
         private UICheckBox m_showDirectionName;
         private UITextField m_hwMileageOffset;
-        private UICheckBox m_hwInvertMileage;
+        private UIDropDown m_hwMileageStart;
+        private UIDropDown m_hwAxis;
         private UIColorField m_hwColor;
 
 
@@ -83,7 +87,12 @@ namespace Klyte.Addresses.UI
             AddTextField(Locale.Get("K45_ADR_HIGHWAYITEM_ID"), out m_hwId, m_editingHelper, OnSetHwId);
             AddTextField(Locale.Get("K45_ADR_HIGHWAYITEM_FORCEDNAME"), out m_hwName, m_editingHelper, OnSetHwForcedName);
             AddIntField(Locale.Get("K45_ADR_HIGHWAYITEM_MILEAGEOFFSET"), out m_hwMileageOffset, m_editingHelper, OnSetMileageOffset, false);
-            AddCheckboxLocale("K45_ADR_HIGHWAYITEM_INVERTMILEAGE", out m_hwInvertMileage, m_editingHelper, OnSetMileageInvert);
+
+            var startSourceOptions = Enum.GetValues(typeof(MileageStartSource)).Cast<MileageStartSource>().Select(x => Tuple.New(Locale.Get("K45_ADR_HIGHWAYITEM_MILEAGESTART_OPT", x.ToString()), x)).ToArray();
+            var axisOptions = Enum.GetValues(typeof(MileageStartSource)).Cast<MileageStartSource>().Where(x => x >= 0 && (int)x < 180).Select(x => Tuple.New(Locale.Get("K45_ADR_HIGHWAYITEM_AXIS_OPT", x.ToString()), x)).ToArray();
+
+            AddDropdown(Locale.Get("K45_ADR_HIGHWAYITEM_MILEAGESTART"), out m_hwMileageStart, m_editingHelper, startSourceOptions, OnSetMileageOrientation);
+            AddDropdown(Locale.Get("K45_ADR_HIGHWAYITEM_AXIS"), out m_hwAxis, m_editingHelper, axisOptions, OnSetHighwayAxis);
             AddColorField(m_editingHelper, Locale.Get("K45_ADR_HIGHWAYITEM_COLOR"), out m_hwColor, OnSetHwColor);
             m_hwMileageOffset.width = 120;
 
@@ -108,7 +117,11 @@ namespace Klyte.Addresses.UI
             OnSegmentSet(0);
         }
 
-        private string[] OnFilterHwTypes(string input) => AdrHighwayParentLibDataXml.Instance.FilterBy(input);
+        private IEnumerator OnFilterHwTypes(string input, Wrapper<string[]> result)
+        {
+            yield return 0;
+            AdrHighwayParentLibDataXml.Instance.FilterBy(input, result);
+        }
 
         private string OnSetHwType(string typedText, int idx, string[] options)
         {
@@ -123,7 +136,8 @@ namespace Klyte.Addresses.UI
         private void OnSetHwId(string s) => CurrentEditingInstance.HighwayIdentifier = s.IsNullOrWhiteSpace() ? "" : s.Trim();
         private void OnSetHwForcedName(string s) => CurrentEditingInstance.ForcedName = s.IsNullOrWhiteSpace() ? "" : s.Trim();
         private void OnSetMileageOffset(int s) => CurrentEditingInstance.MileageOffset = (uint)s;
-        private void OnSetMileageInvert(bool s) => CurrentEditingInstance.InvertMileageStart = s;
+        private void OnSetMileageOrientation(MileageStartSource s) => CurrentEditingInstance.MileageStartSrc = s;
+        private void OnSetHighwayAxis(MileageStartSource s) => CurrentEditingInstance.HighwayAxis = s;
         private void OnSetHwColor(Color s) => CurrentEditingInstance.HighwayColor = s;
 
         private void EnablePickTool()
@@ -249,7 +263,8 @@ namespace Klyte.Addresses.UI
                 m_hwId.text = CurrentEditingInstance.HighwayIdentifier ?? "";
                 m_hwName.text = CurrentEditingInstance.ForcedName ?? "";
                 m_hwMileageOffset.text = CurrentEditingInstance.MileageOffset.ToString("0");
-                m_hwInvertMileage.isChecked = CurrentEditingInstance.InvertMileageStart;
+                m_hwAxis.selectedIndex = m_hwAxis.GetReverseOptionsIndex<MileageStartSource>().TryGetValue(CurrentEditingInstance.HighwayAxis, out int val) ? val : -1;
+                m_hwMileageStart.selectedIndex = m_hwMileageStart.GetReverseOptionsIndex<MileageStartSource>().TryGetValue(CurrentEditingInstance.HighwayAxis, out val) ? val : -1;
                 m_hwColor.selectedColor = CurrentEditingInstance.HighwayColor;
             }
         }

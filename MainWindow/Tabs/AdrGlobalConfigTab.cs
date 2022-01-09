@@ -167,7 +167,7 @@ namespace Klyte.Addresses.UI
         private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, Action onReload, out UIDropDown dropDown)
         {
             isLoading = true;
-            AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperGlobal, new string[0], onChanged);
+            AddEmptyDropdown(Locale.Get(i18n), out dropDown, m_uiHelperGlobal, onChanged);
             AddButtonInEditorRow(dropDown, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, onReload, "K45_ADR_ROAD_NAME_FILES_RELOAD");
             isLoading = false;
             onReload.Invoke();

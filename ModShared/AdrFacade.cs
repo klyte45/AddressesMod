@@ -55,14 +55,22 @@ namespace Klyte.Addresses.ModShared
                 ? GetStreetFull(idx).Trim()
                 : GetStreetFull(idx).Replace(qualifier, "").Trim();
         }
-
+        [Obsolete("Use version with mileage source and highway axis", true)]
         public static void GetMileageSeedConfig(ushort seedId, out bool invertStart, out int offsetMeters)
         {
             invertStart = false;
             offsetMeters = 0;
+        }
+
+        public static void GetMileageSeedConfig(ushort seedId, out int offsetMeters, out int mileageSource, out int highwayAxis)
+        {
+            mileageSource = 0;
+            highwayAxis = 0;
+            offsetMeters = 0;
             if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seedId, out AdrNameSeedConfig seedConf))
             {
-                invertStart = seedConf.InvertMileageStart;
+                mileageSource = (int)seedConf.MileageStartSrc;
+                highwayAxis = (int)seedConf.HighwayAxis;
                 offsetMeters = (int)seedConf.MileageOffset;
             }
         }
@@ -109,7 +117,7 @@ namespace Klyte.Addresses.ModShared
             longCode = parentConf.GetLongValue(identifier);
         }
 
-        public static string[] ListAllHighwayTypes(string textFilter) => AdrHighwayParentLibDataXml.Instance.FilterBy(textFilter);
+        public static void ListAllHighwayTypes(string textFilter, Wrapper<string[]> result) => AdrHighwayParentLibDataXml.Instance.FilterBy(textFilter, result);
 
         public static string GetStreetFull(ushort segmentId)
         {

@@ -151,21 +151,27 @@ namespace Klyte.Addresses.Overrides
                 if (format.Contains("{3}") || format.Contains("{4}"))
                 {
                     var seed = NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_nameSeed;
-                    var invertStart = false;
+                    MileageStartSource src = MileageStartSource.DEFAULT;
                     var offsetMeters = 0;
                     if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
                     {
-                        invertStart = seedConf.InvertMileageStart;
+                        src = seedConf.MileageStartSrc;
                         offsetMeters = (int)seedConf.MileageOffset;
                     }
 
-                    float km = GetDistanceFromStart(startRef.segmentReference, NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference, invertStart, offsetMeters) / 1000f;
+                    float km = GetNumberAt(NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference ? 1 : 0, startRef.segmentReference, src, offsetMeters, out _) / 1000f;
                     variables.sourceKm = km.ToString("0");
                     variables.sourceKmWithDecimal = km.ToString("0.0");
                 }
                 if (format.Contains("{7}"))//direction
                 {
-                    int cardinalDirection = SegmentUtils.GetCardinalDirection(startRef, endRef);
+                    var seed = segment.m_nameSeed;
+                    MileageStartSource axis = MileageStartSource.DEFAULT;
+                    if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
+                    {
+                        axis = seedConf.HighwayAxis;
+                    }
+                    int cardinalDirection = SegmentUtils.GetCardinalDirection(startRef, endRef, axis);
 
                     variables.direction = Locale.Get("K45_CARDINAL_POINT_SHORT", cardinalDirection.ToString());
                 }

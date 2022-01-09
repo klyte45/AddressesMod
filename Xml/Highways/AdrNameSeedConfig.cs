@@ -4,6 +4,7 @@ using Klyte.Commons.Interfaces;
 using Klyte.Commons.Utils;
 using System.Xml.Serialization;
 using UnityEngine;
+using static Klyte.Commons.Utils.SegmentUtils;
 
 namespace Klyte.Addresses.Xml
 {
@@ -72,12 +73,22 @@ namespace Klyte.Addresses.Xml
             }
         }
 
-        [XmlAttribute("invertMileageStart")]
-        public bool InvertMileageStart
+        [XmlAttribute("mileageStartSrc")]
+        public MileageStartSource MileageStartSrc
         {
-            get => invertMileageStart; set
+            get => mileageStartSource; set
             {
-                invertMileageStart = value;
+                mileageStartSource = value;
+                AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
+            }
+        }
+
+        [XmlAttribute("highwayAxis")]
+        public MileageStartSource HighwayAxis
+        {
+            get => highwayAxis; set
+            {
+                highwayAxis = value;
                 AdrFacade.TriggerHighwaySeedChanged((ushort)Id);
             }
         }
@@ -89,7 +100,8 @@ namespace Klyte.Addresses.Xml
         private string highwayIdentifier;
         private string forcedName;
         private uint mileageOffset;
-        private bool invertMileageStart;
+        private MileageStartSource mileageStartSource;
+        private MileageStartSource highwayAxis;
         private ushort id;
 
         [XmlAttribute("color")]

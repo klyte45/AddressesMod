@@ -81,7 +81,7 @@ namespace Klyte.Addresses.Xml
                 m_savedDescriptorsSerialized = m_savedDescriptorsSerialized.Select(x => x.Value).Union(result)
                 .GroupBy(p => p.SaveName)
                 .Select(g => g.OrderBy(x => -1 * (int)x.m_configurationSource).First())
-                .ToDictionary(x => x.SaveName, x => x); 
+                .ToDictionary(x => x.SaveName, x => x);
             }
             else
             {
@@ -89,8 +89,8 @@ namespace Klyte.Addresses.Xml
             }
         }
 
-        public string[] FilterBy(string input) =>
-         m_savedDescriptorsSerialized
+        public void FilterBy(string input, Wrapper<string[]> result) =>
+         result.Value = m_savedDescriptorsSerialized
          .Where((x) => (input.IsNullOrWhiteSpace() ? true : LocaleManager.cultureInfo.CompareInfo.IndexOf(x.Key, input, CompareOptions.IgnoreCase) >= 0))
          .OrderBy((x) => ((int)(3 - x.Value.m_configurationSource)) + x.Key)
          .Select(x => x.Key)

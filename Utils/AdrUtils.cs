@@ -3,6 +3,7 @@ using Klyte.Commons.Utils;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using static Klyte.Commons.Utils.SegmentUtils;
 
 namespace Klyte.Addresses.Utils
 {
@@ -67,15 +68,15 @@ namespace Klyte.Addresses.Utils
                 return false;
             }
             var seed = NetManager.instance.m_segments.m_buffer[targetSegmentId].m_nameSeed;
-            var invertStart = false;
+            var startSrc = MileageStartSource.DEFAULT;
             var offsetMeters = 0;
             if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
             {
-                invertStart = seedConf.InvertMileageStart;
+                startSrc = seedConf.MileageStartSrc;
                 offsetMeters = (int)seedConf.MileageOffset;
             }
 
-            return SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, invertStart, offsetMeters, out number, out streetName);
+            return SegmentUtils.GetAddressStreetAndNumber(targetPosition, targetSegmentId, targetLength, midPosBuilding, startSrc, offsetMeters, out number, out streetName);
         }
 
         private static void ParseToFormatableString(ref string input, byte count)

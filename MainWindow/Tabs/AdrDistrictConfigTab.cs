@@ -40,17 +40,17 @@ namespace Klyte.Addresses.UI
 
             m_uiHelperDistrict = new UIHelperExtension(MainContainer);
 
-            AddDropdown(Locale.Get("K45_ADR_DISTRICT_TITLE"), out m_selectDistrict, m_uiHelperDistrict, new string[0], null);
+            AddEmptyDropdown(Locale.Get("K45_ADR_DISTRICT_TITLE"), out m_selectDistrict, m_uiHelperDistrict, null);
             AddButtonInEditorRow(m_selectDistrict, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, ReloadDistricts, "K45_ADR_RELOADFILES");
             m_selectDistrict.eventSelectedIndexChanged += (x, y) => OnDistrictSelect(y);
             m_uiHelperDistrict.AddSpace(30);
 
-            AddDropdown(Locale.Get("K45_ADR_DISTRICT_NAME_FILE"), out m_roadNameFile, m_uiHelperDistrict, new string[0], OnChangeSelectedRoadName);
+            AddEmptyDropdown(Locale.Get("K45_ADR_DISTRICT_NAME_FILE"), out m_roadNameFile, m_uiHelperDistrict, OnChangeSelectedRoadName);
             AddButtonInEditorRow(m_roadNameFile, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, ReloadOptionsRoad, "K45_ADR_ROAD_NAME_FILES_RELOAD");
-            
-            AddDropdown(Locale.Get("K45_ADR_STREETS_PREFIXES_NAME_FILE"), out m_prefixesFile, m_uiHelperDistrict, new string[0], OnChangeSelectedRoadPrefix);
+
+            AddEmptyDropdown(Locale.Get("K45_ADR_STREETS_PREFIXES_NAME_FILE"), out m_prefixesFile, m_uiHelperDistrict, OnChangeSelectedRoadPrefix);
             AddButtonInEditorRow(m_prefixesFile, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, ReloadOptionsRoadPrefix, "K45_ADR_STREETS_PREFIXES_FILES_RELOAD");
-            
+
             AddIntField(Locale.Get("K45_ADR_DISTRICT_POSTAL_CODE"), out m_prefixPostalCodeDistrict, m_uiHelperDistrict, OnChangePostalCodePrefixDistrict, false);
             AddButtonInEditorRow(m_prefixPostalCodeDistrict, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Delete, ResetPostalCode, "K45_ADR_RESET_POSTAL_CODE", false, 30);
             m_prefixPostalCodeDistrict.maxLength = 3;

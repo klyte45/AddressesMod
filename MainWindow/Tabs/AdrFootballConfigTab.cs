@@ -97,10 +97,10 @@ namespace Klyte.Addresses.UI
 
         private void CreateTitleLabel(UIHelperExtension titleUiHelper, string content, float width) => titleUiHelper.AddLabel(content, width, true).textAlignment = UIHorizontalAlignment.Center;
 
-        private void CreateGroupFileSelect(string i18n, OnDropdownSelectionChanged onChanged, Action onReload, out UIDropDown dropDown)
+        private void CreateGroupFileSelect(string i18n, Action<int> onChanged, Action onReload, out UIDropDown dropDown)
         {
             isLoading = true;
-            AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperDistrict, new string[0], onChanged);
+            AddDropdown(Locale.Get(i18n), out dropDown, m_uiHelperDistrict, null, onChanged);
             AddButtonInEditorRow(dropDown, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, onReload, "K45_ADR_ROAD_NAME_FILES_RELOAD");
             onReload.Invoke();
             isLoading = false;

@@ -41,7 +41,7 @@ namespace Klyte.Addresses.UI
             var angle = AdrNeighborhoodExtension.GetAzimuth(m_id);
             var cityNameFixed = AdrNeighborhoodExtension.GetFixedName(m_id);
 
-            m_direction.text = CardinalPoint.GetCardinalPoint16(angle);
+            m_direction.text = CardinalPoint.GetCardinalPoint16LocalizedShort(angle);
             bool canTrust = true;
             var name = cityNameFixed ?? OutsideConnectionAIOverrides.GetNameBasedInAngle(angle, out canTrust);
             m_generatedName.text = name;

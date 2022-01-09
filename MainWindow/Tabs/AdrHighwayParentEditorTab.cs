@@ -6,6 +6,7 @@ using Klyte.Commons.Extensions;
 using Klyte.Commons.UI.SpriteNames;
 using Klyte.Commons.Utils;
 using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using static Klyte.Commons.UI.DefaultEditorUILib;
@@ -222,7 +223,11 @@ namespace Klyte.Addresses.UI
             AdrHighwayParentLibDataXml.Instance.Add(key, ref newItem);
         }
 
-        private string[] OnFilterLayouts(string input) => AdrHighwayParentLibDataXml.Instance.FilterBy(input);
+        private IEnumerator OnFilterLayouts(string input, Wrapper<string[]> result)
+        {
+            yield return 0;
+            AdrHighwayParentLibDataXml.Instance.FilterBy(input, result);
+        }
 
         private string OnConfigSelectionChange(string typed, int sel, string[] items)
         {

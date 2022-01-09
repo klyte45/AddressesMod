@@ -41,7 +41,7 @@ namespace Klyte.Addresses.UI
 
             m_uiHelperNeighbors = new UIHelperExtension(MainContainer);
 
-            AddDropdown(Locale.Get("K45_ADR_REGION_CITIES_FILE"), out m_neighborFileSelect, m_uiHelperNeighbors, new string[0], OnChangeSelectedNeighborFile);
+            AddEmptyDropdown(Locale.Get("K45_ADR_REGION_CITIES_FILE"), out m_neighborFileSelect, m_uiHelperNeighbors, OnChangeSelectedNeighborFile);
             AddButtonInEditorRow(m_neighborFileSelect, Commons.UI.SpriteNames.CommonsSpriteNames.K45_Reload, ReloadOptionsFilesNeighbor, "K45_ADR_ROAD_NAME_FILES_RELOAD");
 
 
