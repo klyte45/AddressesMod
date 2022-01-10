@@ -127,10 +127,10 @@ namespace Klyte.Addresses.Overrides
 
             if (format.Contains("{1}") || format.Contains("{2}") || format.Contains("{3}") || format.Contains("{4}") || format.Contains("{7}"))
             {
-                SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef, out _);
+                SegmentUtils.GetSegmentRoadEdges(segmentID, true, true, true, out ComparableRoad startRef, out ComparableRoad endRef, out ComparableRoad beforeStartRef, out ComparableRoad afterEndRef, out _);
 
-                ushort sourceSeg = startRef.segmentReference;
-                ushort targetSeg = endRef.segmentReference;
+                ushort sourceSeg = beforeStartRef.segmentReference;
+                ushort targetSeg = afterEndRef.segmentReference;
 
                 if (format.Contains("{1}"))
                 {
@@ -150,7 +150,7 @@ namespace Klyte.Addresses.Overrides
                 }
                 if (format.Contains("{3}") || format.Contains("{4}"))
                 {
-                    var seed = NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_nameSeed;
+                    var seed = NetManager.instance.m_segments.m_buffer[beforeStartRef.nodeReference].m_nameSeed;
                     MileageStartSource src = MileageStartSource.DEFAULT;
                     var offsetMeters = 0;
                     if (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(seed, out AdrNameSeedConfig seedConf))
@@ -159,7 +159,7 @@ namespace Klyte.Addresses.Overrides
                         offsetMeters = (int)seedConf.MileageOffset;
                     }
 
-                    float km = GetNumberAt(NetManager.instance.m_segments.m_buffer[startRef.segmentReference].m_startNode == startRef.nodeReference ? 1 : 0, startRef.segmentReference, src, offsetMeters, out _) / 1000f;
+                    float km = GetNumberAt(NetManager.instance.m_segments.m_buffer[beforeStartRef.segmentReference].m_startNode == startRef.nodeReference ? 1 : 0, beforeStartRef.segmentReference, src, offsetMeters, out _) / 1000f;
                     variables.sourceKm = km.ToString("0");
                     variables.sourceKmWithDecimal = km.ToString("0.0");
                 }
@@ -178,7 +178,7 @@ namespace Klyte.Addresses.Overrides
             }
             if (format.Contains("{5}") || format.Contains("{6}"))
             {
-                GetSegmentRoadEdges(segmentID, false, false, false, out ComparableRoad startRef, out ComparableRoad endRef, out _);
+                GetSegmentRoadEdges(segmentID, false, false, false, out _, out _, out ComparableRoad startRef, out ComparableRoad endRef, out _);
                 if (format.Contains("{5}"))//source district
                 {
                     variables.sourceDistrict = GetDistrictAt(startRef);
