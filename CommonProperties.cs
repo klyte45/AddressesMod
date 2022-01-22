@@ -1,4 +1,5 @@
 using Klyte.Addresses;
+using UnityEngine;
 
 namespace Klyte.Commons
 {
@@ -16,5 +17,9 @@ namespace Klyte.Commons
         public static string[] AssetExtraFileNames => null;
 
         public static string[] AssetExtraDirectoryNames => null;
+
+        public static float UIScale { get; } = 1f;
+        public static Color ModColor { get; } = new Color32(8, 70, 0, 255);
+        public static MonoBehaviour Controller => AddressesMod.Controller;
     }
 }

@@ -87,6 +87,9 @@ namespace Klyte.Addresses.ModShared
             GetHighwayTypeData(out detachedStr, out shortCode, out longCode, cachedParent, "XXX");
             return true;
         }
+
+        public static float GetDistanceFromReference(ushort segmentId) => (GetStartPoint() - VectorUtils.XZ(NetManager.instance.m_segments.m_buffer[segmentId].m_middlePosition)).magnitude;
+
         public static bool GetSeedHighwayParameters(ushort seedId, out string layoutName, out string detachedStr, out string hwIdentifier, out string shortCode, out string longCode, out Color hwColor)
         {
             detachedStr = null;
@@ -133,6 +136,13 @@ namespace Klyte.Addresses.ModShared
             var usedQueue = new List<ushort>();
             NetManagerOverrides.GenerateSegmentNameInternal(segmentId, ref result, ref usedQueue, true);
             return result.IsNullOrWhiteSpace() ? GetStreetFull(segmentId).Trim() : GetStreetFull(segmentId).Replace(result, "").Trim();
+        }
+        public static byte GetStreetDirection(ushort segmentId)
+        {
+            string result = "";
+            var usedQueue = new List<ushort>();
+            NetManagerOverrides.GenerateSegmentNameInternal(segmentId, ref result, ref usedQueue, true);
+            return SegmentUtils.GetCardinalDirectionSegment(segmentId, (AdrNameSeedDataXml.Instance.NameSeedConfigs.TryGetValue(NetManager.instance.m_segments.m_buffer[segmentId].m_nameSeed, out AdrNameSeedConfig seedConf)) ? seedConf.HighwayAxis : SegmentUtils.MileageStartSource.DEFAULT);
         }
 
         public static Color GetDistrictColor(ushort districtId)

@@ -140,7 +140,7 @@ namespace Klyte.Addresses.UI
 
         public void SetCurrentSelectionNewName(string newName)
         {
-            AdrHighwayParentLibDataXml.Instance.Add(newName, ref EditingInstance);
+            AdrHighwayParentLibDataXml.Instance.Add(newName, EditingInstance);
             m_configList.text = newName;
         }
 
@@ -204,7 +204,7 @@ namespace Klyte.Addresses.UI
                               {
                                   m_configurationSource = ConfigurationSource.CITY
                               };
-                              AdrHighwayParentLibDataXml.Instance.Add(text, ref newModel);
+                              AdrHighwayParentLibDataXml.Instance.Add(text, newModel);
                               m_configList.text = ExecuteItemChange(text, true);
                           }
                           else
@@ -220,7 +220,7 @@ namespace Klyte.Addresses.UI
         {
             AdrHighwayParentXml newItem = XmlUtils.DefaultXmlDeserialize<AdrHighwayParentXml>(data);
             newItem.m_configurationSource = ConfigurationSource.CITY;
-            AdrHighwayParentLibDataXml.Instance.Add(key, ref newItem);
+            AdrHighwayParentLibDataXml.Instance.Add(key, newItem);
         }
 
         private IEnumerator OnFilterLayouts(string input, Wrapper<string[]> result)
